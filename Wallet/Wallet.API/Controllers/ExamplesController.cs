@@ -24,9 +24,9 @@ namespace Wallet.API.Controllers
 
         // JUST AN EXAMPLE !! DELETE IT LATER
         [HttpGet]
-        public IEnumerable<Users> Get()
+        public IEnumerable<Transactions> Get()
         {
-            return _context.Users.ToList();
+            return _context.Transactions.ToList();
         }
         // JUST AN EXAMPLE !! DELETE IT LATER
 

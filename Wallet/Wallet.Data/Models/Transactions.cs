@@ -12,6 +12,8 @@ namespace Wallet.Data.Models
         public int Id { get; set; }
         public double Amount { get; set; }
         public string Concept { get; set; }
+        public DateTime Date { get; set; }
+        public string Type { get; set; }
         public int AccountId { get; set; }
 
         public virtual Accounts Account { get; set; }

@@ -13,8 +13,8 @@ namespace Wallet.Data.Models
         public double Amount { get; set; }
         public DateTime CreationDate { get; set; }
         public DateTime? ClosingDate { get; set; }
-        public int UserId { get; set; }
+        public int AccountId { get; set; }
 
-        public virtual Users User { get; set; }
+        public virtual Accounts Account { get; set; }
     }
 }
