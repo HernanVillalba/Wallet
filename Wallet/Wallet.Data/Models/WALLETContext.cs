@@ -29,7 +29,7 @@ namespace Wallet.Data.Models
             if (!optionsBuilder.IsConfigured)
             {
                 optionsBuilder.UseSqlServer("name=WalletDB");
-            }
+        }
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -87,13 +87,11 @@ namespace Wallet.Data.Models
                     .WithMany(p => p.Transactions)
                     .HasForeignKey(d => d.AccountId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK__Transacti__Accou__2E1BDC42");
             });
 
             modelBuilder.Entity<Users>(entity =>
             {
                 entity.HasIndex(e => e.Email)
-                    .HasName("UQ__Users__A9D105349C6B86D8")
                     .IsUnique();
 
                 entity.Property(e => e.Email)
