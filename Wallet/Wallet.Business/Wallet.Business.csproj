@@ -4,4 +4,8 @@
     <TargetFramework>netstandard2.0</TargetFramework>
   </PropertyGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\Wallet.Data\Wallet.Data.csproj" />
+  </ItemGroup>
+
 </Project>

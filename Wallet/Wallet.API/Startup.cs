@@ -13,6 +13,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Wallet.Data.Models;
+using Wallet.Data.Repositories;
+using Wallet.Data.Repositories.Interfaces;
 
 namespace Wallet.API
 {
@@ -36,6 +38,10 @@ namespace Wallet.API
             });
             services.AddDbContext<WALLETContext>(options =>
                 options.UseSqlServer(Configuration.GetConnectionString("WalletDB")));
+            services.AddTransient(typeof(IGenericRepository<>), typeof(GenericRepository<>));
+            services.AddTransient<IUserRepository, UserRepository>();
+            services.AddTransient<IUnitOfWork, UnitOfWork>();
+
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
