@@ -86,7 +86,7 @@ namespace Wallet.Data.Models
                 entity.HasOne(d => d.Account)
                     .WithMany(p => p.Transactions)
                     .HasForeignKey(d => d.AccountId)
-                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .OnDelete(DeleteBehavior.ClientSetNull);
             });
 
             modelBuilder.Entity<Users>(entity =>
