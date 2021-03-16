@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using AutoMapper;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
@@ -15,11 +16,13 @@ namespace Wallet.API.Controllers
     {
         private readonly WALLETContext _context;
         private readonly IUnitOfWork _unitOfWork;
+        private readonly IMapper _mapper;
 
-        public ExamplesController(WALLETContext context, IUnitOfWork unitOfWork)
+        public ExamplesController(WALLETContext context, IUnitOfWork unitOfWork, IMapper mapper)
         {
             _context = context;
             _unitOfWork = unitOfWork;
+            _mapper = mapper;
         }
 
         // JUST AN EXAMPLE !! DELETE IT LATER
@@ -36,6 +39,13 @@ namespace Wallet.API.Controllers
         //{
         //    var users = await _unitOfWork.Users.GetAllAsync();
         //    return Ok(users);
+        //}
+
+        //MAPPER EXAMPLE
+        //public void Index()
+        //{
+        //    Examples example = new example();
+        //    ExampleViewModel exampleViewModel = _mapper.Map<ExampleViewModel>(example);
         //}
     }
 }
