@@ -31,11 +31,11 @@ namespace Wallet.API.Controllers
         // JUST AN EXAMPLE !! DELETE IT LATER
 
         //Unit of work example
-        [HttpGet]
-        public async Task<IActionResult> GetUsersAsync()
-        {
-            var users = await _unitOfWork.Users.GetAllAsync();
-            return Ok(users);
-        }
+        //[HttpGet]
+        //public async Task<IActionResult> GetUsersAsync()
+        //{
+        //    var users = await _unitOfWork.Users.GetAllAsync();
+        //    return Ok(users);
+        //}
     }
 }
