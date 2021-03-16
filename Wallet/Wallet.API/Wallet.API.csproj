@@ -5,6 +5,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="3.1.13">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
     <PackageReference Include="Swashbuckle.AspNetCore" Version="5.6.3" />
   </ItemGroup>
 
@@ -14,6 +18,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Wallet.Business\Wallet.Business.csproj" />
+    <ProjectReference Include="..\Wallet.Data\Wallet.Data.csproj" />
   </ItemGroup>
 
 </Project>
