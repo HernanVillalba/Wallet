@@ -26,6 +26,10 @@ namespace Wallet.Data.Models
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
+            if (!optionsBuilder.IsConfigured)
+            {
+                optionsBuilder.UseSqlServer("name=WalletDB");
+        }
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -45,6 +49,8 @@ namespace Wallet.Data.Models
 
             modelBuilder.Entity<FixedTermDeposit>(entity =>
             {
+                entity.Property(e => e.AccountId).HasColumnName("Account_Id");
+
                 entity.Property(e => e.ClosingDate)
                     .HasColumnName("Closing_Date")
                     .HasColumnType("datetime");
@@ -54,13 +60,11 @@ namespace Wallet.Data.Models
                     .HasColumnType("datetime")
                     .HasDefaultValueSql("(getdate())");
 
-                entity.Property(e => e.UserId).HasColumnName("User_Id");
-
-                entity.HasOne(d => d.User)
+                entity.HasOne(d => d.Account)
                     .WithMany(p => p.FixedTermDeposit)
-                    .HasForeignKey(d => d.UserId)
+                    .HasForeignKey(d => d.AccountId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK__FixedTerm__User___30F848ED");
+                    .HasConstraintName("FK__FixedTerm__Accou__32E0915F");
             });
 
             modelBuilder.Entity<Transactions>(entity =>
@@ -71,17 +75,23 @@ namespace Wallet.Data.Models
                     .IsRequired()
                     .HasMaxLength(50);
 
+                entity.Property(e => e.Date)
+                    .HasColumnType("datetime")
+                    .HasDefaultValueSql("(getdate())");
+
+                entity.Property(e => e.Type)
+                    .IsRequired()
+                    .HasMaxLength(10);
+
                 entity.HasOne(d => d.Account)
                     .WithMany(p => p.Transactions)
                     .HasForeignKey(d => d.AccountId)
-                    .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK__Transacti__Accou__2C3393D0");
+                    .OnDelete(DeleteBehavior.ClientSetNull);
             });
 
             modelBuilder.Entity<Users>(entity =>
             {
                 entity.HasIndex(e => e.Email)
-                    .HasName("UQ__Users__A9D10534052A20DD")
                     .IsUnique();
 
                 entity.Property(e => e.Email)
