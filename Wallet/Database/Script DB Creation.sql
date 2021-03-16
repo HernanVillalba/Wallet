@@ -20,6 +20,8 @@ CREATE TABLE Transactions(
 Id int not null identity(1,1) primary key,
 Amount float not null check(Amount>0),
 Concept nvarchar(50) not null,
+Date Datetime not null,
+Type nvarchar(10) not null CHECK(Type='Topup' or Type='Payment'),
 Account_Id int not null foreign key references Accounts(Id)
 )
 GO
@@ -28,5 +30,5 @@ Id int not null identity(1,1) primary key,
 Amount float not null check(Amount>0),
 Creation_Date Datetime not null DEFAULT(GETDATE()),
 Closing_Date Datetime null,
-User_Id int not null FOREIGN KEY REFERENCES Users(Id)
+Account_Id int not null FOREIGN KEY REFERENCES Accounts(Id)
 )
