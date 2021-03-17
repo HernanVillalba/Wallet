@@ -2,7 +2,7 @@
 
 namespace Wallet.Data.Repositories.Interfaces
 {
-    public interface IFixedTermDepositRepository : IGenericRepository<FixedTermDepositRepository>
+    public interface IFixedTermDepositRepository : IGenericRepository<FixedTermDeposit>
     {
 
     }
