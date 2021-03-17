@@ -68,10 +68,6 @@ namespace Wallet.API.Controllers
                 {
                     var secretKey = _configuration.GetValue<string>("SecretKey");
                     var key = Encoding.ASCII.GetBytes(secretKey);
-                    var claims = new Claim[]{
-                        new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
-                     };
-
                     var tokenDescriptor = new SecurityTokenDescriptor
                     {
                         Subject = new ClaimsIdentity(new Claim[]
