@@ -49,11 +49,11 @@ namespace Wallet.API.Controllers
         //}
 
         //Get User Id example
-        [HttpGet]
-        public IActionResult GetId()
-        {
-            var id = int.Parse(User.Claims.First(i => i.Type == "UserId").Value);
-            return Ok(id);
-        }
+        //[HttpGet]
+        //public IActionResult GetId()
+        //{
+        //    var id = int.Parse(User.Claims.First(i => i.Type == "UserId").Value);
+        //    return Ok(id);
+        //}
     }
 }
