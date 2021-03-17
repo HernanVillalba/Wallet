@@ -47,5 +47,13 @@ namespace Wallet.API.Controllers
         //    Examples example = new example();
         //    ExampleViewModel exampleViewModel = _mapper.Map<ExampleViewModel>(example);
         //}
+
+        //Get User Id example
+        [HttpGet]
+        public IActionResult GetId()
+        {
+            var id = int.Parse(User.Claims.First(i => i.Type == "UserId").Value);
+            return Ok(id);
+        }
     }
 }
