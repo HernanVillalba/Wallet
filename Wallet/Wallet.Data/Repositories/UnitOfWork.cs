@@ -11,8 +11,10 @@ namespace Wallet.Data.Repositories
         {
             _context = context;
             Users = new UserRepository(_context);
+            Transactions = new TrasactionRepository(_context);
         }
         public IUserRepository Users { get; set; }
+        public ITransactionRepository Transactions { get; set; }
         public async Task<int> Complete()
         {
             return await _context.SaveChangesAsync();
