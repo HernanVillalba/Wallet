@@ -40,6 +40,7 @@ namespace Wallet.API
                 options.UseSqlServer(Configuration.GetConnectionString("WalletDB")));
             services.AddTransient(typeof(IGenericRepository<>), typeof(GenericRepository<>));
             services.AddTransient<IUserRepository, UserRepository>();
+            services.AddTransient<ITransactionRepository, TrasactionRepository>();
             services.AddTransient<IUnitOfWork, UnitOfWork>();
             services.AddAutoMapper(typeof(Startup));
 
