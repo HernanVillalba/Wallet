@@ -15,6 +15,11 @@ namespace Wallet.Data.Repositories
             return _context.Users.Any(user => user.Email == email);
         }
 
+        public Users FindUser(string email)
+        {
+            return _context.Users.FirstOrDefault(user => user.Email == email);
+        }
+
         public async Task AddAccounts(Users user)
         {
             Accounts ars = new Accounts
@@ -28,8 +33,8 @@ namespace Wallet.Data.Repositories
                 UserId = user.Id
             };
             user.Accounts.Add(usd);
-            user.Accounts.Add(ars);
-            await _context.SaveChangesAsync();
+            user.Accounts.Add(ars);               
+            await _context.SaveChangesAsync();            
         }
     }
 }
