@@ -7,6 +7,7 @@ using Wallet.API.Models;
 using Wallet.Data.Models;
 using Wallet.Data.Repositories.Interfaces;
 using Wallet.Business.Operations;
+using AutoMapper;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -17,15 +18,18 @@ namespace Wallet.API.Controllers
     public class AccessController : ControllerBase
     {
         private readonly IUnitOfWork _unitOfWork;
+        private readonly IMapper _mapper;
 
-        public AccessController(IUnitOfWork unitOfWork)
+        public AccessController(IUnitOfWork unitOfWork, IMapper mapper)
         {
             _unitOfWork = unitOfWork;
+            _mapper = mapper;
         }
 
         [HttpPost]
-        public async Task<IActionResult> Register([FromBody]Users user)
+        public async Task<IActionResult> Register([FromBody]RegisterModel newUser)
         {
+            Users user = _mapper.Map<Users>(newUser);
             if (!_unitOfWork.Users.FindEmail(user.Email))
             {
                 try

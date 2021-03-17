@@ -3,6 +3,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Wallet.API.Models;
+using Wallet.Data.Models;
 
 namespace Wallet.API.Profiles
 {
@@ -12,6 +14,7 @@ namespace Wallet.API.Profiles
         {
             //Agregar mapeos necesarios acá:
             //CreateMap<Example, ExampleViewModel>();
+            CreateMap<Users, RegisterModel>().ReverseMap();
         }
     }
 }

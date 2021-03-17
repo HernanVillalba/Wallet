@@ -9,9 +9,6 @@ namespace Wallet.API.Models
     public class RegisterModel
     {
         [Required]
-        public int Id { get; set; }
-
-        [Required]
         public string FirstName { get; set; }
 
         [Required]
