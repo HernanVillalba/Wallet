@@ -45,6 +45,7 @@ namespace Wallet.API
             services.AddTransient<IUserRepository, UserRepository>();
             services.AddTransient<ITransactionRepository, TrasactionRepository>();
             services.AddTransient<IFixedTermDepositRepository, FixedTermDepositRepository>();
+            services.AddTransient<IAccountRepository, AccountRepository>();
             services.AddTransient<IUnitOfWork, UnitOfWork>();
             services.AddAutoMapper(typeof(Startup));
 

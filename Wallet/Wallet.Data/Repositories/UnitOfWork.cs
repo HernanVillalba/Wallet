@@ -13,10 +13,12 @@ namespace Wallet.Data.Repositories
             Users = new UserRepository(_context);
             Transactions = new TrasactionRepository(_context);
             FixedTermDeposits = new FixedTermDepositRepository(_context);
+            Accounts = new AccountRepository(_context);
         }
         public IUserRepository Users { get; set; }
         public ITransactionRepository Transactions { get; set; }
         public IFixedTermDepositRepository FixedTermDeposits { get; set; }
+        public IAccountRepository Accounts { get; set; }
         public async Task<int> Complete()
         {
             return await _context.SaveChangesAsync();
