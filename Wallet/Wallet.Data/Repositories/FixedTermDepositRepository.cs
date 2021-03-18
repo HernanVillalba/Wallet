@@ -1,4 +1,7 @@
-﻿using Wallet.Data.Models;
+﻿using Microsoft.EntityFrameworkCore;
+using System.Collections.Generic;
+using System.Linq;
+using Wallet.Data.Models;
 using Wallet.Data.Repositories.Interfaces;
 
 namespace Wallet.Data.Repositories
@@ -7,6 +10,9 @@ namespace Wallet.Data.Repositories
     {
         public FixedTermDepositRepository(WALLETContext context) : base(context) {}
 
-
+        public IEnumerable<FixedTermDeposit> ExecuteStoredProcedure(string stored_procedure)
+        {
+            return _context.FixedTermDeposit.FromSqlRaw("EXEC " + stored_procedure);
+        }
     }
 }
