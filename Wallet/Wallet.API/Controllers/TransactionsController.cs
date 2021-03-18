@@ -5,6 +5,7 @@ using Wallet.Data.Repositories.Interfaces;
 using Wallet.Data.Models;
 using System;
 using System.Threading.Tasks;
+using System.Linq;
 
 namespace Wallet.API.Controllers
 {
@@ -20,16 +21,20 @@ namespace Wallet.API.Controllers
             _mapper = mapper;
         }
 
-        [HttpPost]
-        public IActionResult GetAllTransactions()
+        [HttpGet]
+        public IActionResult GetAll()
         {
-            //tengo que saber el id del user traido desde el login, por ahora lista todas las transacciones
-            //asignando su id a mano.
-            var user_id = 1;
-            string SP = "TRANSACTIONS_USER " + user_id;
-            var transactions = _unitOfWork.Transactions.SP_ListTransactions(SP, user_id);
-            if (transactions != null) { return Ok(transactions); }
-            else { return BadRequest(); }
+            try
+            {
+                //tengo que saber el id del user traido desde el login, por ahora lista todas las transacciones
+                //asignando su id a mano.
+                var user_id = 1;
+                string SP = "SP_GetTransactionsUser " + user_id;
+                var transactions = _unitOfWork.Transactions.SP_GetTransactionsUser(SP, user_id);
+                if (transactions != null) { return Ok(transactions); }
+                else { return BadRequest(); }
+            }
+            catch (Exception ex) { return BadRequest(ex.Message); }
         }
 
         [HttpPost("Create")]
@@ -41,6 +46,7 @@ namespace Wallet.API.Controllers
                 {
                     //el type tiene que ser topup o payment
                     //tengo que saber el id de la account del user en ARS. Por ahora la asigno a mano mas abajo porque la sé.
+                    var id_user = int.Parse(User.Claims.First(i => i.Type == "UserId").Value);
                     Transactions transaction = _mapper.Map<Transactions>(NewTransaction);
                     transaction.AccountId = 1; //acá
                     _unitOfWork.Transactions.Insert(transaction);
@@ -55,5 +61,28 @@ namespace Wallet.API.Controllers
             else { return BadRequest(); }
         }
 
+        [HttpPatch("Edit/{id}")]
+        public async Task<IActionResult> Edit(int? id, [FromBody] TransactionModel NewTransaction)
+        {
+            if (id == null || id <= 0)
+            {
+                return BadRequest();
+            }
+            //falta obtener los id de la cuenta en usd y ars del usuario con su id
+            int USD_account_id = 1, ARS_account_id = 2;
+            var transaction_buscada = _unitOfWork.Transactions.FindTransaction((int)id, USD_account_id, ARS_account_id);
+            if (!ModelState.IsValid || transaction_buscada == null) { return BadRequest(); }
+            else
+            {
+                try
+                {
+                    transaction_buscada.Concept = NewTransaction.Concept;
+                    _unitOfWork.Transactions.Update(transaction_buscada);
+                    await _unitOfWork.Complete();
+                    return Ok();
+                }
+                catch (Exception ex) { return BadRequest(ex.Message); }
+            }
+        }
     }
 }
