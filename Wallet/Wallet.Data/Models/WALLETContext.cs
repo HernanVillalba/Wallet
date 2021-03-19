@@ -23,13 +23,13 @@ namespace Wallet.Data.Models
         public virtual DbSet<FixedTermDeposit> FixedTermDeposit { get; set; }
         public virtual DbSet<Transactions> Transactions { get; set; }
         public virtual DbSet<Users> Users { get; set; }
+        public virtual DbSet<AccountBalance> AccountBalance { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             if (!optionsBuilder.IsConfigured)
             {
-                optionsBuilder.UseSqlServer("name=WalletDB");
-        }
+            }
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -110,6 +110,8 @@ namespace Wallet.Data.Models
 
                 entity.Property(e => e.Password).IsRequired();
             });
+
+            modelBuilder.Entity<AccountBalance>().HasNoKey();
 
             OnModelCreatingPartial(modelBuilder);
         }

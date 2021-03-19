@@ -2,7 +2,7 @@ USE WALLET
 
 GO
 
-CREATE PROCEDURE SP_GetTransactionsUser(
+CREATE OR ALTER PROCEDURE SP_GetTransactionsUser(
 	 @user_id int
 )
 AS
@@ -22,7 +22,7 @@ END
 
 GO
 
-CREATE PROCEDURE SP_GetUserFixedTermDeposit (@user_id int)
+CREATE OR ALTER PROCEDURE SP_GetUserFixedTermDeposit (@user_id int)
 AS
 BEGIN
 
@@ -32,4 +32,32 @@ WHERE FixedTermDeposit.Account_Id IN
 	 WHERE Accounts.User_Id = @user_id)
 ORDER BY FixedTermDeposit.Creation_Date DESC
 
+END
+
+GO
+
+CREATE OR ALTER PROCEDURE SP_Balance(
+	@user_id int,
+	@currency nvarchar(MAX)
+)
+AS
+BEGIN
+	SELECT 
+		ISNULL((
+		SELECT sum(Amount)
+		FROM Transactions AS t
+		JOIN Accounts AS a ON t.Account_Id = a.Id
+		WHERE a.Currency = @currency
+			AND t.Type = 'Topup'
+			AND a.User_Id = @user_id
+		), 0) - 
+		ISNULL((
+		SELECT sum(Amount)
+		FROM Transactions AS t
+		JOIN Accounts AS a ON t.Account_Id = a.Id
+		WHERE a.Currency = @currency
+			AND t.Type = 'Payment'
+			AND a.User_Id = @user_id
+		), 0)
+	 AS Balance
 END
