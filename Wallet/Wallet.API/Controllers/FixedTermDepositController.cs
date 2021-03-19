@@ -63,7 +63,12 @@ namespace Wallet.API.Controllers
                     // Must determine if there is enough balance in the account to afford the fixed term deposit opening
 
                     // We need first the currency to call the stored procedure which calculates the balance
-                    string currency = _unitOfWork.Accounts.GetById(fixedTermDeposit.AccountId).Currency;
+                    var account = _unitOfWork.Accounts.GetById(fixedTermDeposit.AccountId);
+                    if(account == null)
+                    {
+                        return BadRequest("Cuenta inexistente.");
+                    }
+                    string currency = account.Currency;
 
                     // Execute the respective stored procedure to get the balance
                     var balance = _unitOfWork.Accounts.GetAccountBalance(userId, currency);
