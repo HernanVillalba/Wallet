@@ -13,6 +13,12 @@ namespace Wallet.Data.Repositories
     {
         public AccountRepository(WALLETContext context) : base(context)
         {
-        }        
+        }
+
+        public double GetAccountBalance(int id, string currency)
+        {
+            var balance = _context.AccountBalance.FromSqlRaw($"EXEC SP_Balance {id}, {currency}").ToList();
+            return balance[0].Balance;
+        }
     }
 }
