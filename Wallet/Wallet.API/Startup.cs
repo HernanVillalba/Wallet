@@ -48,6 +48,8 @@ namespace Wallet.API
             services.AddTransient<IAccountRepository, AccountRepository>();
             services.AddTransient<IUnitOfWork, UnitOfWork>();
             services.AddAutoMapper(typeof(Startup));
+            services.AddControllers().AddNewtonsoftJson(options => options
+                    .SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore);
 
             var key = Encoding.ASCII.GetBytes(Configuration.GetValue<string>("SecretKey"));
             services.AddAuthentication(x =>
