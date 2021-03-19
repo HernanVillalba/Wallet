@@ -22,3 +22,14 @@ END
 
 GO
 
+CREATE PROCEDURE SP_GetUserFixedTermDeposit (@user_id int)
+AS
+BEGIN
+
+SELECT * FROM FixedTermDeposit
+WHERE FixedTermDeposit.Account_Id IN 
+	(SELECT Accounts.Id FROM Accounts 
+	 WHERE Accounts.User_Id = @user_id)
+ORDER BY FixedTermDeposit.Creation_Date DESC
+
+END
