@@ -7,5 +7,6 @@ namespace Wallet.Data.Repositories.Interfaces
 {
     public interface IAccountRepository : IGenericRepository<Accounts>
     {
+        double GetAccountBalance(int id, string currency);
     }
 }
