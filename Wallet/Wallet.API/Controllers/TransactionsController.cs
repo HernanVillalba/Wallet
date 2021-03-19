@@ -5,6 +5,8 @@ using Wallet.Data.Repositories.Interfaces;
 using Wallet.Data.Models;
 using System;
 using System.Threading.Tasks;
+using System.Collections.Generic;
+using System.Linq;
 using System.Linq;
 using Microsoft.AspNetCore.Authorization;
 
@@ -26,6 +28,14 @@ namespace Wallet.API.Controllers
         [HttpGet]
         public IActionResult GetAll()
         {
+            //tengo que saber el id del user traido desde el login, por ahora lista todas las transacciones
+            //asignando su id a mano.
+            var user_id = 1;
+            string SP = "SP_ListTransactionsByUser " + user_id;
+            var transactions = _unitOfWork.Transactions.SP_TrasactionsByUser(SP, user_id);
+            if (transactions != null) { return Ok(transactions); }
+            else { return BadRequest(); }
+        }
             try
             {
                 var user_id = int.Parse(User.Claims.First(i => i.Type == "UserId").Value);
@@ -64,6 +74,27 @@ namespace Wallet.API.Controllers
             else { return BadRequest(); }
         }
 
+        [HttpPost("Edit/{id}")]
+        public async Task<IActionResult> Edit(int? id, [FromBody] TransactionModel NewTransaction)
+        {
+            //var transaction_buscada = _unitOfWork.
+            if (!ModelState.IsValid || id == null || id <= 0) { return BadRequest(); }
+            else
+            {
+                try
+                {
+                    var transaction = _unitOfWork.Transactions.GetById((int)id);
+                    if (transaction == null) { return BadRequest(); }
+                    transaction.Concept = NewTransaction.Concept;
+                    _unitOfWork.Transactions.Update(transaction);
+                    await _unitOfWork.Complete();
+                    return Ok();
+                }
+                catch (Exception ex) { return BadRequest(ex.Message); }
+            }
+        }
+
+    }
         [HttpPatch("Edit/{id}")]
         public async Task<IActionResult> Edit(int? id, [FromBody] TransactionEditModel NewTransaction)
         {
