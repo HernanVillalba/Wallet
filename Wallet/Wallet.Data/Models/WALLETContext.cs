@@ -44,7 +44,7 @@ namespace Wallet.Data.Models
                     .WithMany(p => p.Accounts)
                     .HasForeignKey(d => d.UserId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK__Accounts__User_I__2D27B809");
+                    .HasConstraintName("FK__Accounts__User_I__286302EC");
             });
 
             modelBuilder.Entity<FixedTermDeposit>(entity =>
@@ -64,7 +64,7 @@ namespace Wallet.Data.Models
                     .WithMany(p => p.FixedTermDeposit)
                     .HasForeignKey(d => d.AccountId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK__FixedTerm__Accou__2E1BDC42");
+                    .HasConstraintName("FK__FixedTerm__Accou__32E0915F");
             });
 
             modelBuilder.Entity<Transactions>(entity =>
@@ -86,14 +86,12 @@ namespace Wallet.Data.Models
                 entity.HasOne(d => d.Account)
                     .WithMany(p => p.Transactions)
                     .HasForeignKey(d => d.AccountId)
-                    .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK__Transacti__Accou__2F10007B");
+                    .OnDelete(DeleteBehavior.ClientSetNull);
             });
 
             modelBuilder.Entity<Users>(entity =>
             {
                 entity.HasIndex(e => e.Email)
-                    .HasName("UQ__Users__A9D10534B060BDB9")
                     .IsUnique();
 
                 entity.Property(e => e.Email)
