@@ -29,11 +29,10 @@ namespace Wallet.API.Controllers
             try
             {
                 var user_id = int.Parse(User.Claims.First(i => i.Type == "UserId").Value);
-                //int user_id = 4;
                 string SP = "SP_GetTransactionsUser " + user_id;
-                var transactions = _unitOfWork.Transactions.SP_GetTransactionsUser(SP, user_id);
+                var list_transactions = _unitOfWork.Transactions.SP_GetTransactionsUser(SP, user_id);
 
-                if (transactions != null) { return Ok(transactions); }
+                if (list_transactions != null) { return Ok(list_transactions); }
                 else { return BadRequest("No hay transacciones para mostrar"); }
             }
             catch (Exception ex) { return BadRequest(ex.Message); }
@@ -52,7 +51,7 @@ namespace Wallet.API.Controllers
 
                     Transactions transaction = _mapper.Map<Transactions>(NewTransaction);
                     transaction.AccountId = ARS_account_id;
-                    
+
                     _unitOfWork.Transactions.Insert(transaction);
                     await _unitOfWork.Complete();
                     return Ok();
@@ -113,5 +112,29 @@ namespace Wallet.API.Controllers
             }
             else { return BadRequest("No se encontraron las cuentas del usuario"); }
         }
+
+        [HttpPost("Filter")]
+        public IActionResult Filter([FromBody] TransactionSearchModel transaction)
+        {
+            if (transaction != null)
+            {
+                try
+                {
+                    if (transaction.AccountId == null)
+                    {
+                        var user_id = int.Parse(User.Claims.First(i => i.Type == "UserId").Value);
+                        transaction.AccountId = _unitOfWork.Accounts.GetAccountId(user_id, "ARS");
+                    }
+                    Transactions transactionDB = _mapper.Map<Transactions>(transaction);
+                    transactionDB = _unitOfWork.Transactions.FilterTransaction(transactionDB);
+
+                    if (transaction != null) { return Ok(transactionDB); }
+                    else { return BadRequest("No se encontró la transacción"); }
+                }
+                catch (Exception ex) { return BadRequest(ex.Message); }
+            }
+            else { return BadRequest(); }
+        }
     }
+
 }
