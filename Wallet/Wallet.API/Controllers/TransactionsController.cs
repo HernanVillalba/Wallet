@@ -7,11 +7,11 @@ using System;
 using System.Threading.Tasks;
 using System.Collections.Generic;
 using System.Linq;
-using System.Linq;
 using Microsoft.AspNetCore.Authorization;
 
 namespace Wallet.API.Controllers
 {
+
     [Authorize]
     [Route("api/[controller]")]
     [ApiController]
@@ -28,14 +28,6 @@ namespace Wallet.API.Controllers
         [HttpGet]
         public IActionResult GetAll()
         {
-            //tengo que saber el id del user traido desde el login, por ahora lista todas las transacciones
-            //asignando su id a mano.
-            var user_id = 1;
-            string SP = "SP_ListTransactionsByUser " + user_id;
-            var transactions = _unitOfWork.Transactions.SP_TrasactionsByUser(SP, user_id);
-            if (transactions != null) { return Ok(transactions); }
-            else { return BadRequest(); }
-        }
             try
             {
                 var user_id = int.Parse(User.Claims.First(i => i.Type == "UserId").Value);
@@ -73,37 +65,12 @@ namespace Wallet.API.Controllers
             }
             else { return BadRequest(); }
         }
-
-        [HttpPost("Edit/{id}")]
-        public async Task<IActionResult> Edit(int? id, [FromBody] TransactionModel NewTransaction)
-        {
-            //var transaction_buscada = _unitOfWork.
-            if (!ModelState.IsValid || id == null || id <= 0) { return BadRequest(); }
-            else
-            {
-                try
-                {
-                    var transaction = _unitOfWork.Transactions.GetById((int)id);
-                    if (transaction == null) { return BadRequest(); }
-                    transaction.Concept = NewTransaction.Concept;
-                    _unitOfWork.Transactions.Update(transaction);
-                    await _unitOfWork.Complete();
-                    return Ok();
-                }
-                catch (Exception ex) { return BadRequest(ex.Message); }
-            }
-        }
-
-    }
         [HttpPatch("Edit/{id}")]
         public async Task<IActionResult> Edit(int? id, [FromBody] TransactionEditModel NewTransaction)
         {
-            if (id == null || id <= 0)
-            {
-                return BadRequest();
-            }
-            var user_id = int.Parse(User.Claims.First(i => i.Type == "UserId").Value);
+            if (id == null || id <= 0) { return BadRequest(); }
 
+            var user_id = int.Parse(User.Claims.First(i => i.Type == "UserId").Value);
             int USD_account_id = _unitOfWork.Accounts.GetAccountId(user_id, "USD");
             int ARS_account_id = _unitOfWork.Accounts.GetAccountId(user_id, "ARS");
             var transaction_buscada = _unitOfWork.Transactions.FindTransaction((int)id, USD_account_id, ARS_account_id);
@@ -125,7 +92,7 @@ namespace Wallet.API.Controllers
         [HttpGet("Details/{id}")]
         public IActionResult Details(int? id)
         {
-            if (id == null || id <= 0) { return BadRequest(); }
+            if (id == null || id <= 0) { return BadRequest("Id no válido"); }
 
             var user_id = int.Parse(User.Claims.First(i => i.Type == "UserId").Value);
 
@@ -147,19 +114,24 @@ namespace Wallet.API.Controllers
         [HttpPost("Filter")]
         public IActionResult Filter([FromBody] TransactionSearchModel transaction)
         {
-            if (transaction != null)
+            if (ModelState.IsValid)
             {
                 try
                 {
-                    if (transaction.AccountId == null)
-                    {
-                        var user_id = int.Parse(User.Claims.First(i => i.Type == "UserId").Value);
-                        transaction.AccountId = _unitOfWork.Accounts.GetAccountId(user_id, "ARS");
-                    }
-                    Transactions transactionDB = _mapper.Map<Transactions>(transaction);
-                    transactionDB = _unitOfWork.Transactions.FilterTransaction(transactionDB);
+                    var user_id = int.Parse(User.Claims.First(i => i.Type == "UserId").Value);
 
-                    if (transaction != null) { return Ok(transactionDB); }
+                    int ARS_account_id = _unitOfWork.Accounts.GetAccountId(user_id, "ARS");
+                    int USD_account_id = _unitOfWork.Accounts.GetAccountId(user_id, "USD");
+
+                    //si el id de account es null o menor a 0 se asume que busca en pesos
+                    if (transaction.AccountId == null || transaction.AccountId <= 0 ||
+                        (transaction.AccountId != ARS_account_id && transaction.AccountId != USD_account_id)) //si el id de la account ingresado es distinta a alguna de la suyas, se asume que busca en pesos
+                    { transaction.AccountId = ARS_account_id; }
+
+                    Transactions transactionDB = _mapper.Map<Transactions>(transaction);
+                    IEnumerable<Transactions> List = _unitOfWork.Transactions.FilterTransaction(transactionDB);
+
+                    if (List != null) { return Ok(List); }
                     else { return BadRequest("No se encontró la transacción"); }
                 }
                 catch (Exception ex) { return BadRequest(ex.Message); }
@@ -167,5 +139,4 @@ namespace Wallet.API.Controllers
             else { return BadRequest(); }
         }
     }
-
 }
