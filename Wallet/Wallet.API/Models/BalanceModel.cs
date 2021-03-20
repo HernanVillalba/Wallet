@@ -7,7 +7,7 @@ namespace Wallet.API.Models
 {
     public class BalanceModel
     {
-        public double argBalance { get; set; }
-        public double usdBalance { get; set; }
+        public double ArgBalance { get; set; }
+        public double UsdBalance { get; set; }
     }
 }

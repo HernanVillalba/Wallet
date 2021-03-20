@@ -10,7 +10,6 @@ using Wallet.Business.Operations;
 using AutoMapper;
 using Microsoft.Extensions.Configuration;
 using System.Text;
-//using System.Security.Claims;
 using Microsoft.IdentityModel.Tokens;
 using System.Security.Claims;
 using System.IdentityModel.Tokens.Jwt;
