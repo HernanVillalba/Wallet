@@ -16,6 +16,7 @@ namespace Wallet.API.Profiles
             CreateMap<Users, LoginModel>().ReverseMap();
             CreateMap<Transactions, TransactionModel>().ReverseMap();
             CreateMap<FixedTermDeposit, FixedTermDepositModel>().ReverseMap();
+            CreateMap<Transactions, TransactionSearchModel>().ReverseMap();
         }
     }
 }

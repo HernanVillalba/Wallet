@@ -9,5 +9,6 @@ namespace Wallet.Data.Repositories.Interfaces
     {
         double GetAccountBalance(int id, string currency);
         List<Accounts> GetUserAccounts(int id);
+        int GetAccountId(int id_user, string currency);
     }
 }

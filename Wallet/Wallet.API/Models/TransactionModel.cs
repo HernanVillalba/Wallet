@@ -8,6 +8,7 @@ namespace Wallet.API.Models
 {
     public class TransactionModel
     {
+        //[JsonIgnore(Condition = JsonIgnoreCondition.)]
         [Required]
         public float Amount { get; set; }
         [Required]

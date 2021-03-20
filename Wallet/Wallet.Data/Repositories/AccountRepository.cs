@@ -9,7 +9,7 @@ using Microsoft.Data.SqlClient;
 
 namespace Wallet.Data.Repositories
 {
-    public class AccountRepository : GenericRepository<Accounts>, IAccountRepository 
+    public class AccountRepository : GenericRepository<Accounts>, IAccountRepository
     {
         public AccountRepository(WALLETContext context) : base(context)
         {
@@ -24,6 +24,12 @@ namespace Wallet.Data.Repositories
         public List<Accounts> GetUserAccounts(int id)
         {
             return _context.Accounts.Where(x => x.UserId == id).ToList();
+        }
+
+        public int GetAccountId(int id_user, string currency)
+        {
+            Accounts account = _context.Accounts.FirstOrDefault(e => e.UserId == id_user && e.Currency == currency);
+            return account.Id;
         }
     }
 }

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 
 namespace Wallet.Data.Models
 {
@@ -10,6 +11,7 @@ namespace Wallet.Data.Models
         public DateTime Date { get; set; }
         public string Type { get; set; }
         public int AccountId { get; set; }
+        [JsonIgnore]
         public virtual Accounts Account { get; set; }
     }
 }
