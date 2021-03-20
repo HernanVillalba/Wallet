@@ -20,5 +20,10 @@ namespace Wallet.Data.Repositories
             var balance = _context.AccountBalance.FromSqlRaw($"EXEC SP_Balance {id}, {currency}").ToList();
             return balance[0].Balance;
         }
+
+        public List<Accounts> GetUserAccounts(int id)
+        {
+            return _context.Accounts.Where(x => x.UserId == id).ToList();
+        }
     }
 }
