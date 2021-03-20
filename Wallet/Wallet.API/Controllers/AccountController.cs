@@ -8,6 +8,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Wallet.Data.Repositories.Interfaces;
 using Wallet.API.Models;
+using Wallet.Data.Models;
 
 namespace Wallet.API.Controllers
 {
@@ -23,16 +24,16 @@ namespace Wallet.API.Controllers
         }
 
         [Authorize]
-        [HttpGet]
-        public IActionResult GetAllAccounts()
+        [HttpGet("balance")]
+        public IActionResult ListBalance()
         {
             var id = int.Parse(User.Claims.First(i => i.Type == "UserId").Value);
             try
             {
                 BalanceModel balance = new BalanceModel()
                 {
-                    argBalance = _unitOfWork.Accounts.GetAccountBalance(id, "ARS"),
-                    usdBalance = _unitOfWork.Accounts.GetAccountBalance(id, "USD")
+                    ArgBalance = _unitOfWork.Accounts.GetAccountBalance(id, "ARS"),
+                    UsdBalance = _unitOfWork.Accounts.GetAccountBalance(id, "USD")
                 };
                 return Ok(balance);
             }
@@ -41,5 +42,33 @@ namespace Wallet.API.Controllers
                 return BadRequest(new { message = ex.Message });
             }
         }
+
+        [Authorize]
+        [HttpGet]
+        public IActionResult ListAccounts()
+        {
+            var id = int.Parse(User.Claims.First(i => i.Type == "UserId").Value);
+            var accounts = _unitOfWork.Accounts.GetUserAccounts(id);
+            List<AccountModel> acc = new List<AccountModel>();
+            try
+            {
+                foreach (Accounts a in accounts)
+                {
+                    acc.Add(new AccountModel
+                    {
+                        Id = a.Id,
+                        Currency = a.Currency,
+                        Balance = _unitOfWork.Accounts.GetAccountBalance(id, a.Currency)
+                    });
+                }
+                return Ok(acc);
+            }
+            catch(Exception ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+        }
     }
 }
+
+    

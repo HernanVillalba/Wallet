@@ -12,8 +12,6 @@ namespace Wallet.API.Profiles
     {
         public AutoMapperProfile()
         {
-            //Agregar mapeos necesarios acá:
-            //CreateMap<Example, ExampleViewModel>();
             CreateMap<Users, RegisterModel>().ReverseMap();
             CreateMap<Users, LoginModel>().ReverseMap();
             CreateMap<Transactions, TransactionModel>().ReverseMap();
