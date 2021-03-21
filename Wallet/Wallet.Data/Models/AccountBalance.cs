@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace Wallet.Data.Models
+namespace Wallet.Data.ModelsAPI
 {
     public class AccountBalance
     {

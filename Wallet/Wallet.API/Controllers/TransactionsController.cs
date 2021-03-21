@@ -2,16 +2,16 @@
 using Microsoft.AspNetCore.Mvc;
 using Wallet.API.Models;
 using Wallet.Data.Repositories.Interfaces;
-using Wallet.Data.Models;
+using Wallet.Data.ModelsAPI;
 using System;
 using System.Threading.Tasks;
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.AspNetCore.Authorization;
+using X.PagedList;
 
 namespace Wallet.API.Controllers
 {
-
     [Authorize]
     [Route("api/[controller]")]
     [ApiController]
@@ -25,16 +25,19 @@ namespace Wallet.API.Controllers
             _mapper = mapper;
         }
 
-        [HttpGet]
-        public IActionResult GetAll()
+        [HttpGet("{page}")]
+        public async Task<IActionResult> GetAll(int? page)
         {
             try
             {
+                if (page == null || page <= 0) { page = 1; }
+                int pageNumber = (int)page, pageSize = 10;
                 var user_id = int.Parse(User.Claims.First(i => i.Type == "UserId").Value);
-                string SP = "SP_GetTransactionsUser " + user_id;
-                var list_transactions = _unitOfWork.Transactions.SP_GetTransactionsUser(SP, user_id);
+                int ARS_id = _unitOfWork.Accounts.GetAccountId(user_id, "ARS"), USD_id = _unitOfWork.Accounts.GetAccountId(user_id, "USD");
+                IEnumerable<Transactions> listDB = await _unitOfWork.Transactions.GetTransactionsUser(ARS_id, USD_id);
+                var TransactionsPagined = listDB.ToPagedList(pageNumber, pageSize);
 
-                if (list_transactions != null) { return Ok(list_transactions); }
+                if (TransactionsPagined != null) { return Ok(TransactionsPagined); }
                 else { return BadRequest("No hay transacciones para mostrar"); }
             }
             catch (Exception ex) { return BadRequest(ex.Message); }
@@ -58,13 +61,11 @@ namespace Wallet.API.Controllers
                     await _unitOfWork.Complete();
                     return Ok();
                 }
-                catch (Exception ex)
-                {
-                    return BadRequest(ex.Message);
-                }
+                catch (Exception ex){return BadRequest(ex.Message);}
             }
             else { return BadRequest(); }
         }
+
         [HttpPatch("Edit/{id}")]
         public async Task<IActionResult> Edit(int? id, [FromBody] TransactionEditModel NewTransaction)
         {
