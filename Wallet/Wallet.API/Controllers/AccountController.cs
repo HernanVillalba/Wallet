@@ -8,7 +8,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Wallet.Data.Repositories.Interfaces;
 using Wallet.API.Models;
-using Wallet.Data.Models;
+using Wallet.Data.ModelsAPI;
 
 namespace Wallet.API.Controllers
 {

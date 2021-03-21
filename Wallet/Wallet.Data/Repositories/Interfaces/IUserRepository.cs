@@ -1,5 +1,5 @@
 ﻿using System.Threading.Tasks;
-using Wallet.Data.Models;
+using Wallet.Data.ModelsAPI;
 
 namespace Wallet.Data.Repositories.Interfaces
 {

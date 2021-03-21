@@ -5,7 +5,7 @@ using System.Collections.Generic;
 // If you have enabled NRTs for your project, then un-comment the following line:
 // #nullable disable
 
-namespace Wallet.Data.Models
+namespace Wallet.Data.ModelsAPI
 {
     public partial class Users
     {

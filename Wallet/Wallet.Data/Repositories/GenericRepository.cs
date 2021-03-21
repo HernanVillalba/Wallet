@@ -1,7 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using Wallet.Data.Models;
+using Wallet.Data.ModelsAPI;
 using Wallet.Data.Repositories.Interfaces;
 
 namespace Wallet.Data.Repositories

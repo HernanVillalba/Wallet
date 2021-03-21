@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
-using Wallet.Data.Models;
+using Wallet.Data.ModelsAPI;
 
 namespace Wallet.Data.Repositories.Interfaces
 {
