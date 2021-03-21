@@ -143,7 +143,7 @@ namespace Wallet.API.Controllers
                 Transactions newTransaction = new Transactions();
                 newTransaction.AccountId = fixedTermDeposit.AccountId;
                 newTransaction.Amount = total;
-                newTransaction.Concept = "Plazo fijo (Cierre)";
+                newTransaction.Concept = "Plazo Fijo (Cierre)";
                 newTransaction.Type = "Topup";
                 _unitOfWork.Transactions.Insert(newTransaction);
 
