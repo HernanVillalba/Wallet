@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System;
@@ -11,6 +12,7 @@ using Wallet.Data.Repositories.Interfaces;
 
 namespace Wallet.API.Controllers
 {
+    [Authorize]
     [Route("api/[controller]")]
     [ApiController]
     public class FixedTermDepositController : ControllerBase
@@ -50,8 +52,8 @@ namespace Wallet.API.Controllers
             }
         }
 
-        [HttpPost]
-        public async Task<IActionResult> PostFixedTermDeposit([FromBody] FixedTermDepositModel fixedTermDeposit)
+        [HttpPost("Create")]
+        public async Task<IActionResult> CreateFixedTermDeposit([FromBody] FixedTermDepositModel fixedTermDeposit)
         {
             if(ModelState.IsValid)
             {
@@ -85,7 +87,7 @@ namespace Wallet.API.Controllers
                     Transactions newTransaction = new Transactions();
                     newTransaction.AccountId = fixedTermDeposit.AccountId;
                     newTransaction.Amount = fixedTermDeposit.Amount;
-                    newTransaction.Concept = "Plazo Fijo";
+                    newTransaction.Concept = "Plazo Fijo (Apertura)";
                     newTransaction.Type = "Payment";
                     _unitOfWork.Transactions.Insert(newTransaction);
 
@@ -107,6 +109,56 @@ namespace Wallet.API.Controllers
                 }
             }
             return BadRequest("Datos de entrada inválidos.");
+        }
+
+        [HttpPost("Close/{id}")]
+        public async Task<IActionResult> CloseFixedTermDeposit(int? id)
+        {
+            // Think if the function has to receive only the id or the entire fixed term deposit model
+            if (id == null || id <= 0) return BadRequest("Id inválido.");
+            try
+            {
+                // First check if this fixed term deposit exists
+                var fixedTermDeposit = _unitOfWork.FixedTermDeposits.GetById((int)id);
+                if(fixedTermDeposit == null)
+                {
+                    return BadRequest("Plazo fijo inexistente."); // Fixed term deposit doesn't exist
+                }
+
+                // Now that we know it exists, we have to change the closing date,
+                // calculate the days and apply the topup transaction
+
+                fixedTermDeposit.ClosingDate = DateTime.Now; // Closing date isn't null anymore
+                TimeSpan difference = ((DateTime)fixedTermDeposit.ClosingDate) - fixedTermDeposit.CreationDate;
+                int days = difference.Days;
+                // [ASK] if it has to be business days
+
+                // Apply 1% for each day, with compound interest
+                double gainRate = 1/100d; // 1%
+                double total = fixedTermDeposit.Amount * Math.Pow(1 + gainRate, days);
+                // [ASK] if we can parametrize that 1% to be another number in some configuration table,
+                // just to avoid hard coded it
+
+                // Now, we have to add a topup transaction with total value
+                Transactions newTransaction = new Transactions();
+                newTransaction.AccountId = fixedTermDeposit.AccountId;
+                newTransaction.Amount = total;
+                newTransaction.Concept = "Plazo fijo (Cierre)";
+                newTransaction.Type = "Topup";
+                _unitOfWork.Transactions.Insert(newTransaction);
+
+                // Having the transaction placed, it's time to update the fixed term deposit
+                // since we changed the closing date
+                _unitOfWork.FixedTermDeposits.Update(fixedTermDeposit);
+
+                // Save changes and return 200 OK
+                await _unitOfWork.Complete();
+                return Ok();
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
     }
 }
