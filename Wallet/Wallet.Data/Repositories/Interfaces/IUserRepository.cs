@@ -6,7 +6,7 @@ namespace Wallet.Data.Repositories.Interfaces
     public interface IUserRepository : IGenericRepository<Users>
     {
         bool FindEmail(string email);
-        Users FindUser(string email);
+        Task<Users> FindUser(string email);
         Task AddAccounts(Users user);
     }
 }
