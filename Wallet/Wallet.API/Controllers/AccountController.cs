@@ -2,7 +2,6 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System;
-using Wallet.Business.Operations;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
