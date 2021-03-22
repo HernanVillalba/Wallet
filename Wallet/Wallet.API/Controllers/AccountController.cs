@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using Wallet.Data.Repositories.Interfaces;
 using Wallet.API.Models;
 using Wallet.Data.ModelsAPI;
+using Wallet.Business;
 
 namespace Wallet.API.Controllers
 {
@@ -17,10 +18,12 @@ namespace Wallet.API.Controllers
     public class AccountController : ControllerBase
     {
         private readonly IUnitOfWork _unitOfWork;
+        private readonly IAccountLogic _accountLogic;
 
-        public AccountController(IUnitOfWork unitOfWork)
+        public AccountController(IUnitOfWork unitOfWork, IAccountLogic accountLogic)
         {
             _unitOfWork = unitOfWork;
+            _accountLogic = accountLogic;
         }
 
         [Authorize]
@@ -30,10 +33,11 @@ namespace Wallet.API.Controllers
             var id = int.Parse(User.Claims.First(i => i.Type == "UserId").Value);
             try
             {
+                var balances = _accountLogic.SelectBalances(id, "ARS", "USD");
                 BalanceModel balance = new BalanceModel()
                 {
-                    ArgBalance = _unitOfWork.Accounts.GetAccountBalance(id, "ARS"),
-                    UsdBalance = _unitOfWork.Accounts.GetAccountBalance(id, "USD")
+                    ArgBalance = balances[0],
+                    UsdBalance = balances[1]
                 };
                 return Ok(balance);
             }

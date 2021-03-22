@@ -86,6 +86,7 @@ namespace Wallet.API
                 };
             });
             services.AddTransient<IAccessLogic, AccessLogic>();
+            services.AddTransient<IAccountLogic, AccountLogic>();
 
         }
 
