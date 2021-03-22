@@ -6,7 +6,6 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
-using Wallet.Business.Operations;
 using Wallet.Data.ModelsAPI;
 using Wallet.Data.Repositories.Interfaces;
 
