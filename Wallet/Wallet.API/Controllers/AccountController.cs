@@ -1,13 +1,8 @@
 ﻿using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
-using Wallet.Data.Repositories.Interfaces;
-using Wallet.Entities;
-using Wallet.Data.Models;
+using Wallet.Business.Logic;
 
 namespace Wallet.API.Controllers
 {
@@ -15,11 +10,25 @@ namespace Wallet.API.Controllers
     [ApiController]
     public class AccountController : ControllerBase
     {
-        private readonly IUnitOfWork _unitOfWork;
+        private readonly IAccountBusiness _accountBusiness;
 
-        public AccountController(IUnitOfWork unitOfWork)
+        public AccountController(IAccountBusiness accountBusiness)
         {
-            _unitOfWork = unitOfWork;
+            _accountBusiness= accountBusiness;
+        }
+        [Authorize]
+        [HttpGet]
+        public IActionResult ListAccounts()
+        {
+            var id = int.Parse(User.Claims.First(i => i.Type == "UserId").Value);
+            try
+            {
+                return Ok(_accountBusiness.GetAccountsWithBalance(id));
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
         }
 
         [Authorize]
@@ -29,44 +38,14 @@ namespace Wallet.API.Controllers
             var id = int.Parse(User.Claims.First(i => i.Type == "UserId").Value);
             try
             {
-                BalanceModel balance = new BalanceModel()
-                {
-                    ArgBalance = _unitOfWork.Accounts.GetAccountBalance(id, "ARS"),
-                    UsdBalance = _unitOfWork.Accounts.GetAccountBalance(id, "USD")
-                };
-                return Ok(balance);
+                var balances = _accountBusiness.GetBalances(id);               
+                return Ok(balances);
             }
             catch (Exception ex)
             {
                 return BadRequest(new { message = ex.Message });
             }
-        }
-
-        [Authorize]
-        [HttpGet]
-        public IActionResult ListAccounts()
-        {
-            var id = int.Parse(User.Claims.First(i => i.Type == "UserId").Value);
-            var accounts = _unitOfWork.Accounts.GetUserAccounts(id);
-            List<AccountModel> acc = new List<AccountModel>();
-            try
-            {
-                foreach (Accounts a in accounts)
-                {
-                    acc.Add(new AccountModel
-                    {
-                        Id = a.Id,
-                        Currency = a.Currency,
-                        Balance = _unitOfWork.Accounts.GetAccountBalance(id, a.Currency)
-                    });
-                }
-                return Ok(acc);
-            }
-            catch(Exception ex)
-            {
-                return BadRequest(new { message = ex.Message });
-            }
-        }
+        }        
     }
 }
 
