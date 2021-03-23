@@ -13,9 +13,11 @@ using Microsoft.OpenApi.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
-using Wallet.Data.ModelsAPI;
+using Wallet.Business.Profiles;
+using Wallet.Data.Models;
 using Wallet.Data.Repositories;
 using Wallet.Data.Repositories.Interfaces;
 
@@ -70,7 +72,7 @@ namespace Wallet.API
             services.AddTransient<IFixedTermDepositRepository, FixedTermDepositRepository>();
             services.AddTransient<IAccountRepository, AccountRepository>();
             services.AddTransient<IUnitOfWork, UnitOfWork>();
-            services.AddAutoMapper(typeof(Startup));
+            services.AddAutoMapper(Assembly.GetAssembly(typeof(AutoMapperProfile)));
             services.AddControllers().AddNewtonsoftJson(options => options
                     .SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore);
 

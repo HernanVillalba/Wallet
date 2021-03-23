@@ -6,17 +6,10 @@
 
   <ItemGroup>
     <PackageReference Include="AutoMapper" Version="10.1.1" />
-    <PackageReference Include="Microsoft.AspNetCore.Cryptography.KeyDerivation" Version="5.0.4" />
-    <PackageReference Include="X.PagedList.Mvc.Core" Version="8.0.7" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\Wallet.Data\Wallet.Data.csproj" />
-    <ProjectReference Include="..\Wallet.Entities\Wallet.Entities.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Logic\" />
   </ItemGroup>
 
 </Project>

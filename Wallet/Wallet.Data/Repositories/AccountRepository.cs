@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 using System.Linq;
-using Wallet.Data.ModelsAPI;
+using Wallet.Data.Models;
 using Wallet.Data.Repositories.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Data.SqlClient;
