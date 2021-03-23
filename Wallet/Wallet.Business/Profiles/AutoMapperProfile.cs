@@ -1,12 +1,8 @@
 ﻿using AutoMapper;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Wallet.API.Models;
-using Wallet.Data.ModelsAPI;
+using Wallet.Data.Models;
+using Wallet.Entities;
 
-namespace Wallet.API.Profiles
+namespace Wallet.Business.Profiles
 {
     public class AutoMapperProfile : Profile
     {

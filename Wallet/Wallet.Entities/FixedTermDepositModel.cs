@@ -4,7 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.ComponentModel.DataAnnotations;
 
-namespace Wallet.API.Models
+namespace Wallet.Entities
 {
     public class FixedTermDepositModel
     {

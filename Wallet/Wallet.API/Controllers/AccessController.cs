@@ -1,19 +1,17 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Wallet.API.Models;
-using Wallet.Data.ModelsAPI;
-using Wallet.Data.Repositories.Interfaces;
-using Wallet.Business.Operations;
-using AutoMapper;
+﻿using AutoMapper;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
-using System.Text;
 using Microsoft.IdentityModel.Tokens;
-using System.Security.Claims;
+using System;
 using System.IdentityModel.Tokens.Jwt;
-using Microsoft.AspNetCore.Authorization;
+using System.Security.Claims;
+using System.Text;
+using System.Threading.Tasks;
+using Wallet.Business.Operations;
+using Wallet.Data.Models;
+using Wallet.Data.Repositories.Interfaces;
+using Wallet.Entities;
+using Wallet.Business.Profiles;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 

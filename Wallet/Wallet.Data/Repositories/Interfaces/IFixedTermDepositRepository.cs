@@ -1,5 +1,5 @@
 ﻿using System.Collections.Generic;
-using Wallet.Data.ModelsAPI;
+using Wallet.Data.Models;
 
 namespace Wallet.Data.Repositories.Interfaces
 {
