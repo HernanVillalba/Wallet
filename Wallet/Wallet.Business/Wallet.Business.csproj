@@ -15,4 +15,8 @@
     <ProjectReference Include="..\Wallet.Entities\Wallet.Entities.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Logic\" />
+  </ItemGroup>
+
 </Project>
