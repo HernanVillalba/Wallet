@@ -13,12 +13,10 @@ namespace Wallet.API.Controllers
     [ApiController]
     public class AccessController : ControllerBase
     {
-        private readonly IMapper _mapper;
         private readonly IAccessBusiness _accessBusiness;
 
-        public AccessController(IMapper mapper, IAccessBusiness accessBusiness)
+        public AccessController( IAccessBusiness accessBusiness)
         {
-            _mapper = mapper;
             _accessBusiness= accessBusiness;
         }
 
