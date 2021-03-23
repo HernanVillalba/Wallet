@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace Wallet.API.Models
+namespace Wallet.Entities
 {
     public class BalanceModel
     {

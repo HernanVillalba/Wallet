@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace Wallet.API.Models
+namespace Wallet.Entities
 {
     public class TransactionEditModel
     {

@@ -2,14 +2,12 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System;
-using Wallet.Business.Operations;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Wallet.Data.Repositories.Interfaces;
-using Wallet.API.Models;
-using Wallet.Data.ModelsAPI;
-using Wallet.Business;
+using Wallet.Entities;
+using Wallet.Data.Models;
 
 namespace Wallet.API.Controllers
 {

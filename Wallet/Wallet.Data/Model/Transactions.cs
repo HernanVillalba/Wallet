@@ -1,7 +1,7 @@
 ﻿using Newtonsoft.Json;
 using System;
 
-namespace Wallet.Data.ModelsAPI
+namespace Wallet.Data.Models
 {
     public partial class Transactions
     {

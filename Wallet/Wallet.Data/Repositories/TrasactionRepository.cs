@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Wallet.Data.ModelsAPI;
+using Wallet.Data.Models;
 using Wallet.Data.Repositories.Interfaces;
 
 namespace Wallet.Data.Repositories

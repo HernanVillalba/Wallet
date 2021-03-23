@@ -7,11 +7,17 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Reflection;
 using System.Text;
-using Wallet.Business;
-using Wallet.Data.ModelsAPI;
+using System.Threading.Tasks;
+using Wallet.Business.Profiles;
+using Wallet.Data.Models;
 using Wallet.Data.Repositories;
 using Wallet.Data.Repositories.Interfaces;
+using Wallet.Business.Logic;
 
 namespace Wallet.API
 {
@@ -64,7 +70,7 @@ namespace Wallet.API
             services.AddTransient<IFixedTermDepositRepository, FixedTermDepositRepository>();
             services.AddTransient<IAccountRepository, AccountRepository>();
             services.AddTransient<IUnitOfWork, UnitOfWork>();
-            services.AddAutoMapper(typeof(Startup));
+            services.AddAutoMapper(Assembly.GetAssembly(typeof(AutoMapperProfile)));
             services.AddControllers().AddNewtonsoftJson(options => options
                     .SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore);
 
@@ -85,8 +91,7 @@ namespace Wallet.API
                     ValidateAudience = false
                 };
             });
-            services.AddTransient<IAccessLogic, AccessLogic>();
-            services.AddTransient<IAccountLogic, AccountLogic>();
+            services.AddTransient<IAccessBusiness, AccessBusiness>();
 
         }
 
