@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Metadata;
 // If you have enabled NRTs for your project, then un-comment the following line:
 // #nullable disable
 
-namespace Wallet.Data.ModelsAPI
+namespace Wallet.Data.Models
 {
     public partial class WALLETContext : DbContext
     {

@@ -1,8 +1,8 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
-using Wallet.API.Models;
+using Wallet.Entities;
 using Wallet.Data.Repositories.Interfaces;
-using Wallet.Data.ModelsAPI;
+using Wallet.Data.Models;
 using System;
 using System.Threading.Tasks;
 using System.Collections.Generic;

@@ -4,7 +4,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace Wallet.API.Models
+namespace Wallet.Entities
 {
     public class TransactionModel
     {
