@@ -12,13 +12,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Text;
-using Wallet.Business;
-using Wallet.Data.ModelsAPI;
 using System.Threading.Tasks;
 using Wallet.Business.Profiles;
 using Wallet.Data.Models;
 using Wallet.Data.Repositories;
 using Wallet.Data.Repositories.Interfaces;
+using Wallet.Business.Logic;
 
 namespace Wallet.API
 {
@@ -92,7 +91,7 @@ namespace Wallet.API
                     ValidateAudience = false
                 };
             });
-            services.AddTransient<IAccessLogic, AccessLogic>();
+            services.AddTransient<IAccessBusiness, AccessBusiness>();
 
         }
 

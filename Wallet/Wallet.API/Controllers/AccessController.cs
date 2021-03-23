@@ -1,9 +1,9 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Threading.Tasks;
-using Wallet.API.Models;
-using Wallet.Business;
-using Wallet.Data.ModelsAPI;
+using Wallet.Entities;
+using AutoMapper;
+using Wallet.Business.Logic;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -14,21 +14,20 @@ namespace Wallet.API.Controllers
     public class AccessController : ControllerBase
     {
         private readonly IMapper _mapper;
-        private readonly IAccessLogic _accessLogic;
+        private readonly IAccessBusiness _accessBusiness;
 
-        public AccessController(IMapper mapper, IAccessLogic accessLogic)
+        public AccessController(IMapper mapper, IAccessBusiness accessBusiness)
         {
             _mapper = mapper;
-            _accessLogic = accessLogic;
+            _accessBusiness= accessBusiness;
         }
 
         [HttpPost("register")]
         public async Task<IActionResult> Register([FromBody] RegisterModel newUser)
         {
-            Users user = _mapper.Map<Users>(newUser);
             try
             {               
-                if (await _accessLogic.RegisterNewUser(user))
+                if (await _accessBusiness.RegisterNewUser(newUser))
                 {
                     return Ok(new { message = "Usuario registrado correctamente" });
                 }
@@ -46,10 +45,9 @@ namespace Wallet.API.Controllers
         [HttpPost("login")]
         public async Task<IActionResult> Login([FromBody] LoginModel userToCheck)
         {
-            Users mappedUser = _mapper.Map<Users>(userToCheck);
             try
             {
-                var token =  await _accessLogic.LoginUser(mappedUser);
+                var token =  await _accessBusiness.LoginUser(userToCheck);
                 if(token != null)
                 {
                     return Ok(token);
