@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using Microsoft.EntityFrameworkCore;
+using System.Linq;
 using System.Threading.Tasks;
 using Wallet.Data.Models;
 using Wallet.Data.Repositories.Interfaces;
@@ -15,9 +16,9 @@ namespace Wallet.Data.Repositories
             return _context.Users.Any(user => user.Email == email);
         }
 
-        public Users FindUser(string email)
+        public async Task<Users> FindUser(string email)
         {
-            return _context.Users.FirstOrDefault(user => user.Email == email);
+            return await _context.Users.FirstOrDefaultAsync(user => user.Email == email);
         }
 
         public async Task AddAccounts(Users user)

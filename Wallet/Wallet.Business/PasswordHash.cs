@@ -1,12 +1,10 @@
 ﻿using Microsoft.AspNetCore.Cryptography.KeyDerivation;
 using System;
-using System.Collections.Generic;
 using System.Security.Cryptography;
-using System.Text;
 
-namespace Wallet.Business.Operations
+namespace Wallet.Business
 {
-    public class PasswordHash
+    class PasswordHash
     {
         public static string Generate(string password, byte[] salt = null, bool needsOnlyHash = false)
         {
@@ -59,6 +57,3 @@ namespace Wallet.Business.Operations
         }
     }
 }
-
-
-

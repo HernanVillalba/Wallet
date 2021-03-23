@@ -1,13 +1,10 @@
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.HttpsPolicy;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using System;
@@ -20,6 +17,7 @@ using Wallet.Business.Profiles;
 using Wallet.Data.Models;
 using Wallet.Data.Repositories;
 using Wallet.Data.Repositories.Interfaces;
+using Wallet.Business.Logic;
 
 namespace Wallet.API
 {
@@ -93,6 +91,7 @@ namespace Wallet.API
                     ValidateAudience = false
                 };
             });
+            services.AddTransient<IAccessBusiness, AccessBusiness>();
 
         }
 
