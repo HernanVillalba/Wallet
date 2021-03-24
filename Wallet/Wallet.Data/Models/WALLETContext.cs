@@ -24,6 +24,7 @@ namespace Wallet.Data.Models
         public virtual DbSet<Transactions> Transactions { get; set; }
         public virtual DbSet<Users> Users { get; set; }
         public virtual DbSet<AccountBalance> AccountBalance { get; set; }
+        public virtual DbSet<UserContact> UserContact { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
@@ -112,6 +113,7 @@ namespace Wallet.Data.Models
             });
 
             modelBuilder.Entity<AccountBalance>().HasNoKey();
+            modelBuilder.Entity<UserContact>().HasNoKey();
 
             OnModelCreatingPartial(modelBuilder);
         }
