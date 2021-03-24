@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System.Collections.Generic;
+using System.Threading.Tasks;
 using Wallet.Data.Models;
 
 namespace Wallet.Data.Repositories.Interfaces
@@ -8,5 +9,6 @@ namespace Wallet.Data.Repositories.Interfaces
         bool FindEmail(string email);
         Task<Users> FindUser(string email);
         Task AddAccounts(Users user);
+        IEnumerable<UserContact> GetByPage(int page, int pageSize);
     }
 }

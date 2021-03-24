@@ -36,7 +36,7 @@ END
 
 GO
 
-CREATE OR ALTER PROCEDURE SP_Balance(
+CREATE OR ALTER PROCEDURE SP_GetBalance(
 	@user_id int,
 	@currency nvarchar(MAX)
 )
@@ -60,4 +60,24 @@ BEGIN
 			AND a.User_Id = @user_id
 		), 0)
 	 AS Balance
+END
+
+GO
+
+CREATE OR ALTER PROCEDURE SP_GetPagedUsers(	
+	@PageNumber INT,
+	@RowsOfPage INT
+)
+AS
+BEGIN
+
+SELECT id,
+	First_Name,
+	Last_Name,
+	Email
+FROM Users
+ORDER BY Last_Name 
+OFFSET(@PageNumber - 1) * @RowsOfPage ROWS
+FETCH NEXT @RowsOfPage ROWS ONLY
+
 END

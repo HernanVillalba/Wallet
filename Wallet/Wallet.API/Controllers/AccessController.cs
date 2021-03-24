@@ -18,29 +18,9 @@ namespace Wallet.API.Controllers
         public AccessController( IAccessBusiness accessBusiness)
         {
             _accessBusiness= accessBusiness;
-        }
+        }              
 
-        [HttpPost("register")]
-        public async Task<IActionResult> Register([FromBody] RegisterModel newUser)
-        {
-            try
-            {               
-                if (await _accessBusiness.RegisterNewUser(newUser))
-                {
-                    return Ok(new { message = "Usuario registrado correctamente" });
-                }
-                else
-                {
-                    return BadRequest(new { message = "El usuario ya está registrado" });
-                }
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(new { message = ex.Message });
-            }            
-        }
-
-        [HttpPost("login")]
+        [HttpPost]
         public async Task<IActionResult> Login([FromBody] LoginModel userToCheck)
         {
             try
