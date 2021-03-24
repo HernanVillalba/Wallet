@@ -62,6 +62,8 @@ BEGIN
 	 AS Balance
 END
 
+GO
+
 CREATE OR ALTER PROCEDURE SP_GetPagedUsers(	
 	@PageNumber INT,
 	@RowsOfPage INT
