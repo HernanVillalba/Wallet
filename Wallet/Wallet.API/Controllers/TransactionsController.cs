@@ -112,5 +112,22 @@ namespace Wallet.API.Controllers
             }
             else { return BadRequest(); }
         }
+
+        [HttpPost("Transfer"]
+        public IActionResult Transfer([FromBody] TransferModel newTransfer)
+        {
+            if(ModelState.IsValid)
+            {
+                var user_id = int.Parse(User.Claims.First(i => i.Type == "UserId").Value);
+                try
+                {
+
+                }
+                catch(Exception ex)
+                {
+
+                }
+            }
+        }
     }
 }

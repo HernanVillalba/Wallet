@@ -31,5 +31,10 @@ namespace Wallet.Data.Repositories
             Accounts account = _context.Accounts.FirstOrDefault(e => e.UserId == id_user && e.Currency == currency);
             return account.Id;
         }
+
+        public Accounts GetAccount(int id)
+        {
+            return _context.Accounts.FirstOrDefault(x => x.Id == id);
+        }
     }
 }

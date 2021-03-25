@@ -99,5 +99,13 @@ namespace Wallet.Business.Logic
             IEnumerable<Transactions> List = _unitOfWork.Transactions.FilterTransaction(transaction);
             return List;
         }
+
+        public void Transfer(TransferModel newTransfer, int id)
+        {
+            if((newTransfer.AccountId == id) || ()
+            {
+                //return("Ingrese una cuenta válida")
+            }
+        }
     }
 }
