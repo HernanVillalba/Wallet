@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Wallet.Data.Models;
@@ -36,6 +37,11 @@ namespace Wallet.Data.Repositories
             user.Accounts.Add(usd);
             user.Accounts.Add(ars);               
             await _context.SaveChangesAsync();            
+        }
+
+        public IEnumerable<UserContact> GetByPage(int page, int pageSize)
+        {
+            return _context.UserContact.FromSqlRaw($"execute SP_GetPagedUsers {page}, {pageSize}");
         }
     }
 }

@@ -1,11 +1,10 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using Wallet.Data.Models;
 using Wallet.Data.Repositories.Interfaces;
+using Wallet.Entities;
 
 namespace Wallet.Data.Repositories
 {
@@ -16,18 +15,20 @@ namespace Wallet.Data.Repositories
 
         }
 
-        public IEnumerable<Transactions> FilterTransaction(Transactions t)
+        public IEnumerable<Transactions> FilterTransaction(TransactionFilterModel t)
         {
-            IEnumerable<Transactions> list = _context.Transactions
-                           .Where
-                           (e => e.AccountId == t.AccountId || e.Concept == t.Concept || e.Type == t.Type);
+            IEnumerable<Transactions> list =
+                _context.Transactions
+                .Where
+                (e => (e.AccountId == t.ARS_id || e.AccountId == t.USD_id) && (e.Concept.ToLower().Contains(t.Concept.ToLower()) || e.Type.ToLower().Contains(t.Type.ToLower()) ))
+                .OrderByDescending(e => e.Date);
             return list;
         }
 
         public Transactions FindTransaction(int id_transaction, int USD_account_id, int ARS_account_id)
         {
             return _context.Transactions
-                .FirstOrDefault(e=>e.Id == id_transaction && (e.AccountId==ARS_account_id || e.AccountId==USD_account_id));
+                .FirstOrDefault(e => e.Id == id_transaction && (e.AccountId == ARS_account_id || e.AccountId == USD_account_id));
         }
 
 
@@ -39,8 +40,8 @@ namespace Wallet.Data.Repositories
         {
             //los id recibidos son de la account del user
             return await _context.Transactions
-                   .Where(e => e.AccountId == ARS_id || e.AccountId==USD_id)
-                   .OrderBy(e => e.Date).ToListAsync();
+                   .Where(e => e.AccountId == ARS_id || e.AccountId == USD_id)
+                   .OrderByDescending(e => e.Date).ToListAsync();
         }
     }
 }
