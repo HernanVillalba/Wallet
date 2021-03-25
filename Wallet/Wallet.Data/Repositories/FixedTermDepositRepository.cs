@@ -10,9 +10,10 @@ namespace Wallet.Data.Repositories
     {
         public FixedTermDepositRepository(WALLETContext context) : base(context) {}
 
-        public IEnumerable<FixedTermDeposit> ExecuteStoredProcedure(string stored_procedure)
+        public IEnumerable<FixedTermDeposit> GetAllByUserId(int userId)
         {
-            return _context.FixedTermDeposit.FromSqlRaw("EXEC " + stored_procedure);
+            // Executes the stored procedure to retrieve all the fixed term deposits related to an user
+            return _context.FixedTermDeposit.FromSqlRaw($"EXEC SP_GetUserFixedTermDeposits {userId}");
         }
     }
 }

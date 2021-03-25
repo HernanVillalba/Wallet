@@ -1,14 +1,15 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System;
+using System.Collections.Generic;
+using System.Text;
 
 namespace Wallet.Entities
 {
     public class FixedTermDepositModel
     {
-        [Required]
-        [Range(1, int.MaxValue)]
+        public int Id { get; set; }
+        public double Amount { get; set; }
+        public DateTime CreationDate { get; set; }
+        public DateTime? ClosingDate { get; set; }
         public int AccountId { get; set; }
-        [Required]
-        [Range(double.Epsilon, double.MaxValue)]
-        public float Amount { get; set; }
     }
 }

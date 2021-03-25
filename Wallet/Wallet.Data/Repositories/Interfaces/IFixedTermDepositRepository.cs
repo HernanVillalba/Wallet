@@ -5,6 +5,6 @@ namespace Wallet.Data.Repositories.Interfaces
 {
     public interface IFixedTermDepositRepository : IGenericRepository<FixedTermDeposit>
     {
-        IEnumerable<FixedTermDeposit> ExecuteStoredProcedure(string stored_procedure);
+        IEnumerable<FixedTermDeposit> GetAllByUserId(int userId);
     }
 }

@@ -95,6 +95,7 @@ namespace Wallet.API
             services.AddTransient<IAccountBusiness, AccountBusiness>();
             services.AddTransient<IUserBusiness, UserBusiness>();
 
+            services.AddTransient<IFixedTermDepositBusiness, FixedTermDepositBusiness>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
