@@ -108,6 +108,7 @@ namespace Wallet.API
             services.AddTransient<IAccessBusiness, AccessBusiness>();
             services.AddTransient<IAccountBusiness, AccountBusiness>();
             services.AddTransient<IUserBusiness, UserBusiness>();
+            services.AddTransient<IFixedTermDepositBusiness, FixedTermDepositBusiness>();
             #endregion
         }
 

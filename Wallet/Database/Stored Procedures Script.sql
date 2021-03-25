@@ -22,7 +22,7 @@ END
 
 GO
 
-CREATE OR ALTER PROCEDURE SP_GetUserFixedTermDeposit (@user_id int)
+CREATE OR ALTER PROCEDURE SP_GetUserFixedTermDeposits (@user_id int)
 AS
 BEGIN
 
