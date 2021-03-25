@@ -4,6 +4,11 @@
         <name>Wallet.API</name>
     </assembly>
     <members>
+        <member name="M:Wallet.API.Controllers.AccessController.Login(Wallet.Entities.LoginModel)">
+            <summary>
+            Ingresar con email y contraseña para obtener token y poder utilizar la API
+            </summary>
+        </member>
         <member name="M:Wallet.API.Controllers.AccountController.ListAccounts">
             <summary>
             Mostrar lista de cuentas del usuario actual con sus respectivos balances
