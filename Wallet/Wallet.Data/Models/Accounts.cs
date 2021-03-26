@@ -11,7 +11,7 @@ namespace Wallet.Data.Models
     {
         public Accounts()
         {
-            FixedTermDeposit = new HashSet<FixedTermDeposit>();
+            FixedTermDeposits = new HashSet<FixedTermDeposits>();
             Transactions = new HashSet<Transactions>();
         }
 
@@ -20,7 +20,7 @@ namespace Wallet.Data.Models
         public int UserId { get; set; }
 
         public virtual Users User { get; set; }
-        public virtual ICollection<FixedTermDeposit> FixedTermDeposit { get; set; }
+        public virtual ICollection<FixedTermDeposits> FixedTermDeposits { get; set; }
         public virtual ICollection<Transactions> Transactions { get; set; }
     }
 }

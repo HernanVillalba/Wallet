@@ -18,8 +18,11 @@ namespace Wallet.API.Controllers
         public AccessController( IAccessBusiness accessBusiness)
         {
             _accessBusiness= accessBusiness;
-        }              
-
+        }   
+        
+        /// <summary>
+        /// Ingresar con email y contraseña para obtener token y poder utilizar la API
+        /// </summary>
         [HttpPost]
         public async Task<IActionResult> Login([FromBody] LoginModel userToCheck)
         {

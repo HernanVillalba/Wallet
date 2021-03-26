@@ -9,7 +9,6 @@ using Wallet.Entities;
 
 namespace Wallet.API.Controllers
 {
-    [Authorize]
     [Route("api/[controller]")]
     public class UserController : Controller
     {
@@ -19,6 +18,10 @@ namespace Wallet.API.Controllers
             _userBusiness = userBusiness;
         }
 
+        /// <summary>
+        /// Registrar un usuario nuevo con un email único
+        /// </summary>
+        /// <response code="200">Usuario registrado correctamente</response>
         [HttpPost]
         public async Task<IActionResult> Register([FromBody] RegisterModel newUser)
         {
@@ -39,6 +42,10 @@ namespace Wallet.API.Controllers
             }
         }
 
+        /// <summary>
+        /// Mostrar lista paginada de usuarios ordenada por apellido ascendente
+        /// </summary>
+        [Authorize]
         [HttpGet("{page:int:min(1)?}/{pageSize:int:min(1)?}")]
         public IActionResult GetAll(int page = 1, int pageSize = 10)
         {
