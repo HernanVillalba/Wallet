@@ -16,6 +16,10 @@ namespace Wallet.API.Controllers
         {
             _accountBusiness= accountBusiness;
         }
+
+        /// <summary>
+        /// Mostrar lista de cuentas del usuario actual con sus respectivos balances
+        /// </summary>
         [Authorize]
         [HttpGet]
         public IActionResult ListAccounts()
@@ -31,6 +35,9 @@ namespace Wallet.API.Controllers
             }
         }
 
+        /// <summary>
+        /// Mostrar balances de las cuentas en pesos y dolares del usuario actual
+        /// </summary>
         [Authorize]
         [HttpGet("balance")]
         public IActionResult ListBalance()
