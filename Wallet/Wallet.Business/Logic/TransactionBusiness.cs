@@ -105,18 +105,25 @@ namespace Wallet.Business.Logic
 
         public async Task<string> BuyCurrency(TransactionBuyCurrency tbc, int user_id)
         {
-            TransactionCreateModel transaction = new TransactionCreateModel();
-            DollarBusiness db = new DollarBusiness();
-            var dollar = db.GetDollarByName("Dolar blue");
+            TransactionCreateModel transaction = new TransactionCreateModel(); //transacción que uso para crearla
+            DollarBusiness db = new DollarBusiness(); //separé la logica del consumo de la API en DollarBusiness
+            var dollar = db.GetDollarByName("Dolar blue"); //aca trae el dolar blue, pero puede traer otros como el oficial
+
+            //datos necesarios del usario para realizar las transacciones
             int? ARS_accountId = _unitOfWork.Accounts.GetAccountId(user_id, "ARS");
             int? USD_accountId = _unitOfWork.Accounts.GetAccountId(user_id, "USD");
             double? balance_ARS = _unitOfWork.Accounts.GetAccountBalance(user_id, "ARS");
             double? balance_USD = _unitOfWork.Accounts.GetAccountBalance(user_id, "USD");
 
-            double cost;
 
+            ///Logica para ahorrar código///
+            ///entender la lógica de que comprar dólares es vender pesos y
+            ///vender dólares es comprar pesos, me ahorró mucho código repetitivo
+            ///sumary///
+
+            double cost; // costo de las operaciones
             if ((tbc.Type.ToLower() == "compra" && tbc.Currency == "USD") ||
-                (tbc.Type.ToLower() == "venta" && tbc.Currency == "ARS")) // recarga/topup/compra
+                (tbc.Type.ToLower() == "venta" && tbc.Currency == "ARS")) // si quiere comprar usd, quiere vender pesos
             {
                 cost = tbc.Amount * Convert.ToDouble(dollar.Casa.Venta);
                 if (balance_ARS >= cost) // si se cumple, quiere decir que tengo saldo suficiente
@@ -138,7 +145,7 @@ namespace Wallet.Business.Logic
                 else { return "Saldo insuficiente para realizar la transacción"; }
             }
             else if ((tbc.Type.ToLower() == "venta" && tbc.Currency == "USD") ||
-                    (tbc.Type.ToLower() == "compra" && tbc.Currency == "ARS")) // pago/payment/venta
+                    (tbc.Type.ToLower() == "compra" && tbc.Currency == "ARS")) //si quiere vender dolares, quiere comprar pesos
             {
                 cost = tbc.Amount * Convert.ToDouble(dollar.Casa.Compra);
                 if (tbc.Amount <= balance_USD) //si la cantidad que quiero vender...
