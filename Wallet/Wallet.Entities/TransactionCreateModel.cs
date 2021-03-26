@@ -10,6 +10,8 @@ namespace Wallet.Entities
         public string Concept { get; set; }
         [Required]
         public string Type { get; set; }
+        [Required]
+        public int AccountId { get; set; }
 
     }
 }

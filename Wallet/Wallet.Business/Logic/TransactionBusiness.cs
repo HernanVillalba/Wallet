@@ -42,12 +42,9 @@ namespace Wallet.Business.Logic
             return paginatedTransactions;
         }
 
-        public async Task Create(TransactionCreateModel newT, int user_id)
+        public async Task Create(TransactionCreateModel newT)
         {
-            int ARS_account_id = _unitOfWork.Accounts.GetAccountId(user_id, "ARS");
-
             Transactions transaction = _mapper.Map<Transactions>(newT);
-            transaction.AccountId = ARS_account_id;
 
             _unitOfWork.Transactions.Insert(transaction);
             await _unitOfWork.Complete();
