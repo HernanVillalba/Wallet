@@ -10,6 +10,10 @@ using System.Linq;
 using Microsoft.AspNetCore.Authorization;
 using X.PagedList;
 using Wallet.Business.Logic;
+using System.Net.Http;
+using Wallet.Business.Operations;
+using System.Net.Http.Headers;
+using Newtonsoft.Json;
 
 namespace Wallet.API.Controllers
 {
@@ -107,6 +111,24 @@ namespace Wallet.API.Controllers
 
                     if (List != null) { return Ok(List); }
                     else { return BadRequest("No se encontró la transacción"); }
+                }
+                catch (Exception ex) { return BadRequest(ex.Message); }
+            }
+            else { return BadRequest(); }
+        }
+
+        [HttpGet("BuyCurrency")]
+        public IActionResult BuyCurrencyAsync()
+        {
+            if (ModelState.IsValid)
+            {
+                try
+                {
+                    TransactionBuyCurrency tbc = new TransactionBuyCurrency();
+                    var user_id = int.Parse(User.Claims.First(i => i.Type == "UserId").Value);
+                    var dollar = tb.BuyCurrency();
+                    return Ok(dollar);
+                    
                 }
                 catch (Exception ex) { return BadRequest(ex.Message); }
             }

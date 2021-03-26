@@ -1,13 +1,19 @@
 ﻿using AutoMapper;
-using System;
 using System.Collections.Generic;
-using System.Text;
 using System.Threading.Tasks;
 using Wallet.Data.Models;
-using Wallet.Data.Repositories;
 using Wallet.Data.Repositories.Interfaces;
 using Wallet.Entities;
 using X.PagedList;
+using Newtonsoft.Json;
+using System.Net;
+using Wallet.Business.Operations;
+using Newtonsoft.Json.Linq;
+using System.Linq;
+using Microsoft.EntityFrameworkCore.Internal;
+using System.Net.Http;
+using System;
+using System.Net.Http.Headers;
 
 namespace Wallet.Business.Logic
 {
@@ -15,6 +21,9 @@ namespace Wallet.Business.Logic
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
+
+        public object CreateMap { get; private set; }
+
         public TransactionBusiness(IUnitOfWork unitOfWork, IMapper mapper)
         {
             _unitOfWork = unitOfWork;
@@ -93,11 +102,16 @@ namespace Wallet.Business.Logic
                 transaction.ARS_id = ARS_account_id;
                 transaction.USD_id = USD_account_id;
             }
-
-            //Transactions transactionDB = _mapper.Map<Transactions>(transaction);
-            //IEnumerable<Transactions> List = _unitOfWork.Transactions.FilterTransaction(transactionDB);
             IEnumerable<Transactions> List = _unitOfWork.Transactions.FilterTransaction(transaction);
             return List;
+        }
+
+        public object BuyCurrency()
+        {
+            string url = "https://www.dolarsi.com/api/api.php?type=valoresprincipales";
+            var json = new WebClient().DownloadString(url);
+            var list = JsonConvert.DeserializeObject<IEnumerable<Root>>(json);
+            return list.Where(e => e.Casa.Nombre == "Dolar Blue").First();
         }
     }
 }
