@@ -27,7 +27,7 @@ namespace Wallet.Business.Logic
             var fixedTermDepositsDB = _unitOfWork.FixedTermDeposits.GetAllByUserId(userId);
 
             // Map entity model to view model
-            var fixedTermDeposits = _mapper.Map<IEnumerable<FixedTermDeposit>,IEnumerable<FixedTermDepositModel>>(fixedTermDepositsDB);
+            var fixedTermDeposits = _mapper.Map<IEnumerable<FixedTermDeposits>,IEnumerable<FixedTermDepositModel>>(fixedTermDepositsDB);
             
             return fixedTermDeposits;
         }
@@ -65,7 +65,7 @@ namespace Wallet.Business.Logic
             // Having the transaction placed, it's time to make the fixed term deposit
 
             // Mapping the model received to entity model
-            FixedTermDeposit newFixedTermDeposit = _mapper.Map<FixedTermDeposit>(fixedTermDeposit);
+            FixedTermDeposits newFixedTermDeposit = _mapper.Map<FixedTermDeposits>(fixedTermDeposit);
 
             // Insert the new fixed term deposit to unit of work
             _unitOfWork.FixedTermDeposits.Insert(newFixedTermDeposit);

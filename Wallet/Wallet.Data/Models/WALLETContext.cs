@@ -20,7 +20,7 @@ namespace Wallet.Data.Models
         }
 
         public virtual DbSet<Accounts> Accounts { get; set; }
-        public virtual DbSet<FixedTermDeposit> FixedTermDeposit { get; set; }
+        public virtual DbSet<FixedTermDeposits> FixedTermDeposits { get; set; }
         public virtual DbSet<Transactions> Transactions { get; set; }
         public virtual DbSet<Users> Users { get; set; }
         public virtual DbSet<AccountBalance> AccountBalance { get; set; }
@@ -28,9 +28,6 @@ namespace Wallet.Data.Models
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            if (!optionsBuilder.IsConfigured)
-            {
-            }
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -45,10 +42,10 @@ namespace Wallet.Data.Models
                     .WithMany(p => p.Accounts)
                     .HasForeignKey(d => d.UserId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK__Accounts__User_I__286302EC");
+                    .HasConstraintName("FK__Accounts__User_I__2D27B809");
             });
 
-            modelBuilder.Entity<FixedTermDeposit>(entity =>
+            modelBuilder.Entity<FixedTermDeposits>(entity =>
             {
                 entity.Property(e => e.AccountId).HasColumnName("Account_Id");
 
@@ -62,10 +59,10 @@ namespace Wallet.Data.Models
                     .HasDefaultValueSql("(getdate())");
 
                 entity.HasOne(d => d.Account)
-                    .WithMany(p => p.FixedTermDeposit)
+                    .WithMany(p => p.FixedTermDeposits)
                     .HasForeignKey(d => d.AccountId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK__FixedTerm__Accou__32E0915F");
+                    .HasConstraintName("FK__FixedTerm__Accou__2E1BDC42");
             });
 
             modelBuilder.Entity<Transactions>(entity =>
@@ -80,6 +77,8 @@ namespace Wallet.Data.Models
                     .HasColumnType("datetime")
                     .HasDefaultValueSql("(getdate())");
 
+                entity.Property(e => e.Editable).HasDefaultValueSql("((1))");
+
                 entity.Property(e => e.Type)
                     .IsRequired()
                     .HasMaxLength(10);
@@ -87,12 +86,14 @@ namespace Wallet.Data.Models
                 entity.HasOne(d => d.Account)
                     .WithMany(p => p.Transactions)
                     .HasForeignKey(d => d.AccountId)
-                    .OnDelete(DeleteBehavior.ClientSetNull);
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK__Transacti__Accou__2F10007B");
             });
 
             modelBuilder.Entity<Users>(entity =>
             {
                 entity.HasIndex(e => e.Email)
+                    .HasName("UQ__Users__A9D10534B060BDB9")
                     .IsUnique();
 
                 entity.Property(e => e.Email)
