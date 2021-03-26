@@ -37,6 +37,17 @@ namespace Wallet.Business.Logic
             }
         }
 
+        public UserContact GetUserDetails(int userId)
+        {
+            // Search the user by id in the database
+            Users userDB = _unitOfWork.Users.GetById(userId);
+            
+            // Map the user database model to user view model (without password for example)
+            UserContact user = _mapper.Map<UserContact>(userDB);
+
+            return user;
+        }
+
         public IEnumerable<UserContact> PagedUsers(int page, int pageSize)
         {
             //            Users userToCheck= _mapper.Map<Users>(userToMap);            
