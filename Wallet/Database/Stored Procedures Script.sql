@@ -26,11 +26,11 @@ CREATE OR ALTER PROCEDURE SP_GetUserFixedTermDeposits (@user_id int)
 AS
 BEGIN
 
-SELECT * FROM FixedTermDeposit
-WHERE FixedTermDeposit.Account_Id IN 
+SELECT * FROM FixedTermDeposits
+WHERE FixedTermDeposits.Account_Id IN 
 	(SELECT Accounts.Id FROM Accounts 
 	 WHERE Accounts.User_Id = @user_id)
-ORDER BY FixedTermDeposit.Creation_Date DESC
+ORDER BY FixedTermDeposits.Creation_Date DESC
 
 END
 

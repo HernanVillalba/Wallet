@@ -3,8 +3,8 @@ using Wallet.Data.Models;
 
 namespace Wallet.Data.Repositories.Interfaces
 {
-    public interface IFixedTermDepositRepository : IGenericRepository<FixedTermDeposit>
+    public interface IFixedTermDepositRepository : IGenericRepository<FixedTermDeposits>
     {
-        IEnumerable<FixedTermDeposit> GetAllByUserId(int userId);
+        IEnumerable<FixedTermDeposits> GetAllByUserId(int userId);
     }
 }

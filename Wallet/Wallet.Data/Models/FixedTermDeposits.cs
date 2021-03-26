@@ -7,7 +7,7 @@ using System.Collections.Generic;
 
 namespace Wallet.Data.Models
 {
-    public partial class FixedTermDeposit
+    public partial class FixedTermDeposits
     {
         public int Id { get; set; }
         public double Amount { get; set; }
