@@ -1,12 +1,8 @@
-﻿using Newtonsoft.Json;
-using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Text.Json.Serialization;
+﻿using System.Text.Json.Serialization;
 
 namespace Wallet.Business.Operations
 {
-    public class Casa
+    public class Dollar
     {
         [JsonPropertyName("compra")]
         public string Compra;
@@ -33,6 +29,6 @@ namespace Wallet.Business.Operations
     public class Root
     {
         [JsonPropertyName("casa")]
-        public Casa Casa;
+        public Dollar Casa;
     }
 }

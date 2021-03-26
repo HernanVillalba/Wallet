@@ -94,7 +94,7 @@ namespace Wallet.Business.Logic
                 transaction.USD_id = USD_account_id;
             }
 
-            if(transaction.AccountId != ARS_account_id || transaction.AccountId != USD_account_id) //si el id de la account ingresado es distinta a alguna de la suyas, se asume que busca en pesos
+            if (transaction.AccountId != ARS_account_id || transaction.AccountId != USD_account_id) //si el id de la account ingresado es distinta a alguna de la suyas, se asume que busca en pesos
             {
                 transaction.ARS_id = ARS_account_id;
                 transaction.USD_id = USD_account_id;
@@ -103,12 +103,64 @@ namespace Wallet.Business.Logic
             return List;
         }
 
-        public object BuyCurrency()
+        public async Task<string> BuyCurrency(TransactionBuyCurrency tbc, int user_id)
         {
-            string url = "https://www.dolarsi.com/api/api.php?type=valoresprincipales";
-            var json = new WebClient().DownloadString(url);
-            var list = JsonConvert.DeserializeObject<IEnumerable<Root>>(json);
-            return list.Where(e => e.Casa.Nombre == "Dolar Blue").First();
+            TransactionCreateModel transaction = new TransactionCreateModel();
+            DollarBusiness db = new DollarBusiness();
+            var dollar = db.GetDollarByName("Dolar blue");
+            int? ARS_accountId = _unitOfWork.Accounts.GetAccountId(user_id, "ARS");
+            int? USD_accountId = _unitOfWork.Accounts.GetAccountId(user_id, "USD");
+            double? balance_ARS = _unitOfWork.Accounts.GetAccountBalance(user_id, "ARS");
+            double? balance_USD = _unitOfWork.Accounts.GetAccountBalance(user_id, "USD");
+
+            double cost;
+
+            if ((tbc.Type.ToLower() == "compra" && tbc.Currency == "USD") ||
+                (tbc.Type.ToLower() == "venta" && tbc.Currency == "ARS")) // recarga/topup/compra
+            {
+                cost = tbc.Amount * Convert.ToDouble(dollar.Casa.Venta);
+                if (balance_ARS >= cost) // si se cumple, quiere decir que tengo saldo suficiente
+                {
+                    //realizo transaccion para la cuenta en usd (origen)
+                    transaction.Amount = tbc.Amount; //lo que compré
+                    transaction.Concept = "Compra de divisas";
+                    transaction.Type = "Topup";
+                    transaction.AccountId = (int)USD_accountId;
+                    await Create(transaction); //creo la transacción como topup
+
+                    //realizo la transaccion para la cuenta en ars (destino)
+                    transaction.Amount = cost; //lo que me salió la operación
+                    transaction.Type = "Payment";
+                    transaction.AccountId = (int)ARS_accountId;
+                    await Create(transaction);
+                    return "Transacción realizada con éxito.";
+                }
+                else { return "Saldo insuficiente para realizar la transacción"; }
+            }
+            else if ((tbc.Type.ToLower() == "venta" && tbc.Currency == "USD") ||
+                    (tbc.Type.ToLower() == "compra" && tbc.Currency == "ARS")) // pago/payment/venta
+            {
+                cost = tbc.Amount * Convert.ToDouble(dollar.Casa.Compra);
+                if (tbc.Amount <= balance_USD) //si la cantidad que quiero vender...
+                {
+                    //realizo la transaccion para la cuenta en usd (origen)
+                    transaction.Amount = tbc.Amount;
+                    transaction.Concept = "Compra de divisas";
+                    transaction.Type = "Payment"; //aparece como venta en dolares
+                    transaction.AccountId = (int)USD_accountId;
+                    await Create(transaction);
+
+                    //realizo la transacción para la cuenta en ars (destino)
+                    transaction.Amount = cost; //lo que me dieron por la venta de los usd
+                    transaction.Type = "Topup"; //aparece como recarga en pesos...
+                    transaction.AccountId = (int)ARS_accountId;
+                    await Create(transaction);
+                    return "Transacción realizada con éxito";
+                }
+                else { return "Saldo insuficiente para realizar la transacción"; }
+            }
+            return "Los datos ingresados son incorrectos";
+
         }
     }
 }

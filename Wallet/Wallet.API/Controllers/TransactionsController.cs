@@ -54,7 +54,7 @@ namespace Wallet.API.Controllers
                 try
                 {
                     var user_id = int.Parse(User.Claims.First(i => i.Type == "UserId").Value);
-                    int ARS_account_id = _unitOfWork.Accounts.GetAccountId(user_id, "ARS");
+                    int ARS_account_id = _unitOfWork.Accounts.GetAccountId(user_id, "USD");
                     NewTransaction.AccountId = ARS_account_id;
                     await tb.Create(NewTransaction);
                     return Ok();
@@ -119,18 +119,16 @@ namespace Wallet.API.Controllers
             else { return BadRequest(); }
         }
 
-        [HttpGet("BuyCurrency")]
-        public IActionResult BuyCurrencyAsync()
+        [HttpPost("BuyCurrency")]
+        public async Task<IActionResult> BuyCurrencyAsync([FromBody] TransactionBuyCurrency tbc)
         {
             if (ModelState.IsValid)
             {
                 try
                 {
-                    TransactionBuyCurrency tbc = new TransactionBuyCurrency();
                     var user_id = int.Parse(User.Claims.First(i => i.Type == "UserId").Value);
-                    var dollar = tb.BuyCurrency();
-                    return Ok(dollar);
-                    
+                    string message = await tb.BuyCurrency(tbc, user_id);
+                    return Ok(message);
                 }
                 catch (Exception ex) { return BadRequest(ex.Message); }
             }

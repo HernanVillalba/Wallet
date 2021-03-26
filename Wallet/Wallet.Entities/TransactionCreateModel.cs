@@ -5,7 +5,7 @@ namespace Wallet.Entities
     public class TransactionCreateModel
     {
         [Required]
-        public float Amount { get; set; }
+        public double Amount { get; set; }
         [Required]
         public string Concept { get; set; }
         [Required]
