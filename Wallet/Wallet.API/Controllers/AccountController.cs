@@ -1,14 +1,8 @@
 ﻿using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System;
-using Wallet.Business.Operations;
-using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
-using Wallet.Data.Repositories.Interfaces;
-using Wallet.Entities;
-using Wallet.Data.Models;
+using Wallet.Business.Logic;
 
 namespace Wallet.API.Controllers
 {
@@ -16,26 +10,24 @@ namespace Wallet.API.Controllers
     [ApiController]
     public class AccountController : ControllerBase
     {
-        private readonly IUnitOfWork _unitOfWork;
+        private readonly IAccountBusiness _accountBusiness;
 
-        public AccountController(IUnitOfWork unitOfWork)
+        public AccountController(IAccountBusiness accountBusiness)
         {
-            _unitOfWork = unitOfWork;
+            _accountBusiness= accountBusiness;
         }
 
+        /// <summary>
+        /// Mostrar lista de cuentas del usuario actual con sus respectivos balances
+        /// </summary>
         [Authorize]
-        [HttpGet("balance")]
-        public IActionResult ListBalance()
+        [HttpGet]
+        public IActionResult ListAccounts()
         {
             var id = int.Parse(User.Claims.First(i => i.Type == "UserId").Value);
             try
             {
-                BalanceModel balance = new BalanceModel()
-                {
-                    ArgBalance = _unitOfWork.Accounts.GetAccountBalance(id, "ARS"),
-                    UsdBalance = _unitOfWork.Accounts.GetAccountBalance(id, "USD")
-                };
-                return Ok(balance);
+                return Ok(_accountBusiness.GetAccountsWithBalance(id));
             }
             catch (Exception ex)
             {
@@ -43,31 +35,24 @@ namespace Wallet.API.Controllers
             }
         }
 
+        /// <summary>
+        /// Mostrar balances de las cuentas en pesos y dolares del usuario actual
+        /// </summary>
         [Authorize]
-        [HttpGet]
-        public IActionResult ListAccounts()
+        [HttpGet("balance")]
+        public IActionResult ListBalance()
         {
             var id = int.Parse(User.Claims.First(i => i.Type == "UserId").Value);
-            var accounts = _unitOfWork.Accounts.GetUserAccounts(id);
-            List<AccountModel> acc = new List<AccountModel>();
             try
             {
-                foreach (Accounts a in accounts)
-                {
-                    acc.Add(new AccountModel
-                    {
-                        Id = a.Id,
-                        Currency = a.Currency,
-                        Balance = _unitOfWork.Accounts.GetAccountBalance(id, a.Currency)
-                    });
-                }
-                return Ok(acc);
+                var balances = _accountBusiness.GetBalances(id);               
+                return Ok(balances);
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 return BadRequest(new { message = ex.Message });
             }
-        }
+        }        
     }
 }
 

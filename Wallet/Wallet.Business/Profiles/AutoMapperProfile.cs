@@ -13,6 +13,7 @@ namespace Wallet.Business.Profiles
             CreateMap<Users, RegisterModel>().ReverseMap();
             CreateMap<Users, LoginModel>().ReverseMap();
             CreateMap<Transactions, TransactionCreateModel>().ReverseMap();
+            CreateMap<FixedTermDeposit, FixedTermDepositCreateModel>().ReverseMap();
             CreateMap<FixedTermDeposit, FixedTermDepositModel>().ReverseMap();
             CreateMap<Transactions, TransactionFilterModel>().ReverseMap();
         }

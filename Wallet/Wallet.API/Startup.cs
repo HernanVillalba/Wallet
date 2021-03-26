@@ -1,13 +1,10 @@
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.HttpsPolicy;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using System;
@@ -20,6 +17,8 @@ using Wallet.Business.Profiles;
 using Wallet.Data.Models;
 using Wallet.Data.Repositories;
 using Wallet.Data.Repositories.Interfaces;
+using Wallet.Business.Logic;
+using System.IO;
 
 namespace Wallet.API
 {
@@ -35,8 +34,8 @@ namespace Wallet.API
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-
             services.AddControllers();
+            #region Swagger
             services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "Wallet.API", Version = "v1" });
@@ -63,19 +62,30 @@ namespace Wallet.API
                             new string[] {}
                     }
                 });
+                var filePath = Path.Combine(AppContext.BaseDirectory, "Wallet.API.xml");
+                c.IncludeXmlComments(filePath);
             });
+            #endregion
+            #region Database Context
             services.AddDbContext<WALLETContext>(options =>
                 options.UseSqlServer(Configuration.GetConnectionString("WalletDB")));
+            #endregion
+            #region Repositories and Unit of Work
             services.AddTransient(typeof(IGenericRepository<>), typeof(GenericRepository<>));
             services.AddTransient<IUserRepository, UserRepository>();
             services.AddTransient<ITransactionRepository, TrasactionRepository>();
             services.AddTransient<IFixedTermDepositRepository, FixedTermDepositRepository>();
             services.AddTransient<IAccountRepository, AccountRepository>();
             services.AddTransient<IUnitOfWork, UnitOfWork>();
+            #endregion
+            #region AutoMapper
             services.AddAutoMapper(Assembly.GetAssembly(typeof(AutoMapperProfile)));
+            #endregion
+            #region NewtonsoftJson
             services.AddControllers().AddNewtonsoftJson(options => options
                     .SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore);
-
+            #endregion
+            #region JWT Authentication
             var key = Encoding.ASCII.GetBytes(Configuration.GetValue<string>("SecretKey"));
             services.AddAuthentication(x =>
             {
@@ -93,7 +103,13 @@ namespace Wallet.API
                     ValidateAudience = false
                 };
             });
-
+            #endregion
+            #region Business Logic
+            services.AddTransient<IAccessBusiness, AccessBusiness>();
+            services.AddTransient<IAccountBusiness, AccountBusiness>();
+            services.AddTransient<IUserBusiness, UserBusiness>();
+            services.AddTransient<IFixedTermDepositBusiness, FixedTermDepositBusiness>();
+            #endregion
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

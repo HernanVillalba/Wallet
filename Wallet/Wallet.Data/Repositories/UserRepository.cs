@@ -1,4 +1,6 @@
-﻿using System.Linq;
+﻿using Microsoft.EntityFrameworkCore;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Wallet.Data.Models;
 using Wallet.Data.Repositories.Interfaces;
@@ -15,9 +17,9 @@ namespace Wallet.Data.Repositories
             return _context.Users.Any(user => user.Email == email);
         }
 
-        public Users FindUser(string email)
+        public async Task<Users> FindUser(string email)
         {
-            return _context.Users.FirstOrDefault(user => user.Email == email);
+            return await _context.Users.FirstOrDefaultAsync(user => user.Email == email);
         }
 
         public async Task AddAccounts(Users user)
@@ -35,6 +37,11 @@ namespace Wallet.Data.Repositories
             user.Accounts.Add(usd);
             user.Accounts.Add(ars);               
             await _context.SaveChangesAsync();            
+        }
+
+        public IEnumerable<UserContact> GetByPage(int page, int pageSize)
+        {
+            return _context.UserContact.FromSqlRaw($"execute SP_GetPagedUsers {page}, {pageSize}");
         }
     }
 }

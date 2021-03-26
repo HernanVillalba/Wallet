@@ -17,7 +17,7 @@ namespace Wallet.Data.Repositories
 
         public double GetAccountBalance(int user_id, string currency)
         {
-            var balance = _context.AccountBalance.FromSqlRaw($"EXEC SP_Balance {user_id}, {currency}").ToList();
+            var balance = _context.AccountBalance.FromSqlRaw($"EXEC SP_GetBalance {id}, {currency}").ToList();
             return balance[0].Balance;
         }
 
