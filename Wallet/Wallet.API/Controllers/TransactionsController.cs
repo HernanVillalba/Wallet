@@ -113,21 +113,33 @@ namespace Wallet.API.Controllers
             else { return BadRequest(); }
         }
 
-        [HttpPost("Transfer"]
-        public IActionResult Transfer([FromBody] TransferModel newTransfer)
+
+        /// <summary>
+        /// Transferir dinero de una cuenta a propia a otra cuenta existente de la misma moneda
+        /// </summary>
+        /// <param name="newTransfer"></param>
+        /// <returns></returns>
+        [HttpPost("Transfer")]
+        public async Task<IActionResult> Transfer([FromBody] TransferModel newTransfer)
         {
-            if(ModelState.IsValid)
+            var userId = int.Parse(User.Claims.First(i => i.Type == "UserId").Value);
+            try
             {
-                var user_id = int.Parse(User.Claims.First(i => i.Type == "UserId").Value);
-                try
+                string result = await tb.Transfer(newTransfer, userId);
+                if (result == "Transferencia realizada")
                 {
-
+                    return Ok(result);
                 }
-                catch(Exception ex)
+                else
                 {
-
+                    return BadRequest(result);
                 }
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
             }
         }
     }
 }
+

@@ -32,7 +32,7 @@ namespace Wallet.Data.Repositories
             return account.Id;
         }
 
-        public Accounts GetAccount(int id)
+        public Accounts GetAccountById(int id)
         {
             return _context.Accounts.FirstOrDefault(x => x.Id == id);
         }

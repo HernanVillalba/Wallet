@@ -19,6 +19,13 @@
             Mostrar balances de las cuentas en pesos y dolares del usuario actual
             </summary>
         </member>
+        <member name="M:Wallet.API.Controllers.TransactionsController.Transfer(Wallet.Entities.TransferModel)">
+            <summary>
+            Transferir dinero de una cuenta a propia a otra cuenta existente de la misma moneda
+            </summary>
+            <param name="newTransfer"></param>
+            <returns></returns>
+        </member>
         <member name="M:Wallet.API.Controllers.UserController.Register(Wallet.Entities.RegisterModel)">
             <summary>
             Registrar un usuario nuevo con un email único
@@ -29,6 +36,7 @@
             <summary>
             Mostrar lista paginada de usuarios ordenada por apellido ascendente
             </summary>
+            <param name="page">Pagina</param>
         </member>
     </members>
 </doc>
