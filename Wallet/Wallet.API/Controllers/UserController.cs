@@ -42,11 +42,25 @@ namespace Wallet.API.Controllers
             }
         }
 
+        [Authorize]
+        [HttpGet("{userId}")]
+        public IActionResult GetUserById(int userId)
+        {
+            try
+            {
+                return Ok(_userBusiness.GetUserDetails(userId));
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
         /// <summary>
         /// Mostrar lista paginada de usuarios ordenada por apellido ascendente
         /// </summary>
         [Authorize]
-        [HttpGet("{page:int:min(1)?}/{pageSize:int:min(1)?}")]
+        [HttpGet("Page/{page:int:min(1)}/PageSize/{pageSize:int:min(1)}")]
         public IActionResult GetAll(int page = 1, int pageSize = 10)
         {
             try

@@ -11,6 +11,6 @@ namespace Wallet.Business.Logic
     {
         Task<bool> RegisterNewUser(RegisterModel newUser);
         IEnumerable<UserContact> PagedUsers(int page, int pageSize);
-
+        UserContact GetUserDetails(int userId);
     }
 }

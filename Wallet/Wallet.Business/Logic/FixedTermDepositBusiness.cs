@@ -95,6 +95,11 @@ namespace Wallet.Business.Logic
             int days = difference.Days;
             // [ASK] if it has to be business days
 
+            if(days < 1)
+            {
+                throw new Exception("Debe esperar al menos 24 hrs para cerrar el plazo fijo.");
+            }
+
             // Apply 1% for each day, with compound interest
             double gainRate = 1 / 100d; // 1%
             double total = fixedTermDeposit.Amount * Math.Pow(1 + gainRate, days);
