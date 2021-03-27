@@ -39,8 +39,9 @@ namespace Wallet.Data.Repositories
             await _context.SaveChangesAsync();            
         }
 
-        public IEnumerable<UserContact> GetByPage(int page, int pageSize)
+        public IEnumerable<UserContact> GetByPage(int page)
         {
+            int pageSize = 10;
             return _context.UserContact.FromSqlRaw($"execute SP_GetPagedUsers {page}, {pageSize}");
         }
     }

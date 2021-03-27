@@ -56,7 +56,7 @@ namespace Wallet.Business.Logic
             int ARS_account_id = _unitOfWork.Accounts.GetAccountId(user_id, "ARS");
             var transaction_buscada = _unitOfWork.Transactions.FindTransaction((int)id, USD_account_id, ARS_account_id);
 
-            if (transaction_buscada != null)
+            if (transaction_buscada != null && (bool)transaction_buscada.Editable)
             {
                 transaction_buscada.Concept = NewTransaction.Concept;
                 _unitOfWork.Transactions.Update(transaction_buscada);
@@ -168,6 +168,54 @@ namespace Wallet.Business.Logic
             }
             return "Los datos ingresados son incorrectos";
 
+        }
+
+        public async Task<string> Transfer(TransferModel newTransfer, int id)
+        {
+            //get accounts to compare
+            var senderAccount = _unitOfWork.Accounts.GetAccountById(newTransfer.AccountId);
+            var recipientAccount = _unitOfWork.Accounts.GetAccountById(newTransfer.RecipientAccountId);
+            if (senderAccount == null || recipientAccount == null)
+            {
+                return ("Alguna de las cuentas ingresadas no existe");
+            }
+            //set conditions to validate the transfer
+            bool isSameAccount = newTransfer.AccountId == newTransfer.RecipientAccountId;
+            bool isSameCurrency = senderAccount.Currency == recipientAccount.Currency;
+            bool isAccountOwner = senderAccount.UserId == id;
+            //validate the transfer
+            if (isSameAccount || !isSameCurrency || !isAccountOwner)
+            {
+                return ("Ingrese cuentas válidas");
+            }
+            //get balance and validate
+            var balance = _unitOfWork.Accounts.GetAccountBalance(senderAccount.UserId, senderAccount.Currency);
+            if (newTransfer.Amount > balance)
+            {
+                return ("Saldo insuficiente");
+            }
+            //after validation create transactions on both accounts
+            Transactions transferTopup = new Transactions
+            {
+                Amount = newTransfer.Amount,
+                Concept = $"Transfer from account {newTransfer.AccountId}",
+                Type = "Topup",
+                AccountId = newTransfer.RecipientAccountId,
+                Editable = false
+            };
+            Transactions transferPayment = new Transactions
+            {
+                Amount = newTransfer.Amount,
+                Concept = $"Transfer to account {newTransfer.RecipientAccountId}",
+                Type = "Payment",
+                AccountId = newTransfer.AccountId,
+                Editable = false
+            };
+            //try inserting into database
+            _unitOfWork.Transactions.Insert(transferTopup);
+            _unitOfWork.Transactions.Insert(transferPayment);
+            await _unitOfWork.Complete();
+            return ("Transferencia realizada");
         }
     }
 }

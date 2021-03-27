@@ -10,7 +10,7 @@ namespace Wallet.Business.Logic
     public interface IUserBusiness
     {
         Task<bool> RegisterNewUser(RegisterModel newUser);
-        IEnumerable<UserContact> PagedUsers(int page, int pageSize);
+        IEnumerable<UserContact> PagedUsers(int page);
         UserContact GetUserDetails(int userId);
     }
 }
