@@ -48,11 +48,9 @@ namespace Wallet.Business.Logic
             return user;
         }
 
-        public IEnumerable<UserContact> PagedUsers(int page, int pageSize)
+        public IEnumerable<UserContact> PagedUsers(int page)
         {
-            //            Users userToCheck= _mapper.Map<Users>(userToMap);            
-            return _unitOfWork.Users.GetByPage(page, pageSize);
-            
+            return _unitOfWork.Users.GetByPage(page);            
         }
     }
 }

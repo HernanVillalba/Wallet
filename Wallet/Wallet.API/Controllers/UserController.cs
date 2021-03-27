@@ -60,12 +60,17 @@ namespace Wallet.API.Controllers
         /// Mostrar lista paginada de usuarios ordenada por apellido ascendente
         /// </summary>
         [Authorize]
-        [HttpGet("Page/{page:int:min(1)}/PageSize/{pageSize:int:min(1)}")]
-        public IActionResult GetAll(int page = 1, int pageSize = 10)
+        [HttpGet("Page/{page:int:min(1)}")]
+        public IActionResult GetAll(int page)
         {
             try
             {
-                return Ok(_userBusiness.PagedUsers(page, pageSize));
+                var users = _userBusiness.PagedUsers(page);
+                if (users.Any())
+                {
+                    return Ok(users);
+                }
+                return StatusCode(404);
             }
             catch (Exception ex)
             {
