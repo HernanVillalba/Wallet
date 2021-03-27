@@ -31,7 +31,7 @@
             </summary>
             <response code="200">Usuario registrado correctamente</response>
         </member>
-        <member name="M:Wallet.API.Controllers.UserController.GetAll(System.Int32,System.Int32)">
+        <member name="M:Wallet.API.Controllers.UserController.GetAll(System.Int32)">
             <summary>
             Mostrar lista paginada de usuarios ordenada por apellido ascendente
             </summary>
