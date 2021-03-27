@@ -56,7 +56,7 @@ namespace Wallet.Business.Logic
             int ARS_account_id = _unitOfWork.Accounts.GetAccountId(user_id, "ARS");
             var transaction_buscada = _unitOfWork.Transactions.FindTransaction((int)id, USD_account_id, ARS_account_id);
 
-            if (transaction_buscada != null)
+            if (transaction_buscada != null && (bool)transaction_buscada.Editable)
             {
                 transaction_buscada.Concept = NewTransaction.Concept;
                 _unitOfWork.Transactions.Update(transaction_buscada);
