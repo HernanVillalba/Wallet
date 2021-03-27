@@ -139,8 +139,7 @@ namespace Wallet.API.Controllers
         /// <summary>
         /// Transferir dinero de una cuenta a propia a otra cuenta existente de la misma moneda
         /// </summary>
-        /// <param name="newTransfer"></param>
-        /// <returns></returns>
+        /// <remarks>Ingrese la cuenta de origen, el monto y por último la cuenta de destino</remarks>
         [HttpPost("Transfer")]
         public async Task<IActionResult> Transfer([FromBody] TransferModel newTransfer)
         {

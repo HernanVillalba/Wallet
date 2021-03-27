@@ -216,24 +216,6 @@ namespace Wallet.Business.Logic
             _unitOfWork.Transactions.Insert(transferPayment);
             await _unitOfWork.Complete();
             return ("Transferencia realizada");
-
-
-            //ADAPT WHEN BUSINESS IS UPDATED
-
-            //var transferTopup = new TransactionCreateModel
-            //{
-            //    Amount = newTransfer.Amount,
-            //    Concept = "Transfer",
-            //    Type = "Topup"
-            //};
-            //var transferPayment = new TransactionCreateModel
-            //{
-            //    Amount = newTransfer.Amount,
-            //    Concept = "Transfer",
-            //    Type = "Payment"
-            //};
-
-
         }
     }
 }
