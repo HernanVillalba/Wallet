@@ -10,6 +10,10 @@ using System.Linq;
 using Microsoft.AspNetCore.Authorization;
 using X.PagedList;
 using Wallet.Business.Logic;
+using System.Net.Http;
+using Wallet.Business.Operations;
+using System.Net.Http.Headers;
+using Newtonsoft.Json;
 
 namespace Wallet.API.Controllers
 {
@@ -50,7 +54,9 @@ namespace Wallet.API.Controllers
                 try
                 {
                     var user_id = int.Parse(User.Claims.First(i => i.Type == "UserId").Value);
-                    await tb.Create(NewTransaction, user_id);
+                    int ARS_account_id = _unitOfWork.Accounts.GetAccountId(user_id, "USD");
+                    NewTransaction.AccountId = ARS_account_id;
+                    await tb.Create(NewTransaction);
                     return Ok();
                 }
                 catch (Exception ex) { return BadRequest(ex.Message); }
@@ -107,6 +113,22 @@ namespace Wallet.API.Controllers
 
                     if (List != null) { return Ok(List); }
                     else { return BadRequest("No se encontró la transacción"); }
+                }
+                catch (Exception ex) { return BadRequest(ex.Message); }
+            }
+            else { return BadRequest(); }
+        }
+
+        [HttpPost("BuyCurrency")]
+        public async Task<IActionResult> BuyCurrencyAsync([FromBody] TransactionBuyCurrency tbc)
+        {
+            if (ModelState.IsValid)
+            {
+                try
+                {
+                    var user_id = int.Parse(User.Claims.First(i => i.Type == "UserId").Value);
+                    string message = await tb.BuyCurrency(tbc, user_id);
+                    return Ok(message);
                 }
                 catch (Exception ex) { return BadRequest(ex.Message); }
             }
