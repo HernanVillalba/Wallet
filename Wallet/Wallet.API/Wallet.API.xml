@@ -19,9 +19,50 @@
             Mostrar balances de las cuentas en pesos y dolares del usuario actual
             </summary>
         </member>
+        <member name="M:Wallet.API.Controllers.TransactionsController.GetAll(System.Nullable{System.Int32})">
+            <summary>
+            Listar todas las transacciones ordenadas por fecha descendente y paginadas de a 10
+            </summary>
+            <param name="page">Página</param>
+        </member>
+        <member name="M:Wallet.API.Controllers.TransactionsController.Create(Wallet.Entities.TransactionCreateModel)">
+            <summary>
+            Crear una transacción en pesos
+            </summary>
+        </member>
+        <member name="M:Wallet.API.Controllers.TransactionsController.Edit(System.Nullable{System.Int32},Wallet.Entities.TransactionEditModel)">
+            <summary>
+            Editar una transacción
+            </summary>
+            <param name="id">Id de la transacción</param>
+            <param name="NewTransaction">Transacción</param>
+            <returns></returns>
+        </member>
+        <member name="M:Wallet.API.Controllers.TransactionsController.Details(System.Nullable{System.Int32})">
+            <summary>
+            Mostrar los detalles de una transacción en específico por Id
+            </summary>
+            <param name="id">Id de la transacción</param>
+            <returns></returns>
+        </member>
+        <member name="M:Wallet.API.Controllers.TransactionsController.Filter(Wallet.Entities.TransactionFilterModel)">
+            <summary>
+            Filtrar transacción por campos
+            </summary>
+            <param name="transaction">Transacción</param>
+            <returns></returns>
+        </member>
+        <member name="M:Wallet.API.Controllers.TransactionsController.BuyCurrencyAsync(Wallet.Entities.TransactionBuyCurrency)">
+            <summary>
+            Comprar divisas
+            </summary>
+            <param name="tbc">Transacción</param>
+            <returns></returns>
+            <remarks>Ingrese si va a comprar o vender, el tipo de divisa y el monto</remarks>
+        </member>
         <member name="M:Wallet.API.Controllers.TransactionsController.Transfer(Wallet.Entities.TransferModel)">
             <summary>
-            Transferir dinero de una cuenta a propia a otra cuenta existente de la misma moneda
+            Transferir dinero de una cuenta propia a otra cuenta existente de la misma moneda
             </summary>
             <remarks>Ingrese la cuenta de origen, el monto y por último la cuenta de destino</remarks>
         </member>

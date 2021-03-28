@@ -1,12 +1,11 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using System.Linq;
 
 namespace Wallet.Entities
 {
     public class TransactionBuyCurrency
     {
         [Required(ErrorMessage = "Tipo requerido (compra o venta)")]
-        [MaxLength(50, ErrorMessage = "Máximo 50 carácteres")]
+        [MaxLength(10, ErrorMessage = "Máximo 10 carácteres")]
         [RegularExpression("Compra|Venta", ErrorMessage = "Solo se acepta Compra o Venta")]
         public string Type { get; set; }
 

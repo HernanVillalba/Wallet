@@ -52,5 +52,12 @@ namespace Wallet.Business.Logic
         {
             return _unitOfWork.Users.GetByPage(page);            
         }
+
+        public List<UserFilterModel> Filter(UserFilterModel user)
+        {
+            var listDB = _unitOfWork.Users.Filter(user);
+            List<UserFilterModel> listFilter = _mapper.Map<List<UserFilterModel>>(listDB);
+            return listFilter;
+        }
     }
 }

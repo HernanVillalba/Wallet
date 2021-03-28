@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using Wallet.Data.Models;
+using Wallet.Entities;
 
 namespace Wallet.Data.Repositories.Interfaces
 {
@@ -10,5 +11,6 @@ namespace Wallet.Data.Repositories.Interfaces
         Task<Users> FindUser(string email);
         Task AddAccounts(Users user);
         IEnumerable<UserContact> GetByPage(int page);
+        List<Users> Filter(UserFilterModel user);
     }
 }
