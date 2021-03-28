@@ -10,6 +10,7 @@ using Wallet.Entities;
 using Wallet.Data.Models;
 using Wallet.Data.Repositories.Interfaces;
 using Wallet.Business.Logic;
+using Wallet.Business;
 
 namespace Wallet.API.Controllers
 {
@@ -28,20 +29,20 @@ namespace Wallet.API.Controllers
         [HttpGet]
         public IActionResult GetAllUserFixedTermDeposits()
         {
-            try
-            {
-                // Get the current user's id logged to the API
+            //try
+            //{
+            // Get the current user's id logged to the API
                 var userId = int.Parse(User.Claims.First(i => i.Type == "UserId").Value);
 
                 // Get all the fixed term deposits of the current user
                 var fixedTermDeposits = _fixedTermDepositBusiness.GetAllByUserId(userId);
 
                 return Ok(fixedTermDeposits);
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(ex.Message);
-            }
+            //}
+            //catch (Exception ex)
+            //{
+            //    return BadRequest(ex.Message);
+            //}
         }
 
         [HttpPost]

@@ -19,6 +19,12 @@ using Wallet.Data.Repositories;
 using Wallet.Data.Repositories.Interfaces;
 using Wallet.Business.Logic;
 using System.IO;
+using System.Net;
+using Microsoft.AspNetCore.Diagnostics;
+using Microsoft.AspNetCore.Http;
+using Wallet.Entities;
+using Wallet.Business;
+using Microsoft.AspNetCore.Mvc;
 
 namespace Wallet.API
 {
@@ -34,7 +40,46 @@ namespace Wallet.API
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddControllers();
+            #region ErrorHandling
+            services.AddControllers().ConfigureApiBehaviorOptions(options =>
+            {
+                options.InvalidModelStateResponseFactory = actionContext =>
+                {
+                    var modelState = actionContext.ModelState.Values;
+                    ErrorModel error = new ErrorModel();
+                    error.status = 400; // Bad request error
+                    //error.errors = modelState;
+
+                    // convert modelstate dictionary to error dictionary
+                    var dictionary = actionContext.ModelState;
+
+                    error.errors = new Dictionary<string, List<string>>();
+                    foreach(var validationError in dictionary)
+                    {
+                        List<string> errorList = new List<string>();
+                        foreach (var innerError in validationError.Value.Errors)
+                        {
+                            errorList.Add(innerError.ErrorMessage);
+                        }
+                        error.errors.Add(validationError.Key, errorList);
+                    }
+
+                    /*error.errors = new Dictionary<string, List<string>>();
+                    foreach(var validationError in modelState)
+                    {
+                        List<string> errorList = new List<string>();
+                        foreach (var innerError in validationError.Errors)
+                        {
+                            errorList.Add(innerError.ErrorMessage);
+                        }
+                        error.errors.Add(validationError.ValidationState.ToString(), errorList);
+                    }*/
+                    return new BadRequestObjectResult(error);
+                };
+            });
+            //services.AddExceptionHandler
+            // Agregar acá lo del error handling si tuviese que poner algo aca
+            #endregion
             #region Swagger
             services.AddSwaggerGen(c =>
             {
@@ -127,6 +172,7 @@ namespace Wallet.API
             app.UseRouting();
 
             app.UseAuthentication();
+            app.UseMiddleware<ExceptionHandler>();
             app.UseAuthorization();
 
             app.UseEndpoints(endpoints =>
