@@ -20,7 +20,7 @@ namespace Wallet.Data.Repositories
             IEnumerable<Transactions> list =
                 _context.Transactions
                 .Where
-                (e => (e.AccountId == t.ARS_id || e.AccountId == t.USD_id) && (e.Concept.ToLower().Contains(t.Concept.ToLower()) || e.Type.ToLower().Contains(t.Type.ToLower()) ))
+                (e => (e.AccountId == t.ARS_Id || e.AccountId == t.USD_Id) && (e.Concept.ToLower().Contains(t.Concept.ToLower()) || e.Type.ToLower().Contains(t.Type.ToLower()) ))
                 .OrderByDescending(e => e.Date);
             return list;
         }

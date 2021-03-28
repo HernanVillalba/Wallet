@@ -37,8 +37,13 @@ namespace Wallet.API.Controllers
         {
             try
             {
-                //TransactionBusiness tb = new TransactionBusiness(_unitOfWork);
-                var transactionsPagined = await tb.GetAll(page);
+                if (page == null || page <= 0) { page = 1; } //asigna la primer página
+                int pageNumber = (int)page, pageSize = 10; //10 registros por página
+
+                var user_id = int.Parse(User.Claims.First(i => i.Type == "UserId").Value);
+                var ListDB = await tb.GetAll(user_id);
+                IEnumerable<Transactions> transactionsPagined = await ListDB.ToPagedList(pageNumber, pageSize).ToListAsync();
+
                 if (transactionsPagined != null) { return Ok(transactionsPagined); }
                 else { return BadRequest("No hya transacciones para mostrar"); }
             }
@@ -54,8 +59,9 @@ namespace Wallet.API.Controllers
                 try
                 {
                     var user_id = int.Parse(User.Claims.First(i => i.Type == "UserId").Value);
-                    int ARS_account_id = _unitOfWork.Accounts.GetAccountId(user_id, "USD");
+                    int ARS_account_id = _unitOfWork.Accounts.GetAccountId(user_id, "ARS");
                     NewTransaction.AccountId = ARS_account_id;
+
                     await tb.Create(NewTransaction);
                     return Ok();
                 }

@@ -1,5 +1,5 @@
-﻿using Newtonsoft.Json;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
+using System.Text.Json.Serialization;
 
 namespace Wallet.Entities
 {
@@ -11,8 +11,8 @@ namespace Wallet.Entities
         public string Type { get; set; }
         public int? AccountId { get; set; }
         [JsonIgnore]
-        public int? USD_id { get; set; }
+        public int USD_Id { get; set; }
         [JsonIgnore]
-        public int? ARS_id { get; set; }
+        public int ARS_Id { get; set; }
     }
 }
