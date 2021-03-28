@@ -32,11 +32,11 @@ namespace Wallet.Business.Logic
 
         public async Task<IEnumerable<Transactions>> GetAll(int user_id)
         {
-            
-            int ARS_id = _unitOfWork.Accounts.GetAccountId(user_id, "ARS"), 
+
+            int ARS_id = _unitOfWork.Accounts.GetAccountId(user_id, "ARS"),
                 USD_id = _unitOfWork.Accounts.GetAccountId(user_id, "USD");
             IEnumerable<Transactions> listDB = await _unitOfWork.Transactions.GetTransactionsUser(ARS_id, USD_id);
-            
+
 
             return listDB;
         }
@@ -49,20 +49,24 @@ namespace Wallet.Business.Logic
             await _unitOfWork.Complete();
         }
 
-        public async Task<bool> EditTransaction(int? id, TransactionEditModel NewTransaction, int user_id)
+        public async Task<string> EditTransaction(int? id, TransactionEditModel NewTransaction, int user_id)
         {
             int USD_account_id = _unitOfWork.Accounts.GetAccountId(user_id, "USD");
             int ARS_account_id = _unitOfWork.Accounts.GetAccountId(user_id, "ARS");
             var transaction_buscada = _unitOfWork.Transactions.FindTransaction((int)id, USD_account_id, ARS_account_id);
 
-            if (transaction_buscada != null && (bool)transaction_buscada.Editable)
+            if (transaction_buscada != null)
             {
-                transaction_buscada.Concept = NewTransaction.Concept;
-                _unitOfWork.Transactions.Update(transaction_buscada);
-                await _unitOfWork.Complete();
-                return true;
+                if ((bool)transaction_buscada.Editable)
+                {
+                    transaction_buscada.Concept = NewTransaction.Concept;
+                    _unitOfWork.Transactions.Update(transaction_buscada);
+                    await _unitOfWork.Complete();
+                    return "Transacción editada con éxito";
+                }
+                else { return "La transacción no se puede editar"; }
             }
-            else { return false; }
+            else { return "No se encontró la transacción"; }
         }
 
         public Transactions GetDetails(int? id, int user_id)
