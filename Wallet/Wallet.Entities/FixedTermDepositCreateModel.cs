@@ -8,10 +8,11 @@ namespace Wallet.Entities
 {
     public class FixedTermDepositCreateModel
     {
-        [Required]
+        [Required(ErrorMessage = "Se requiere un id de cuenta mayor a cero y menor a 2^31")]
         [Range(1, int.MaxValue)]
         public int AccountId { get; set; }
-        [Required]
+
+        [Required(ErrorMessage = "Se requiere un monto mayor a cero y menor a 17e307")]
         [Range(double.Epsilon, double.MaxValue)]
         public float Amount { get; set; }
     }

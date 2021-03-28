@@ -43,6 +43,10 @@ namespace Wallet.API.Controllers
             }
         }
 
+        /// <summary>
+        /// Obtener detalles de un usuario en específico por su id
+        /// </summary>
+        /// <param name="userId">Id del usuario</param>
         [Authorize]
         [HttpGet("{userId}")]
         public IActionResult GetUserById(int userId)

@@ -19,6 +19,24 @@
             Mostrar balances de las cuentas en pesos y dolares del usuario actual
             </summary>
         </member>
+        <member name="M:Wallet.API.Controllers.FixedTermDepositController.GetAllUserFixedTermDeposits">
+            <summary>
+            Listar todos los plazos fijos abiertos por el usuario logueado
+            </summary>
+        </member>
+        <member name="M:Wallet.API.Controllers.FixedTermDepositController.CreateFixedTermDeposit(Wallet.Entities.FixedTermDepositCreateModel)">
+            <summary>
+            Crea un nuevo plazo fijo
+            </summary>
+            <response code="200">Plazo fijo creado correctamente</response>
+        </member>
+        <member name="M:Wallet.API.Controllers.FixedTermDepositController.CloseFixedTermDeposit(System.Nullable{System.Int32})">
+            <summary>
+            Cierra un plazo fijo en específico por su Id
+            </summary>
+            <param name="id">Id del plazo fijo</param>
+            <response code="200">Plazo fijo cerrado correctamente</response>
+        </member>
         <member name="M:Wallet.API.Controllers.TransactionsController.GetAll(System.Nullable{System.Int32})">
             <summary>
             Listar todas las transacciones ordenadas por fecha descendente y paginadas de a 10
@@ -71,6 +89,12 @@
             Registrar un usuario nuevo con un email único
             </summary>
             <response code="200">Usuario registrado correctamente</response>
+        </member>
+        <member name="M:Wallet.API.Controllers.UserController.GetUserById(System.Int32)">
+            <summary>
+            Obtener detalles de un usuario en específico por su id
+            </summary>
+            <param name="userId">Id del usuario</param>
         </member>
         <member name="M:Wallet.API.Controllers.UserController.GetAll(System.Int32)">
             <summary>
