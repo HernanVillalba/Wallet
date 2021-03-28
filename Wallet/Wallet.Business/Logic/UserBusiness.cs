@@ -39,6 +39,9 @@ namespace Wallet.Business.Logic
 
         public UserContact GetUserDetails(int userId)
         {
+            if (userId <= 0)
+                throw new CustomException(400, "Id inválido");
+
             // Search the user by id in the database
             Users userDB = _unitOfWork.Users.GetById(userId);
             

@@ -55,9 +55,9 @@ namespace Wallet.API.Controllers
             {
                 return Ok(_userBusiness.GetUserDetails(userId));
             }
-            catch (Exception ex)
+            catch
             {
-                return BadRequest(ex.Message);
+                throw;
             }
         }
 
