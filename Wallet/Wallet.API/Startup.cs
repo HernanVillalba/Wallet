@@ -66,8 +66,6 @@ namespace Wallet.API
                     return new BadRequestObjectResult(error);
                 };
             });
-            //services.AddExceptionHandler
-            // Agregar acá lo del error handling si tuviese que poner algo aca
             #endregion
             #region Swagger
             services.AddSwaggerGen(c =>
