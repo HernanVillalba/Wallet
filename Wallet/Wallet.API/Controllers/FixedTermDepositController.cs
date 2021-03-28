@@ -32,13 +32,20 @@ namespace Wallet.API.Controllers
         [HttpGet]
         public IActionResult GetAllUserFixedTermDeposits()
         {
-            // Get the current user's id logged to the API
-            var userId = int.Parse(User.Claims.First(i => i.Type == "UserId").Value);
+            try
+            {
+                // Get the current user's id logged to the API
+                var userId = int.Parse(User.Claims.First(i => i.Type == "UserId").Value);
 
-            // Get all the fixed term deposits of the current user
-            var fixedTermDeposits = _fixedTermDepositBusiness.GetAllByUserId(userId);
+                // Get all the fixed term deposits of the current user
+                var fixedTermDeposits = _fixedTermDepositBusiness.GetAllByUserId(userId);
 
-            return Ok(fixedTermDeposits);
+                return Ok(fixedTermDeposits);
+            }
+            catch
+            {
+                throw;
+            }
         }
 
         /// <summary>
@@ -48,13 +55,20 @@ namespace Wallet.API.Controllers
         [HttpPost]
         public async Task<IActionResult> CreateFixedTermDeposit([FromBody] FixedTermDepositCreateModel fixedTermDeposit)
         {
-            // Get the current user's id logged to the API
-            var userId = int.Parse(User.Claims.First(i => i.Type == "UserId").Value);
+            try
+            {
+                // Get the current user's id logged to the API
+                var userId = int.Parse(User.Claims.First(i => i.Type == "UserId").Value);
 
-            // Delegate the logic to business
-            await _fixedTermDepositBusiness.CreateFixedTermDeposit(fixedTermDeposit, userId);
+                // Delegate the logic to business
+                await _fixedTermDepositBusiness.CreateFixedTermDeposit(fixedTermDeposit, userId);
 
-            return Ok(new { message = "Plazo fijo creado correctamente" });
+                return Ok(new { message = "Plazo fijo creado correctamente" });
+            }
+            catch
+            {
+                throw;
+            }
         }
 
         /// <summary>
@@ -65,10 +79,17 @@ namespace Wallet.API.Controllers
         [HttpPatch("{id}")]
         public async Task<IActionResult> CloseFixedTermDeposit(int? id)
         {
-            // Delegate the logic to business
-            await _fixedTermDepositBusiness.CloseFixedTermDeposit((int)id);
+            try
+            {
+                // Delegate the logic to business
+                await _fixedTermDepositBusiness.CloseFixedTermDeposit((int)id);
 
-            return Ok(new { message = "Plazo fijo cerrado correctamente" });
+                return Ok(new { message = "Plazo fijo cerrado correctamente" });
+            }
+            catch
+            {
+                throw;
+            }
         }
     }
 }
