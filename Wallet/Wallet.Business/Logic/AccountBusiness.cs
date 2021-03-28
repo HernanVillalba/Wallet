@@ -28,18 +28,19 @@ namespace Wallet.Business.Logic
 
         public List<AccountModel> GetAccountsWithBalance(int id)
         {
-            var accounts = _unitOfWork.Accounts.GetUserAccounts(id);
-            List<AccountModel> accountsWithBalance = new List<AccountModel>();
-            foreach (Accounts a in accounts)
-            {
-                accountsWithBalance.Add(new AccountModel
+                var accounts = _unitOfWork.Accounts.GetUserAccounts(id);
+                List<AccountModel> accountsWithBalance = new List<AccountModel>();
+                foreach (Accounts a in accounts)
                 {
-                    Id = a.Id,
-                    Currency = a.Currency,
-                    Balance = _unitOfWork.Accounts.GetAccountBalance(id, a.Currency)
-                });
-            }
-            return accountsWithBalance;
+                    accountsWithBalance.Add(new AccountModel
+                    {
+                        Id = a.Id,
+                        Currency = a.Currency,
+                        Balance = _unitOfWork.Accounts.GetAccountBalance(id, a.Currency)
+                    });
+                }
+                return accountsWithBalance;
+
         }
     }
 }

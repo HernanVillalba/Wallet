@@ -1,9 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using System;
 using System.Threading.Tasks;
-using Wallet.Entities;
-using AutoMapper;
 using Wallet.Business.Logic;
+using Wallet.Entities;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -29,18 +27,11 @@ namespace Wallet.API.Controllers
             try
             {
                 var token =  await _accessBusiness.LoginUser(userToCheck);
-                if(token != null)
-                {
-                    return Ok(token);
-                }
-                else
-                {
-                    return BadRequest(new { message = "Los datos ingresados son incorrectos" });
-                }
+                return Ok(token);
             }
-            catch (Exception ex)
+            catch
             {
-                return BadRequest(new { message = ex.Message });
+                throw;
             }
         }
     }

@@ -172,14 +172,14 @@ namespace Wallet.Business.Logic
 
         }
 
-        public async Task<string> Transfer(TransferModel newTransfer, int id)
+        public async Task Transfer(TransferModel newTransfer, int id)
         {
             //get accounts to compare
             var senderAccount = _unitOfWork.Accounts.GetAccountById(newTransfer.AccountId);
             var recipientAccount = _unitOfWork.Accounts.GetAccountById(newTransfer.RecipientAccountId);
             if (senderAccount == null || recipientAccount == null)
             {
-                return ("Alguna de las cuentas ingresadas no existe");
+                throw new CustomException(404, "Alguna de las cuentas ingresadas no existe");
             }
             //set conditions to validate the transfer
             bool isSameAccount = newTransfer.AccountId == newTransfer.RecipientAccountId;
@@ -188,13 +188,13 @@ namespace Wallet.Business.Logic
             //validate the transfer
             if (isSameAccount || !isSameCurrency || !isAccountOwner)
             {
-                return ("Ingrese cuentas válidas");
+                throw new CustomException(400, "Alguno de los datos ingresados es incorrecto");
             }
             //get balance and validate
             var balance = _unitOfWork.Accounts.GetAccountBalance(senderAccount.UserId, senderAccount.Currency);
             if (newTransfer.Amount > balance)
             {
-                return ("Saldo insuficiente");
+               throw new CustomException(400, "Saldo insuficiente");
             }
             //after validation create transactions on both accounts
             Transactions transferTopup = new Transactions
@@ -217,7 +217,6 @@ namespace Wallet.Business.Logic
             _unitOfWork.Transactions.Insert(transferTopup);
             _unitOfWork.Transactions.Insert(transferPayment);
             await _unitOfWork.Complete();
-            return ("Transferencia realizada");
         }
     }
 }
