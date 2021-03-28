@@ -48,20 +48,13 @@ namespace Wallet.API.Controllers
         [HttpPost]
         public async Task<IActionResult> CreateFixedTermDeposit([FromBody] FixedTermDepositCreateModel fixedTermDeposit)
         {
-            try
-            {
-                // Get the current user's id logged to the API
-                var userId = int.Parse(User.Claims.First(i => i.Type == "UserId").Value);
+            // Get the current user's id logged to the API
+            var userId = int.Parse(User.Claims.First(i => i.Type == "UserId").Value);
 
-                // Delegate the logic to business
-                await _fixedTermDepositBusiness.CreateFixedTermDeposit(fixedTermDeposit, userId);
+            // Delegate the logic to business
+            await _fixedTermDepositBusiness.CreateFixedTermDeposit(fixedTermDeposit, userId);
 
-                return Ok();
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(ex.Message);
-            }
+            return Ok(new { message = "Plazo fijo creado correctamente" });
         }
 
         /// <summary>

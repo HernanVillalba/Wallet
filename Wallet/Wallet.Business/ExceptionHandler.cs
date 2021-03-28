@@ -22,36 +22,26 @@ namespace Wallet.Business
         {
             try
             {
+                // Execute the HTTP request
                 await _next(httpContext);
+
+                // Check the response status code
                 int statusCode = httpContext.Response.StatusCode;
                 if (statusCode == 401) // Special case when you are not logged in
                 {
-                    ///////////////// The response was an error. We must show it properly
-
                     throw new CustomException(statusCode, "Acceso no autorizado");
                 }
             }
             catch (CustomException ex)
             {
+                // Custom exception handler (to handle common errors thrown in business)
                 await HandleCustomExceptionAsync(httpContext, ex);
             }
             catch
             {
+                // Internal exception handler
                 await HandleExceptionAsync(httpContext);
             }
-        }
-
-        private Task HandleExceptionAsync(HttpContext context)
-        {
-            context.Response.ContentType = "application/json";
-            context.Response.StatusCode = (int)HttpStatusCode.InternalServerError;
-            return context.Response.WriteAsync(new ErrorModel()
-            {
-                status = context.Response.StatusCode,
-                errors = new Dictionary<string, List<string>>() {
-                    { "error",  new List<string>() { "Error interno del servidor" } }
-                }
-            }.ToString());
         }
 
         private Task HandleCustomExceptionAsync(HttpContext context, CustomException exception)
@@ -67,17 +57,17 @@ namespace Wallet.Business
             }.ToString());
         }
 
-        string GetErrorString(int statusCode)
+        private Task HandleExceptionAsync(HttpContext context)
         {
-            switch(statusCode)
+            context.Response.ContentType = "application/json";
+            context.Response.StatusCode = (int)HttpStatusCode.InternalServerError;
+            return context.Response.WriteAsync(new ErrorModel()
             {
-                case 400:
-                    return "Datos de entrada inválidos";
-                case 401:
-                    return "Acceso no autorizado";
-                default:
-                    return "Error interno del servidor";
-            }
+                status = context.Response.StatusCode,
+                errors = new Dictionary<string, List<string>>() {
+                    { "error",  new List<string>() { "Error interno del servidor" } }
+                }
+            }.ToString());
         }
     }
 }

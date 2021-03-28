@@ -77,6 +77,9 @@ namespace Wallet.Business.Logic
 
         public async Task CloseFixedTermDeposit(int fixedTermDepositId)
         {
+            if (fixedTermDepositId <= 0)
+                throw new CustomException(400, "Id inválido");
+
             // First check if this fixed term deposit exists
             var fixedTermDeposit = _unitOfWork.FixedTermDeposits.GetById((int)fixedTermDepositId);
             if (fixedTermDeposit == null)

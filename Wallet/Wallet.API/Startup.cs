@@ -45,14 +45,13 @@ namespace Wallet.API
             {
                 options.InvalidModelStateResponseFactory = actionContext =>
                 {
-                    var modelState = actionContext.ModelState.Values;
+                    // This code is executed when invalid ModelState occurs
+
                     ErrorModel error = new ErrorModel();
-                    error.status = 400; // Bad request error
-                    //error.errors = modelState;
+                    error.status = 400; // Set BadRequest error
 
-                    // convert modelstate dictionary to error dictionary
+                    // Map ModelState dictionary to Error dictionary
                     var dictionary = actionContext.ModelState;
-
                     error.errors = new Dictionary<string, List<string>>();
                     foreach(var validationError in dictionary)
                     {
@@ -61,19 +60,9 @@ namespace Wallet.API
                         {
                             errorList.Add(innerError.ErrorMessage);
                         }
-                        error.errors.Add(validationError.Key, errorList);
+                        error.errors.Add(validationError.Key != "" ? validationError.Key : "error", errorList);
                     }
 
-                    /*error.errors = new Dictionary<string, List<string>>();
-                    foreach(var validationError in modelState)
-                    {
-                        List<string> errorList = new List<string>();
-                        foreach (var innerError in validationError.Errors)
-                        {
-                            errorList.Add(innerError.ErrorMessage);
-                        }
-                        error.errors.Add(validationError.ValidationState.ToString(), errorList);
-                    }*/
                     return new BadRequestObjectResult(error);
                 };
             });
@@ -167,12 +156,14 @@ namespace Wallet.API
                 app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "Wallet.API v1"));
             }
 
+            app.UseStatusCodePages(); // To handle responses without body
+
             app.UseHttpsRedirection();
 
             app.UseRouting();
 
             app.UseAuthentication();
-            app.UseMiddleware<ExceptionHandler>();
+            app.UseMiddleware<ExceptionHandler>(); // To handle the exceptions
             app.UseAuthorization();
 
             app.UseEndpoints(endpoints =>
