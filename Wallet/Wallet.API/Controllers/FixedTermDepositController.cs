@@ -10,6 +10,7 @@ using Wallet.Entities;
 using Wallet.Data.Models;
 using Wallet.Data.Repositories.Interfaces;
 using Wallet.Business.Logic;
+using Wallet.Business;
 
 namespace Wallet.API.Controllers
 {
@@ -41,9 +42,9 @@ namespace Wallet.API.Controllers
 
                 return Ok(fixedTermDeposits);
             }
-            catch (Exception ex)
+            catch
             {
-                return BadRequest(ex.Message);
+                throw;
             }
         }
 
@@ -62,11 +63,11 @@ namespace Wallet.API.Controllers
                 // Delegate the logic to business
                 await _fixedTermDepositBusiness.CreateFixedTermDeposit(fixedTermDeposit, userId);
 
-                return Ok();
+                return Ok(new { message = "Plazo fijo creado correctamente" });
             }
-            catch (Exception ex)
+            catch
             {
-                return BadRequest(ex.Message);
+                throw;
             }
         }
 
@@ -83,11 +84,11 @@ namespace Wallet.API.Controllers
                 // Delegate the logic to business
                 await _fixedTermDepositBusiness.CloseFixedTermDeposit((int)id);
 
-                return Ok();
+                return Ok(new { message = "Plazo fijo cerrado correctamente" });
             }
-            catch (Exception ex)
+            catch
             {
-                return BadRequest(ex.Message);
+                throw;
             }
         }
     }

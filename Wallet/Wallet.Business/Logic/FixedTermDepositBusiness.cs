@@ -39,7 +39,7 @@ namespace Wallet.Business.Logic
             // We need first the currency to call the stored procedure which calculates the balance
             var account = _unitOfWork.Accounts.GetById(fixedTermDeposit.AccountId);
             if (account == null)
-                throw new Exception("Cuenta inexistente.");
+                throw new CustomException(404, "Cuenta inexistente");
 
             string currency = account.Currency;
 
@@ -49,7 +49,7 @@ namespace Wallet.Business.Logic
             if (balance - fixedTermDeposit.Amount < 0)
             {
                 // If there isn't enough balance in the account, we cannot continue
-                throw new Exception("No hay suficiente dinero para realizar la operación.");
+                throw new CustomException(400, "No hay suficiente dinero para realizar la operación.");
             }
 
             // We have enough balance. Lets create the fixed term deposit
@@ -77,17 +77,20 @@ namespace Wallet.Business.Logic
 
         public async Task CloseFixedTermDeposit(int fixedTermDepositId)
         {
+            if (fixedTermDepositId <= 0)
+                throw new CustomException(400, "Id inválido");
+
             // First check if this fixed term deposit exists
             var fixedTermDeposit = _unitOfWork.FixedTermDeposits.GetById((int)fixedTermDepositId);
             if (fixedTermDeposit == null)
-                throw new Exception("Plazo fijo inexistente."); // Fixed term deposit doesn't exist
+                throw new CustomException(404, "Plazo fijo inexistente"); // Fixed term deposit doesn't exist
 
             // Now that we know it exists, we have to change the closing date,
             // calculate the days and apply the topup transaction
 
             // But first we have to check if it has already been closed
             if (fixedTermDeposit.ClosingDate.HasValue)
-                throw new Exception("El plazo fijo fue cerrado anteriormente.");
+                throw new CustomException(400, "El plazo fijo fue cerrado anteriormente");
 
             // If it hasn't been closed, we can proceed to close it
 
@@ -98,7 +101,7 @@ namespace Wallet.Business.Logic
 
             if(days < 1)
             {
-                throw new Exception("Debe esperar al menos 24 hrs para cerrar el plazo fijo.");
+                throw new CustomException(400, "Debe esperar al menos 24 hrs para cerrar el plazo fijo");
             }
 
             // Apply 1% for each day, with compound interest
@@ -120,7 +123,7 @@ namespace Wallet.Business.Logic
             // since we changed the closing date
             _unitOfWork.FixedTermDeposits.Update(fixedTermDeposit);
 
-            // Save changes and return 200 OK
+            // Save changes to database
             await _unitOfWork.Complete();
         }
     }

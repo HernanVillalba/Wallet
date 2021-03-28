@@ -19,6 +19,12 @@ using Wallet.Data.Repositories;
 using Wallet.Data.Repositories.Interfaces;
 using Wallet.Business.Logic;
 using System.IO;
+using System.Net;
+using Microsoft.AspNetCore.Diagnostics;
+using Microsoft.AspNetCore.Http;
+using Wallet.Entities;
+using Wallet.Business;
+using Microsoft.AspNetCore.Mvc;
 
 namespace Wallet.API
 {
@@ -34,7 +40,33 @@ namespace Wallet.API
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddControllers();
+            #region ErrorHandling
+            services.AddControllers().ConfigureApiBehaviorOptions(options =>
+            {
+                options.InvalidModelStateResponseFactory = actionContext =>
+                {
+                    // This code is executed when invalid ModelState occurs
+
+                    ErrorModel error = new ErrorModel();
+                    error.status = 400; // Set BadRequest error
+
+                    // Map ModelState dictionary to Error dictionary
+                    var dictionary = actionContext.ModelState;
+                    error.errors = new Dictionary<string, List<string>>();
+                    foreach(var validationError in dictionary)
+                    {
+                        List<string> errorList = new List<string>();
+                        foreach (var innerError in validationError.Value.Errors)
+                        {
+                            errorList.Add(innerError.ErrorMessage);
+                        }
+                        error.errors.Add(validationError.Key != "" ? validationError.Key : "error", errorList);
+                    }
+
+                    return new BadRequestObjectResult(error);
+                };
+            });
+            #endregion
             #region Swagger
             services.AddSwaggerGen(c =>
             {
@@ -122,11 +154,14 @@ namespace Wallet.API
                 app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "Wallet.API v1"));
             }
 
+            app.UseStatusCodePages(); // To handle responses without body
+
             app.UseHttpsRedirection();
 
             app.UseRouting();
 
             app.UseAuthentication();
+            app.UseMiddleware<ExceptionHandler>(); // To handle the exceptions
             app.UseAuthorization();
 
             app.UseEndpoints(endpoints =>
