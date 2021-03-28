@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Wallet.Business.Logic;
+using Wallet.Data.Models;
 using Wallet.Entities;
 
 namespace Wallet.API.Controllers
@@ -42,6 +43,10 @@ namespace Wallet.API.Controllers
             }
         }
 
+        /// <summary>
+        /// Obtener detalles de un usuario en específico por su id
+        /// </summary>
+        /// <param name="userId">Id del usuario</param>
         [Authorize]
         [HttpGet("{userId}")]
         public IActionResult GetUserById(int userId)
@@ -76,6 +81,19 @@ namespace Wallet.API.Controllers
             {
                 return BadRequest(new { message = ex.Message });
             }
+        }
+
+        [Authorize]
+        [HttpPost("Filter")]
+        public IActionResult Filter([FromBody] UserFilterModel user)
+        {
+            try
+            {
+                var list = _userBusiness.Filter(user);
+                if(list.Count() > 0) { return Ok(list); }
+                else { return BadRequest("No se encontraron usuarios"); }
+            }
+            catch (Exception ex){ return BadRequest(ex.Message); }
         }
     }
 }

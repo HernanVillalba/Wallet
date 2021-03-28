@@ -30,16 +30,15 @@ namespace Wallet.Business.Logic
             _mapper = mapper;
         }
 
-        public async Task<IEnumerable<Transactions>> GetAll(int? page)
+        public async Task<IEnumerable<Transactions>> GetAll(int user_id)
         {
-            if (page == null || page <= 0) { page = 1; }
-            int pageNumber = (int)page, pageSize = 10;
-            int user_id = 4;
-            int ARS_id = _unitOfWork.Accounts.GetAccountId(user_id, "ARS"), USD_id = _unitOfWork.Accounts.GetAccountId(user_id, "USD");
-            IEnumerable<Transactions> listDB = await _unitOfWork.Transactions.GetTransactionsUser(ARS_id, USD_id);
-            IEnumerable<Transactions> paginatedTransactions = await listDB.ToPagedList(pageNumber, pageSize).ToListAsync();
 
-            return paginatedTransactions;
+            int ARS_id = _unitOfWork.Accounts.GetAccountId(user_id, "ARS"),
+                USD_id = _unitOfWork.Accounts.GetAccountId(user_id, "USD");
+            IEnumerable<Transactions> listDB = await _unitOfWork.Transactions.GetTransactionsUser(ARS_id, USD_id);
+
+
+            return listDB;
         }
 
         public async Task Create(TransactionCreateModel newT)
@@ -50,20 +49,24 @@ namespace Wallet.Business.Logic
             await _unitOfWork.Complete();
         }
 
-        public async Task<bool> EditTransaction(int? id, TransactionEditModel NewTransaction, int user_id)
+        public async Task<string> EditTransaction(int? id, TransactionEditModel NewTransaction, int user_id)
         {
             int USD_account_id = _unitOfWork.Accounts.GetAccountId(user_id, "USD");
             int ARS_account_id = _unitOfWork.Accounts.GetAccountId(user_id, "ARS");
             var transaction_buscada = _unitOfWork.Transactions.FindTransaction((int)id, USD_account_id, ARS_account_id);
 
-            if (transaction_buscada != null && (bool)transaction_buscada.Editable)
+            if (transaction_buscada != null)
             {
-                transaction_buscada.Concept = NewTransaction.Concept;
-                _unitOfWork.Transactions.Update(transaction_buscada);
-                await _unitOfWork.Complete();
-                return true;
+                if ((bool)transaction_buscada.Editable)
+                {
+                    transaction_buscada.Concept = NewTransaction.Concept;
+                    _unitOfWork.Transactions.Update(transaction_buscada);
+                    await _unitOfWork.Complete();
+                    return "Transacción editada con éxito";
+                }
+                else { return "La transacción no se puede editar"; }
             }
-            else { return false; }
+            else { return "No se encontró la transacción"; }
         }
 
         public Transactions GetDetails(int? id, int user_id)
@@ -90,14 +93,14 @@ namespace Wallet.Business.Logic
             //si el id de account es null o menor a 0 se asume que busca en pesos
             if (transaction.AccountId == null || transaction.AccountId <= 0)
             {
-                transaction.ARS_id = ARS_account_id;
-                transaction.USD_id = USD_account_id;
+                transaction.ARS_Id = ARS_account_id;
+                transaction.USD_Id = USD_account_id;
             }
 
             if (transaction.AccountId != ARS_account_id || transaction.AccountId != USD_account_id) //si el id de la account ingresado es distinta a alguna de la suyas, se asume que busca en pesos
             {
-                transaction.ARS_id = ARS_account_id;
-                transaction.USD_id = USD_account_id;
+                transaction.ARS_Id = ARS_account_id;
+                transaction.USD_Id = USD_account_id;
             }
             IEnumerable<Transactions> List = _unitOfWork.Transactions.FilterTransaction(transaction);
             return List;
@@ -119,7 +122,6 @@ namespace Wallet.Business.Logic
             ///Logica para ahorrar código///
             ///entender la lógica de que comprar dólares es vender pesos y
             ///vender dólares es comprar pesos, me ahorró mucho código repetitivo
-            ///sumary///
 
             double cost; // costo de las operaciones
             if ((tbc.Type.ToLower() == "compra" && tbc.Currency == "USD") ||
