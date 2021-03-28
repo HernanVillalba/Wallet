@@ -1,16 +1,15 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Wallet.Business.Logic;
-using Wallet.Data.Models;
 using Wallet.Entities;
 
 namespace Wallet.API.Controllers
 {
     [Route("api/[controller]")]
+    [ApiController]
     public class UserController : Controller
     {
         private readonly IUserBusiness _userBusiness;
@@ -28,18 +27,12 @@ namespace Wallet.API.Controllers
         {
             try
             {
-                if (await _userBusiness.RegisterNewUser(newUser))
-                {
-                    return Ok(new { message = "Usuario registrado correctamente" });
-                }
-                else
-                {
-                    return BadRequest(new { message = "El usuario ya está registrado" });
-                }
+                await _userBusiness.RegisterNewUser(newUser);              
+                return Ok(new { message = "Usuario registrado correctamente" });               
             }
-            catch (Exception ex)
+            catch 
             {
-                return BadRequest(new { message = ex.Message });
+                throw;
             }
         }
 
@@ -64,22 +57,18 @@ namespace Wallet.API.Controllers
         /// <summary>
         /// Mostrar lista paginada de usuarios ordenada por apellido ascendente
         /// </summary>
+        /// <param name="page">Página a mostrar</param>
         [Authorize]
-        [HttpGet("Page/{page:int:min(1)}")]
+        [HttpGet("Page/{page}")]
         public IActionResult GetAll(int page)
         {
             try
-            {
-                var users = _userBusiness.PagedUsers(page);
-                if (users.Any())
-                {
-                    return Ok(users);
-                }
-                return StatusCode(404);
+            { 
+                return Ok(_userBusiness.PagedUsers(page));
             }
-            catch (Exception ex)
+            catch 
             {
-                return BadRequest(new { message = ex.Message });
+                throw;
             }
         }
 
