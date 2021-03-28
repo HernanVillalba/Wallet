@@ -24,11 +24,11 @@ namespace Wallet.Business
             {
                 await _next(httpContext);
                 int statusCode = httpContext.Response.StatusCode;
-                if (statusCode >= 300)
+                if (statusCode == 401) // Special case when you are not logged in
                 {
-                    // The response was an error. We must show it properly
+                    ///////////////// The response was an error. We must show it properly
 
-                    throw new CustomException(statusCode, GetErrorString(statusCode));
+                    throw new CustomException(statusCode, "Acceso no autorizado");
                 }
             }
             catch (CustomException ex)

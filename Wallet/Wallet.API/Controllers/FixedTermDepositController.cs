@@ -32,20 +32,13 @@ namespace Wallet.API.Controllers
         [HttpGet]
         public IActionResult GetAllUserFixedTermDeposits()
         {
-            //try
-            //{
             // Get the current user's id logged to the API
-                var userId = int.Parse(User.Claims.First(i => i.Type == "UserId").Value);
+            var userId = int.Parse(User.Claims.First(i => i.Type == "UserId").Value);
 
-                // Get all the fixed term deposits of the current user
-                var fixedTermDeposits = _fixedTermDepositBusiness.GetAllByUserId(userId);
+            // Get all the fixed term deposits of the current user
+            var fixedTermDeposits = _fixedTermDepositBusiness.GetAllByUserId(userId);
 
-                return Ok(fixedTermDeposits);
-            //}
-            //catch (Exception ex)
-            //{
-            //    return BadRequest(ex.Message);
-            //}
+            return Ok(fixedTermDeposits);
         }
 
         /// <summary>
@@ -79,17 +72,10 @@ namespace Wallet.API.Controllers
         [HttpPatch("{id}")]
         public async Task<IActionResult> CloseFixedTermDeposit(int? id)
         {
-            try
-            {
-                // Delegate the logic to business
-                await _fixedTermDepositBusiness.CloseFixedTermDeposit((int)id);
+            // Delegate the logic to business
+            await _fixedTermDepositBusiness.CloseFixedTermDeposit((int)id);
 
-                return Ok();
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(ex.Message);
-            }
+            return Ok(new { message = "Plazo fijo cerrado correctamente" });
         }
     }
 }
