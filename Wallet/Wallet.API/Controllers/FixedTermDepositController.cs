@@ -25,6 +25,9 @@ namespace Wallet.API.Controllers
             _fixedTermDepositBusiness = fixedTermDepositBusiness;
         }
 
+        /// <summary>
+        /// Listar todos los plazos fijos abiertos por el usuario logueado
+        /// </summary>
         [HttpGet]
         public IActionResult GetAllUserFixedTermDeposits()
         {
@@ -44,29 +47,34 @@ namespace Wallet.API.Controllers
             }
         }
 
+        /// <summary>
+        /// Crea un nuevo plazo fijo
+        /// </summary>
+        /// <response code="200">Plazo fijo creado correctamente</response>
         [HttpPost]
         public async Task<IActionResult> CreateFixedTermDeposit([FromBody] FixedTermDepositCreateModel fixedTermDeposit)
         {
-            if(ModelState.IsValid)
+            try
             {
-                try
-                {
-                    // Get the current user's id logged to the API
-                    var userId = int.Parse(User.Claims.First(i => i.Type == "UserId").Value);
+                // Get the current user's id logged to the API
+                var userId = int.Parse(User.Claims.First(i => i.Type == "UserId").Value);
 
-                    // Delegate the logic to business
-                    await _fixedTermDepositBusiness.CreateFixedTermDeposit(fixedTermDeposit, userId);
+                // Delegate the logic to business
+                await _fixedTermDepositBusiness.CreateFixedTermDeposit(fixedTermDeposit, userId);
 
-                    return Ok();
-                }
-                catch (Exception ex)
-                {
-                    return BadRequest(ex.Message);
-                }
+                return Ok();
             }
-            return BadRequest("Datos de entrada inválidos.");
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
 
+        /// <summary>
+        /// Cierra un plazo fijo en específico por su Id
+        /// </summary>
+        /// <param name="id">Id del plazo fijo</param>
+        /// <response code="200">Plazo fijo cerrado correctamente</response>
         [HttpPatch("{id}")]
         public async Task<IActionResult> CloseFixedTermDeposit(int? id)
         {

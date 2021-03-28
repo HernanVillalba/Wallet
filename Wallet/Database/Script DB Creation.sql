@@ -26,7 +26,7 @@ Account_Id int not null foreign key references Accounts(Id),
 Editable BIT NULL DEFAULT(1)
 )
 GO
-CREATE TABLE FixedTermDeposit(
+CREATE TABLE FixedTermDeposits(
 Id int not null identity(1,1) primary key,
 Amount float not null check(Amount>0),
 Creation_Date Datetime not null DEFAULT(GETDATE()),

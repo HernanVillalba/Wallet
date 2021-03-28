@@ -8,11 +8,12 @@ namespace Wallet.Entities
 {
     public class FixedTermDepositCreateModel
     {
-        [Required]
-        [Range(1, int.MaxValue)]
+        [Required(ErrorMessage = "El campo 'AccountId' es obligatorio")]
+        [Range(1, int.MaxValue, ErrorMessage = "Se requiere un id de cuenta mayor a cero y menor a 2^31")]
         public int AccountId { get; set; }
-        [Required]
-        [Range(double.Epsilon, double.MaxValue)]
+
+        [Required(ErrorMessage = "El campo 'Amount' es obligatorio")]
+        [Range(double.Epsilon, double.MaxValue, ErrorMessage = "Se requiere un monto mayor a cero y menor a 17e307")]
         public float Amount { get; set; }
     }
 }
