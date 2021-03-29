@@ -1,0 +1,596 @@
+{
+	"info": {
+		"_postman_id": "afa01431-a47c-4f83-adb8-263078397353",
+		"name": "Wallet Api",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Prueba balance no autorizado",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://localhost:44330/api/account",
+					"protocol": "https",
+					"host": [
+						"localhost"
+					],
+					"port": "44330",
+					"path": [
+						"api",
+						"account"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Prueba plazo fijo no autorizado",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "https://localhost:44330/api/fixedtermdeposit",
+					"protocol": "https",
+					"host": [
+						"localhost"
+					],
+					"port": "44330",
+					"path": [
+						"api",
+						"fixedtermdeposit"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Prueba crear transacción no autorizado",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"url": {
+					"raw": "https://localhost:44330/api/transactions/create",
+					"protocol": "https",
+					"host": [
+						"localhost"
+					],
+					"port": "44330",
+					"path": [
+						"api",
+						"transactions",
+						"create"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Registrar usuario",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"firstName\": \"bob\",\r\n  \"lastName\": \"prueba\",\r\n  \"email\": \"prueba@test1.com\",\r\n  \"password\": 123456\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://localhost:44330/api/user",
+					"protocol": "https",
+					"host": [
+						"localhost"
+					],
+					"port": "44330",
+					"path": [
+						"api",
+						"user"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Loguear usuario",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"email\": \"prueba@test1.com\",\r\n  \"password\": 123456\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://localhost:44330/api/access/",
+					"protocol": "https",
+					"host": [
+						"localhost"
+					],
+					"port": "44330",
+					"path": [
+						"api",
+						"access",
+						""
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Mostrar balance inicial",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJVc2VySWQiOiIyIiwibmJmIjoxNjE3MDQ0NTIxLCJleHAiOjE2MTcxMzA5MjEsImlhdCI6MTYxNzA0NDUyMX0.SREEKE2Egbb2_BoLLBpswQFkzsAafnLHs2L6pAEPHIo",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "https://localhost:44330/api/Account/",
+					"protocol": "https",
+					"host": [
+						"localhost"
+					],
+					"port": "44330",
+					"path": [
+						"api",
+						"Account",
+						""
+					]
+				},
+				"description": "Ver cuentas"
+			},
+			"response": []
+		},
+		{
+			"name": "Mostrar errores al crear transacción",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJVc2VySWQiOiIyIiwibmJmIjoxNjE3MDQ0NTIxLCJleHAiOjE2MTcxMzA5MjEsImlhdCI6MTYxNzA0NDUyMX0.SREEKE2Egbb2_BoLLBpswQFkzsAafnLHs2L6pAEPHIo",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"amount\": -10 ,\r\n\r\n  \"type\": \"pago\",\r\n  \"accountId\": 4\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://localhost:44330/api/transactions/create",
+					"protocol": "https",
+					"host": [
+						"localhost"
+					],
+					"port": "44330",
+					"path": [
+						"api",
+						"transactions",
+						"create"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Crear transacción",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJVc2VySWQiOiIyIiwibmJmIjoxNjE3MDQ0NTIxLCJleHAiOjE2MTcxMzA5MjEsImlhdCI6MTYxNzA0NDUyMX0.SREEKE2Egbb2_BoLLBpswQFkzsAafnLHs2L6pAEPHIo",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"amount\": 1000,\r\n  \"concept\": \"carga inicial\",\r\n  \"type\": \"Topup\",\r\n  \"accountId\": 4\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://localhost:44330/api/transactions/create",
+					"protocol": "https",
+					"host": [
+						"localhost"
+					],
+					"port": "44330",
+					"path": [
+						"api",
+						"transactions",
+						"create"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Comprar USD",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJVc2VySWQiOiIyIiwibmJmIjoxNjE3MDQ0NTIxLCJleHAiOjE2MTcxMzA5MjEsImlhdCI6MTYxNzA0NDUyMX0.SREEKE2Egbb2_BoLLBpswQFkzsAafnLHs2L6pAEPHIo",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"type\": \"Compra\",\r\n  \"currency\": \"USD\",\r\n  \"amount\": 3\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://localhost:44330/api/transactions/buycurrency",
+					"protocol": "https",
+					"host": [
+						"localhost"
+					],
+					"port": "44330",
+					"path": [
+						"api",
+						"transactions",
+						"buycurrency"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Transferir",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJVc2VySWQiOiIyIiwibmJmIjoxNjE3MDQ0NTIxLCJleHAiOjE2MTcxMzA5MjEsImlhdCI6MTYxNzA0NDUyMX0.SREEKE2Egbb2_BoLLBpswQFkzsAafnLHs2L6pAEPHIo",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"accountId\": 4,\r\n  \"amount\": 10,\r\n  \"recipientAccountId\": 2\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://localhost:44330/api/transactions/transfer",
+					"protocol": "https",
+					"host": [
+						"localhost"
+					],
+					"port": "44330",
+					"path": [
+						"api",
+						"transactions",
+						"transfer"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Mostrar transacciones",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJVc2VySWQiOiIyIiwibmJmIjoxNjE3MDQ0NTIxLCJleHAiOjE2MTcxMzA5MjEsImlhdCI6MTYxNzA0NDUyMX0.SREEKE2Egbb2_BoLLBpswQFkzsAafnLHs2L6pAEPHIo",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "https://localhost:44330/api/transactions/1",
+					"protocol": "https",
+					"host": [
+						"localhost"
+					],
+					"port": "44330",
+					"path": [
+						"api",
+						"transactions",
+						"1"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Crear plazo fijo",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJVc2VySWQiOiIyIiwibmJmIjoxNjE3MDQ0NTIxLCJleHAiOjE2MTcxMzA5MjEsImlhdCI6MTYxNzA0NDUyMX0.SREEKE2Egbb2_BoLLBpswQFkzsAafnLHs2L6pAEPHIo",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"accountId\": 4,\r\n  \"amount\": 10\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://localhost:44330/api/fixedtermdeposit",
+					"protocol": "https",
+					"host": [
+						"localhost"
+					],
+					"port": "44330",
+					"path": [
+						"api",
+						"fixedtermdeposit"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Intentar cerrar plazo fijo en mismo día",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJVc2VySWQiOiIyIiwibmJmIjoxNjE3MDQ0NTIxLCJleHAiOjE2MTcxMzA5MjEsImlhdCI6MTYxNzA0NDUyMX0.SREEKE2Egbb2_BoLLBpswQFkzsAafnLHs2L6pAEPHIo",
+							"type": "string"
+						}
+					]
+				},
+				"method": "PATCH",
+				"header": [],
+				"url": {
+					"raw": "https://localhost:44330/api/fixedtermdeposit/3",
+					"protocol": "https",
+					"host": [
+						"localhost"
+					],
+					"port": "44330",
+					"path": [
+						"api",
+						"fixedtermdeposit",
+						"3"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Mostrar balance final",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJVc2VySWQiOiIyIiwibmJmIjoxNjE3MDQ0NTIxLCJleHAiOjE2MTcxMzA5MjEsImlhdCI6MTYxNzA0NDUyMX0.SREEKE2Egbb2_BoLLBpswQFkzsAafnLHs2L6pAEPHIo",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "https://localhost:44330/api/Account/",
+					"protocol": "https",
+					"host": [
+						"localhost"
+					],
+					"port": "44330",
+					"path": [
+						"api",
+						"Account",
+						""
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Loguear usuario ya existente",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"email\": \"alice@test.com\",\r\n  \"password\": 123456\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://localhost:44330/api/access",
+					"protocol": "https",
+					"host": [
+						"localhost"
+					],
+					"port": "44330",
+					"path": [
+						"api",
+						"access"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Ver plazo fijo existente",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJVc2VySWQiOiIxIiwibmJmIjoxNjE3MDQ2MDY0LCJleHAiOjE2MTcxMzI0NjQsImlhdCI6MTYxNzA0NjA2NH0.beDmCrh8cNnAcrMqr5V1PSublCJpjs8qGhcQc7x5Y0E",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "https://localhost:44330/api/fixedtermdeposit",
+					"protocol": "https",
+					"host": [
+						"localhost"
+					],
+					"port": "44330",
+					"path": [
+						"api",
+						"fixedtermdeposit"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Cerrar plazo fijo",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJVc2VySWQiOiIxIiwibmJmIjoxNjE3MDQ2MDY0LCJleHAiOjE2MTcxMzI0NjQsImlhdCI6MTYxNzA0NjA2NH0.beDmCrh8cNnAcrMqr5V1PSublCJpjs8qGhcQc7x5Y0E",
+							"type": "string"
+						}
+					]
+				},
+				"method": "PATCH",
+				"header": [],
+				"url": {
+					"raw": "https://localhost:44330/api/fixedtermdeposit/1",
+					"protocol": "https",
+					"host": [
+						"localhost"
+					],
+					"port": "44330",
+					"path": [
+						"api",
+						"fixedtermdeposit",
+						"1"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Mostrar balance",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJVc2VySWQiOiIxIiwibmJmIjoxNjE3MDQ2MDY0LCJleHAiOjE2MTcxMzI0NjQsImlhdCI6MTYxNzA0NjA2NH0.beDmCrh8cNnAcrMqr5V1PSublCJpjs8qGhcQc7x5Y0E",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "https://localhost:44330/api/transactions/1",
+					"protocol": "https",
+					"host": [
+						"localhost"
+					],
+					"port": "44330",
+					"path": [
+						"api",
+						"transactions",
+						"1"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}

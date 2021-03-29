@@ -1,0 +1,18 @@
+-crear de antemano usuario con transacciones y plazo fijo
+-----------
+-probar endpoints no logueado (account, FixedTermDeposit(get), transactions/create(post))
+-user(post) "registro"
+-access(post) "login"
+-account(get) "cuenta con balance" (mostrar cuentas vacias)
+-transactions/create(post) (primero probar errores(campos requeridos,tipo de dato))
+-transactions/buycurrency(post) (pesos y dolares)
+-transactions/transfer(post)
+-transactions/page(get) "mostrar pagina"
+-fixedtermdeposit(post) "crear plazo fijo"
+-fixedtermdeposit/id (patch) "cerrar plazo fijo" (mostrar que no se puede cerrar)
+-account(get) "cuenta con balance"
+
+-access(post) "login" (a la otra cuenta)
+-fixedtermdeposit(get) "mostrar plazo fijo ya creado"
+-fixedtermdeposit/id (patch) "cerrar plazo fijo"
+-transactions/page(get) "mostrar pagina"
