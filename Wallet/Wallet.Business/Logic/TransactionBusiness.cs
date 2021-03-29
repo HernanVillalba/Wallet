@@ -145,14 +145,17 @@ namespace Wallet.Business.Logic
                         Amount = tbc.Amount,
                         Concept = "Compra de divisas",
                         Type = "Topup",
-                        AccountId = (int)USD_accountId
+                        AccountId = (int)USD_accountId,
+                        Editable = false
                     };
                     //en ARS
                     Transactions transactionsDestiny = new Transactions
                     {
                         Amount = cost,
+                        Concept = "Compra de divisas",
                         Type = "Payment",
-                        AccountId = (int)ARS_accountId
+                        AccountId = (int)ARS_accountId,
+                        Editable = false
                     };
                     _unitOfWork.Transactions.Insert(transactionOrigin);
                     _unitOfWork.Transactions.Insert(transactionsDestiny);
@@ -223,7 +226,7 @@ namespace Wallet.Business.Logic
             Transactions transferTopup = new Transactions
             {
                 Amount = newTransfer.Amount,
-                Concept = $"Transfer from account {newTransfer.AccountId}",
+                Concept = $"Transferencia de cuenta {newTransfer.AccountId}",
                 Type = "Topup",
                 AccountId = newTransfer.RecipientAccountId,
                 Editable = false
@@ -231,7 +234,7 @@ namespace Wallet.Business.Logic
             Transactions transferPayment = new Transactions
             {
                 Amount = newTransfer.Amount,
-                Concept = $"Transfer to account {newTransfer.RecipientAccountId}",
+                Concept = $"Transferencia a la cuenta {newTransfer.RecipientAccountId}",
                 Type = "Payment",
                 AccountId = newTransfer.AccountId,
                 Editable = false
