@@ -100,7 +100,7 @@
             <summary>
             Mostrar lista paginada de usuarios ordenada por apellido ascendente
             </summary>
-            <param name="page">Número de página a mostrar</param>
+            <param name="page">Página a mostrar</param>
         </member>
     </members>
 </doc>
