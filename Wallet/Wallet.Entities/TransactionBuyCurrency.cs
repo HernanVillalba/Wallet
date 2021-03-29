@@ -15,6 +15,7 @@ namespace Wallet.Entities
         public string Currency { get; set; }
 
         [Required(ErrorMessage = "Monto requerido")]
+        [Range(0.01, double.MaxValue, ErrorMessage = "El campo {0} debe ser mayor a cero")]
         public double Amount { get; set; }
 
     }

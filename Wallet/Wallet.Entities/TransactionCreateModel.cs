@@ -5,6 +5,7 @@ namespace Wallet.Entities
     public class TransactionCreateModel
     {
         [Required]
+        [Range(0.01, double.MaxValue, ErrorMessage = "El campo {0} debe ser mayor a cero")]
         public double Amount { get; set; }
         [Required]
         [MaxLength(50, ErrorMessage = "Máximo 50 carácteres")]
@@ -14,6 +15,7 @@ namespace Wallet.Entities
         [RegularExpression("Topup|topup|Payment|payment", ErrorMessage = "Solo se permite Topup o Payment")]
         public string Type { get; set; }
         [Required]
+        [Range(1, int.MaxValue, ErrorMessage = "El campo {0} debe ser mayor a cero")]
         public int AccountId { get; set; }
 
     }
