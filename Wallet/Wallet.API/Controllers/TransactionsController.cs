@@ -69,7 +69,7 @@ namespace Wallet.API.Controllers
                 int ARS_account_id = _unitOfWork.Accounts.GetAccountId(user_id, "ARS");
                 newT.AccountId = ARS_account_id;
                 await tb.Create(newT);
-                return Ok();
+                return Ok(new { message = "Transacción realizada" });
             }
             catch (Exception) { throw new CustomException(404, "No se pudo crear la transacción"); }
 
@@ -89,7 +89,7 @@ namespace Wallet.API.Controllers
                 if (id == null || id <= 0) { return BadRequest(); }
                 var user_id = int.Parse(User.Claims.First(i => i.Type == "UserId").Value);
                 await tb.Edit(id, NewTransaction, user_id);
-                return Ok("Transacción actualizada con éxito");
+                return Ok(new { message = "Transacción actualizada con éxito" });
             }
             catch { throw; }
         }
@@ -141,7 +141,7 @@ namespace Wallet.API.Controllers
             {
                 var user_id = int.Parse(User.Claims.First(i => i.Type == "UserId").Value);
                 await tb.BuyCurrency(tbc, user_id);
-                return Ok("Transacción realizada con éxito");
+                return Ok(new { message = "Transacción realizada con éxito" });
             }
             catch { throw; }
         }
@@ -158,7 +158,7 @@ namespace Wallet.API.Controllers
             {
                 var userId = int.Parse(User.Claims.First(i => i.Type == "UserId").Value);
                 await tb.Transfer(newTransfer, userId);
-                return Ok("Transferencia realizada");
+                return Ok(new { message = "Transferencia realizada" });
             }
             catch { throw; }
         }
