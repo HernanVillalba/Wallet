@@ -59,7 +59,7 @@ namespace Wallet.Business.Logic
             //if user or password is incorrect
             else
             {
-                return null;
+                throw new CustomException(400, "Alguno de los datos ingresados es incorrecto");
             }
         }
     }

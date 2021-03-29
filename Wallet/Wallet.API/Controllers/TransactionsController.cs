@@ -181,19 +181,13 @@ namespace Wallet.API.Controllers
             var userId = int.Parse(User.Claims.First(i => i.Type == "UserId").Value);
             try
             {
-                string result = await tb.Transfer(newTransfer, userId);
-                if (result == "Transferencia realizada")
-                {
-                    return Ok(result);
-                }
-                else
-                {
-                    return BadRequest(result);
-                }
+               await tb.Transfer(newTransfer, userId);
+               return Ok("Transferencia realizada");
+               
             }
-            catch (Exception ex)
+            catch 
             {
-                return BadRequest(ex.Message);
+                throw;
             }
         }
     }

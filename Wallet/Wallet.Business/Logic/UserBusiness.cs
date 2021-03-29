@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Wallet.Data.Models;
@@ -20,7 +21,7 @@ namespace Wallet.Business.Logic
             _mapper = mapper;
         }
 
-        public async Task<bool> RegisterNewUser(RegisterModel newUser)
+        public async Task RegisterNewUser(RegisterModel newUser)
         {
             Users user = _mapper.Map<Users>(newUser);
             if (!_unitOfWork.Users.FindEmail(user.Email))
@@ -29,16 +30,18 @@ namespace Wallet.Business.Logic
                 _unitOfWork.Users.Insert(user);
                 await _unitOfWork.Users.AddAccounts(user);
                 await _unitOfWork.Complete();
-                return true;
             }
             else
             {
-                return false;
+                throw new CustomException(400, "Usuario ya registrado");
             }
         }
 
         public UserContact GetUserDetails(int userId)
         {
+            if (userId <= 0)
+                throw new CustomException(400, "Id inválido");
+
             // Search the user by id in the database
             Users userDB = _unitOfWork.Users.GetById(userId);
             
@@ -50,7 +53,20 @@ namespace Wallet.Business.Logic
 
         public IEnumerable<UserContact> PagedUsers(int page)
         {
-            return _unitOfWork.Users.GetByPage(page);            
+            if (page < 1)
+            {
+                throw new CustomException(400, "Ingrese un valor mayor a cero");
+            }
+            var users = _unitOfWork.Users.GetByPage(page);  
+            if (users.Any())
+            {
+                return users;
+            }
+            else
+            {
+                throw new CustomException(404, "Página no encontrada");
+            }
+
         }
 
         public List<UserFilterModel> Filter(UserFilterModel user)

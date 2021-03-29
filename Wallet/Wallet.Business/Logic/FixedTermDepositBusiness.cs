@@ -23,6 +23,9 @@ namespace Wallet.Business.Logic
 
         public IEnumerable<FixedTermDepositModel> GetAllByUserId(int userId)
         {
+            if (userId <= 0)
+                throw new CustomException(400, "Id inválido");
+
             // Get the fixed term deposits from database
             var fixedTermDepositsDB = _unitOfWork.FixedTermDeposits.GetAllByUserId(userId);
 
@@ -34,6 +37,9 @@ namespace Wallet.Business.Logic
 
         public async Task CreateFixedTermDeposit(FixedTermDepositCreateModel fixedTermDeposit, int userId)
         {
+            if (userId <= 0)
+                throw new CustomException(400, "Id inválido");
+
             // Must determine if there is enough balance in the account to afford the fixed term deposit opening
 
             // We need first the currency to call the stored procedure which calculates the balance

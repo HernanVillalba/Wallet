@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using System;
 using System.Linq;
+using Wallet.Business;
 using Wallet.Business.Logic;
 
 namespace Wallet.API.Controllers
@@ -27,11 +27,12 @@ namespace Wallet.API.Controllers
             var id = int.Parse(User.Claims.First(i => i.Type == "UserId").Value);
             try
             {
-                return Ok(_accountBusiness.GetAccountsWithBalance(id));
+                var accounts = _accountBusiness.GetAccountsWithBalance(id);
+                return Ok(accounts);
             }
-            catch (Exception ex)
+            catch
             {
-                return BadRequest(new { message = ex.Message });
+                throw new CustomException(500, "Error interno del servidor");
             }
         }
 
@@ -48,9 +49,9 @@ namespace Wallet.API.Controllers
                 var balances = _accountBusiness.GetBalances(id);               
                 return Ok(balances);
             }
-            catch (Exception ex)
+            catch
             {
-                return BadRequest(new { message = ex.Message });
+                throw new CustomException(500, "Error interno del servidor");
             }
         }        
     }
