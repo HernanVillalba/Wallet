@@ -52,7 +52,7 @@ namespace Wallet.API.Controllers
                 var ListDB = await tb.GetAll(user_id);
                 return Ok(await ListDB.ToPagedList(pageNumber, pageSize).ToListAsync());
             }
-            catch (Exception ex) { return BadRequest(ex.Message); }
+            catch { throw; }
         }
 
 
@@ -88,8 +88,8 @@ namespace Wallet.API.Controllers
             {
                 if (id == null || id <= 0) { return BadRequest(); }
                 var user_id = int.Parse(User.Claims.First(i => i.Type == "UserId").Value);
-                string message = await tb.EditTransaction(id, NewTransaction, user_id);
-                return Ok(message);
+                await tb.Edit(id, NewTransaction, user_id);
+                return Ok("Transacción actualizada con éxito");
             }
             catch { throw; }
         }

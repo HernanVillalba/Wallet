@@ -49,11 +49,15 @@ namespace Wallet.Business.Logic
             await _unitOfWork.Complete();
         }
 
-        public async Task<string> EditTransaction(int? id, TransactionEditModel NewTransaction, int user_id)
+        public async Task Edit(int? id, TransactionEditModel NewTransaction, int user_id)
         {
-            int USD_account_id = _unitOfWork.Accounts.GetAccountId(user_id, "USD");
-            int ARS_account_id = _unitOfWork.Accounts.GetAccountId(user_id, "ARS");
-            var transaction_buscada = _unitOfWork.Transactions.FindTransaction((int)id, USD_account_id, ARS_account_id);
+            int? USD_account_id = _unitOfWork.Accounts.GetAccountId(user_id, "USD");
+            int? ARS_account_id = _unitOfWork.Accounts.GetAccountId(user_id, "ARS");
+
+            if (USD_account_id == null || USD_account_id <= 0 || ARS_account_id == null || ARS_account_id <= 0) 
+            { throw new CustomException(404, "No se encontraron las cuentas del usuario"); }
+
+            var transaction_buscada = _unitOfWork.Transactions.FindTransaction((int)id, (int)USD_account_id, (int)ARS_account_id);
 
             if (transaction_buscada != null)
             {
@@ -62,7 +66,7 @@ namespace Wallet.Business.Logic
                     transaction_buscada.Concept = NewTransaction.Concept;
                     _unitOfWork.Transactions.Update(transaction_buscada);
                     await _unitOfWork.Complete();
-                    return "Transacción actualizada con éxito";
+                    return;
                 }
                 else { throw new CustomException(400, "La transacción no se puede editar"); }
             }
@@ -90,7 +94,7 @@ namespace Wallet.Business.Logic
         {
             int? ARS_account_id = _unitOfWork.Accounts.GetAccountId(user_id, "ARS");
             int? USD_account_id = _unitOfWork.Accounts.GetAccountId(user_id, "USD");
-            if (ARS_account_id == null || USD_account_id == null) { throw new CustomException(404, "No se pudo encontrar las cuentas del usuario"); }
+            if (ARS_account_id == null || USD_account_id == null) { throw new CustomException(404, "No se encontraron las cuentas del usuario"); }
 
             //si el id de account es null o menor a 0 se asume que busca en pesos
             if (transaction.AccountId == null || transaction.AccountId <= 0)
@@ -106,7 +110,7 @@ namespace Wallet.Business.Logic
             }
             IEnumerable<Transactions> List = _unitOfWork.Transactions.FilterTransaction(transaction);
             if (List != null && List.Count() > 0) { return List; }
-            else { throw new CustomException(404, "No se encontraron transacciones"); }
+            else { throw new CustomException(400, "No se encontraron transacciones"); }
         }
 
         public async Task BuyCurrency(TransactionBuyCurrency tbc, int user_id)
@@ -165,18 +169,20 @@ namespace Wallet.Business.Logic
                     //en USD
                     Transactions transactionsOrigin = new Transactions
                     {
+                        AccountId = (int)USD_accountId,
                         Amount = tbc.Amount,
                         Concept = "Compra de divisas",
                         Type = "Payment",
-                        AccountId = (int)USD_accountId
+                        Editable = false
                     };
                     //en ARS
                     Transactions transactionsDestiny = new Transactions
                     {
+                        AccountId = (int)ARS_accountId,
                         Amount = cost,
                         Concept = "Compra de divisas",
                         Type = "Topup",
-                        AccountId = (int)ARS_accountId
+                        Editable = false
                     };
 
                     _unitOfWork.Transactions.Insert(transactionsOrigin);
