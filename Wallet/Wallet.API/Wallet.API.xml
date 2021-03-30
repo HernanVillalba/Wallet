@@ -63,6 +63,12 @@
             <returns></returns>
             <remarks>Ingrese si va a comprar o vender, el tipo de divisa y el monto</remarks>
         </member>
+        <member name="M:Wallet.API.Controllers.TransactionsController.Transfer(Wallet.Entities.TransferModel)">
+            <summary>
+            Transferir dinero de una cuenta propia a otra cuenta existente de la misma moneda
+            </summary>
+            <remarks>Ingrese la cuenta de origen, el monto y por último la cuenta de destino</remarks>
+        </member>
         <member name="M:Wallet.API.Controllers.TransactionsController.Edit(System.Nullable{System.Int32},Wallet.Entities.TransactionEditModel)">
             <summary>
             Editar una transacción
@@ -70,12 +76,6 @@
             <param name="id">Id de la transacción</param>
             <param name="NewTransaction">Transacción</param>
             <returns></returns>
-        </member>
-        <member name="M:Wallet.API.Controllers.TransactionsController.Transfer(Wallet.Entities.TransferModel)">
-            <summary>
-            Transferir dinero de una cuenta propia a otra cuenta existente de la misma moneda
-            </summary>
-            <remarks>Ingrese la cuenta de origen, el monto y por último la cuenta de destino</remarks>
         </member>
         <member name="M:Wallet.API.Controllers.UserController.Register(Wallet.Entities.RegisterModel)">
             <summary>

@@ -15,21 +15,26 @@ namespace Wallet.Data.Repositories
 
         }
 
-        public IEnumerable<Transactions> FilterTransaction(TransactionFilterModel t)
+        public Task<List<Transactions>> FilterTransaction(TransactionFilterModel t, int usd_id, int ars_id)
         {
-            IEnumerable<Transactions> list;
-            if (t.Concept != "")
+            Task<List<Transactions>> list = null;
+            if (t.Concept != "" && t.Concept != null)
             {
-                list = _context.Transactions.Where(e => e.AccountId == t.AccountId && e.Concept.ToLower() == t.Concept.ToLower()).ToList();
+                list =  _context.Transactions.Where(e => e.AccountId == t.AccountId && e.Concept.ToLower().Contains(t.Concept.ToLower()) ).ToListAsync();
             }
-            else if (t.Type != "")
+            else if (t.Type != "" && t.Concept != null)
             {
-                list = _context.Transactions.Where(e => e.AccountId == t.AccountId && e.Type.ToLower() == t.Type.ToLower()).ToList();
+                list = _context.Transactions.Where(e => e.AccountId == t.AccountId && e.Type.ToLower().Contains(t.Type.ToLower()) ).ToListAsync();
+            }
+            else if(t.AccountId != null)
+            {
+                list = _context.Transactions.Where(e => e.AccountId == t.AccountId).ToListAsync();
             }
             else
             {
-                list = _context.Transactions.Where(e => e.AccountId == t.AccountId).ToList();
+                list =  _context.Transactions.Where(e => e.AccountId == usd_id || e.AccountId == ars_id).ToListAsync();
             }
+
             /*
             list =
                 _context.Transactions

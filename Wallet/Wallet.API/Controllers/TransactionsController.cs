@@ -17,9 +17,6 @@ namespace Wallet.API.Controllers
     [ApiController]
     public class TransactionsController : ControllerBase
     {
-
-        ////////////////////////////////////////////////////////////////////////////falta pasar el business como interfaz////////////////////////////////////////////////////////////////////////////
-
         private readonly ITransactionBusiness _transactionBusiness;
         public TransactionsController(ITransactionBusiness transactionBusiness)
         {
@@ -42,8 +39,7 @@ namespace Wallet.API.Controllers
 
                 var ListDB = await _transactionBusiness.GetAll(transactionFilterModel, user_id);
                 ListDB = await ListDB.ToPagedList(pageNumber, pageSize).ToListAsync();
-
-                return Ok(ListDB);
+                return StatusCode(200,ListDB);
             }
             catch { throw; }
         }
@@ -60,7 +56,7 @@ namespace Wallet.API.Controllers
                 if (id == null || id <= 0) { throw new CustomException(400, "Id de la transacción no válido"); }
                 var user_id = int.Parse(User.Claims.First(i => i.Type == "UserId").Value);
                 var transaction = _transactionBusiness.Details(id, user_id);
-                return Ok(transaction);
+                return StatusCode(200,transaction);
             }
             catch { throw; }
         }
@@ -76,7 +72,7 @@ namespace Wallet.API.Controllers
             {
                 var user_id = int.Parse(User.Claims.First(i => i.Type == "UserId").Value);
                 await _transactionBusiness.Create(newT,user_id);
-                return Ok();
+                return StatusCode(201);
             }
             catch (Exception) { throw new CustomException(404, "No se pudo crear la transacción"); }
 
@@ -96,7 +92,23 @@ namespace Wallet.API.Controllers
             {
                 var user_id = int.Parse(User.Claims.First(i => i.Type == "UserId").Value);
                 await _transactionBusiness.BuyCurrency(tbc, user_id);
-                return Ok();
+                return StatusCode(201);
+            }
+            catch { throw; }
+        }
+
+        /// <summary>
+        /// Transferir dinero de una cuenta propia a otra cuenta existente de la misma moneda
+        /// </summary>
+        /// <remarks>Ingrese la cuenta de origen, el monto y por último la cuenta de destino</remarks>
+        [HttpPost("Transfer")]
+        public async Task<IActionResult> Transfer([FromBody] TransferModel newTransfer)
+        {
+            try
+            {
+                var userId = int.Parse(User.Claims.First(i => i.Type == "UserId").Value);
+                await _transactionBusiness.Transfer(newTransfer, userId);
+                return StatusCode(201);
             }
             catch { throw; }
         }
@@ -115,29 +127,12 @@ namespace Wallet.API.Controllers
                 if (id == null || id <= 0) { return BadRequest(); }
                 var user_id = int.Parse(User.Claims.First(i => i.Type == "UserId").Value);
                 await _transactionBusiness.Edit(id, NewTransaction, user_id);
-                return Ok();
+                return StatusCode(201);
             }
             catch { throw; }
         }
 
-      
-
-
-        /// <summary>
-        /// Transferir dinero de una cuenta propia a otra cuenta existente de la misma moneda
-        /// </summary>
-        /// <remarks>Ingrese la cuenta de origen, el monto y por último la cuenta de destino</remarks>
-        [HttpPost("Transfer")]
-        public async Task<IActionResult> Transfer([FromBody] TransferModel newTransfer)
-        {
-            try
-            {
-                var userId = int.Parse(User.Claims.First(i => i.Type == "UserId").Value);
-                await _transactionBusiness.Transfer(newTransfer, userId);
-                return Ok();
-            }
-            catch { throw; }
-        }
+        
     }
 }
 

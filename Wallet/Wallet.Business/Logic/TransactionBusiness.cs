@@ -33,21 +33,25 @@ namespace Wallet.Business.Logic
             if (user_id <= 0) { throw new CustomException(400, "Id de usuario no válido"); }
 
             IEnumerable<Transactions> listDB;
-
-            if (tfm.Type != "" && tfm.Type != null && tfm.Concept != "" && tfm.Concept != null)
+            
+            if ( (tfm.Type != "" || tfm.Type != null) ||
+                (tfm.Concept != "" || tfm.Concept != null) ||
+                (tfm.AccountId != null || tfm.AccountId>=1) )
             {
-                listDB = Filter(tfm, user_id);
+                listDB = await Filter(tfm, user_id);
             }
+            
             else
             {
                 int ARS_id = _unitOfWork.Accounts.GetAccountId(user_id, "ARS"),
                     USD_id = _unitOfWork.Accounts.GetAccountId(user_id, "USD");
                 listDB = await _unitOfWork.Transactions.GetTransactionsUser(ARS_id, USD_id);
             }
+            
             return listDB;
         }
 
-        public IEnumerable<Transactions> Filter(TransactionFilterModel transaction, int user_id)
+        public Task<List<Transactions>> Filter(TransactionFilterModel transaction, int user_id)
         {
             int? ARS_account_id = _unitOfWork.Accounts.GetAccountId(user_id, "ARS");
             int? USD_account_id = _unitOfWork.Accounts.GetAccountId(user_id, "USD");
@@ -59,11 +63,11 @@ namespace Wallet.Business.Logic
                 transaction.AccountId = (int)ARS_account_id;
             }
 
-            if (transaction.AccountId != ARS_account_id || transaction.AccountId != USD_account_id) //si el id de la account ingresado es distinta a alguna de la suyas, se asume que busca en pesos
+            if (transaction.AccountId != ARS_account_id && transaction.AccountId != USD_account_id) //si el id de la account ingresado es distinta a alguna de la suyas, se asume que busca en pesos
             {
                 transaction.AccountId = (int)ARS_account_id;
             }
-            IEnumerable<Transactions> List = _unitOfWork.Transactions.FilterTransaction(transaction);
+            Task<List<Transactions>> List = _unitOfWork.Transactions.FilterTransaction(transaction,(int)USD_account_id, (int)ARS_account_id);
             return List; 
         }
 

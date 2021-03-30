@@ -10,7 +10,7 @@ namespace Wallet.Business.Logic
     public interface ITransactionBusiness
     {
         Task<IEnumerable<Transactions>> GetAll(TransactionFilterModel tfm, int user_id);
-        IEnumerable<Transactions> Filter(TransactionFilterModel transaction, int user_id);
+        Task<List<Transactions>> Filter(TransactionFilterModel transaction, int user_id);
         Task Create(TransactionCreateModel newT, int user_id);
         Task Edit(int? id, TransactionEditModel NewTransaction, int user_id);
         Transactions Details(int? id, int user_id);
