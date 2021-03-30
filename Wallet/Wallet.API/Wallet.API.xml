@@ -19,20 +19,20 @@
             Mostrar balances de las cuentas en pesos y dolares del usuario actual
             </summary>
         </member>
-        <member name="M:Wallet.API.Controllers.FixedTermDepositController.GetAllUserFixedTermDeposits">
+        <member name="M:Wallet.API.Controllers.FixedTermDepositsController.GetAllUserFixedTermDeposits">
             <summary>
             Listar todos los plazos fijos abiertos por el usuario logueado
             </summary>
         </member>
-        <member name="M:Wallet.API.Controllers.FixedTermDepositController.CreateFixedTermDeposit(Wallet.Entities.FixedTermDepositCreateModel)">
+        <member name="M:Wallet.API.Controllers.FixedTermDepositsController.CreateFixedTermDeposit(Wallet.Entities.FixedTermDepositCreateModel)">
             <summary>
-            Crea un nuevo plazo fijo
+            Crear un nuevo plazo fijo
             </summary>
             <response code="200">Plazo fijo creado correctamente</response>
         </member>
-        <member name="M:Wallet.API.Controllers.FixedTermDepositController.CloseFixedTermDeposit(System.Nullable{System.Int32})">
+        <member name="M:Wallet.API.Controllers.FixedTermDepositsController.CloseFixedTermDeposit(System.Int32)">
             <summary>
-            Cierra un plazo fijo en específico por su Id
+            Cerrar un plazo fijo en específico por su Id
             </summary>
             <param name="id">Id del plazo fijo</param>
             <response code="200">Plazo fijo cerrado correctamente</response>

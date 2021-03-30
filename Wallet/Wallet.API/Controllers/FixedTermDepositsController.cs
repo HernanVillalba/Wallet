@@ -17,11 +17,11 @@ namespace Wallet.API.Controllers
     [Authorize]
     [Route("api/[controller]")]
     [ApiController]
-    public class FixedTermDepositController : ControllerBase
+    public class FixedTermDepositsController : ControllerBase
     {
         private readonly IFixedTermDepositBusiness _fixedTermDepositBusiness;
 
-        public FixedTermDepositController(IFixedTermDepositBusiness fixedTermDepositBusiness)
+        public FixedTermDepositsController(IFixedTermDepositBusiness fixedTermDepositBusiness)
         {
             _fixedTermDepositBusiness = fixedTermDepositBusiness;
         }
@@ -49,7 +49,7 @@ namespace Wallet.API.Controllers
         }
 
         /// <summary>
-        /// Crea un nuevo plazo fijo
+        /// Crear un nuevo plazo fijo
         /// </summary>
         /// <response code="200">Plazo fijo creado correctamente</response>
         [HttpPost]
@@ -63,7 +63,7 @@ namespace Wallet.API.Controllers
                 // Delegate the logic to business
                 await _fixedTermDepositBusiness.CreateFixedTermDeposit(fixedTermDeposit, userId);
 
-                return Ok(new { message = "Plazo fijo creado correctamente" });
+                return Ok();
             }
             catch
             {
@@ -72,19 +72,19 @@ namespace Wallet.API.Controllers
         }
 
         /// <summary>
-        /// Cierra un plazo fijo en específico por su Id
+        /// Cerrar un plazo fijo en específico por su Id
         /// </summary>
         /// <param name="id">Id del plazo fijo</param>
         /// <response code="200">Plazo fijo cerrado correctamente</response>
-        [HttpPatch("{id}")]
-        public async Task<IActionResult> CloseFixedTermDeposit(int? id)
+        [HttpPost("{id}/Close")]
+        public async Task<IActionResult> CloseFixedTermDeposit(int id)
         {
             try
             {
                 // Delegate the logic to business
-                await _fixedTermDepositBusiness.CloseFixedTermDeposit((int)id);
+                await _fixedTermDepositBusiness.CloseFixedTermDeposit(id);
 
-                return Ok(new { message = "Plazo fijo cerrado correctamente" });
+                return Ok();
             }
             catch
             {
