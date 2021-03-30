@@ -1,20 +1,14 @@
 ﻿using AutoMapper;
-using Microsoft.AspNetCore.Mvc;
-using Wallet.Entities;
-using Wallet.Data.Repositories.Interfaces;
-using Wallet.Data.Models;
-using System;
-using System.Threading.Tasks;
-using System.Collections.Generic;
-using System.Linq;
 using Microsoft.AspNetCore.Authorization;
-using X.PagedList;
-using Wallet.Business.Logic;
-using System.Net.Http;
-using Wallet.Business.Operations;
-using System.Net.Http.Headers;
-using Newtonsoft.Json;
+using Microsoft.AspNetCore.Mvc;
+using System;
+using System.Linq;
+using System.Threading.Tasks;
 using Wallet.Business;
+using Wallet.Business.Logic;
+using Wallet.Data.Repositories.Interfaces;
+using Wallet.Entities;
+using X.PagedList;
 
 namespace Wallet.API.Controllers
 {
@@ -23,73 +17,29 @@ namespace Wallet.API.Controllers
     [ApiController]
     public class TransactionsController : ControllerBase
     {
-
-        ////////////////////////////////////////////////////////////////////////////falta pasar el business como interfaz////////////////////////////////////////////////////////////////////////////
-
-        private readonly IUnitOfWork _unitOfWork;
-        private readonly IMapper _mapper;
-        private readonly TransactionBusiness tb;
-        public TransactionsController(IUnitOfWork unitOfWork, IMapper mapper)
+        private readonly ITransactionBusiness _transactionBusiness;
+        public TransactionsController(ITransactionBusiness transactionBusiness)
         {
-            _unitOfWork = unitOfWork;
-            _mapper = mapper;
-            tb = new TransactionBusiness(_unitOfWork, mapper);
+            _transactionBusiness = transactionBusiness;
         }
 
         /// <summary>
         /// Listar todas las transacciones ordenadas por fecha descendente y paginadas de a 10
         /// </summary>
         /// <param name="page">Página</param>
-        [HttpGet("{page}")]
-        public async Task<IActionResult> GetAll(int? page)
+        /// <param name="transactionFilterModel">Transacción</param>
+        [HttpGet]
+        public async Task<IActionResult> GetAll([FromQuery] int page, [FromQuery]TransactionFilterModel transactionFilterModel)
         {
             try
             {
-                if (page == null || page <= 0) { page = 1; } //asigna la primer página
+                if (page <= 0) { page = 1; } //asigna la primer página
                 int pageNumber = (int)page, pageSize = 10; //10 registros por página
-
                 var user_id = int.Parse(User.Claims.First(i => i.Type == "UserId").Value);
-                var ListDB = await tb.GetAll(user_id);
-                return Ok(await ListDB.ToPagedList(pageNumber, pageSize).ToListAsync());
-            }
-            catch { throw; }
-        }
 
-
-        /// <summary>
-        /// Crear una transacción en pesos
-        /// </summary>
-        [HttpPost("Create")]
-        public async Task<IActionResult> Create([FromBody] TransactionCreateModel newT)
-        {
-            //por ahora solo se realalizan transacciones en ARS
-            try
-            {
-                var user_id = int.Parse(User.Claims.First(i => i.Type == "UserId").Value);
-                int ARS_account_id = _unitOfWork.Accounts.GetAccountId(user_id, "ARS");
-                newT.AccountId = ARS_account_id;
-                await tb.Create(newT);
-                return Ok(new { message = "Transacción realizada" });
-            }
-            catch (Exception) { throw new CustomException(404, "No se pudo crear la transacción"); }
-
-        }
-
-        /// <summary>
-        /// Editar una transacción
-        /// </summary>
-        /// <param name="id">Id de la transacción</param>
-        /// <param name="NewTransaction">Transacción</param>
-        /// <returns></returns>
-        [HttpPatch("Edit/{id}")]
-        public async Task<IActionResult> Edit(int? id, [FromBody] TransactionEditModel NewTransaction)
-        {
-            try
-            {
-                if (id == null || id <= 0) { return BadRequest(); }
-                var user_id = int.Parse(User.Claims.First(i => i.Type == "UserId").Value);
-                await tb.Edit(id, NewTransaction, user_id);
-                return Ok(new { message = "Transacción actualizada con éxito" });
+                var ListDB = await _transactionBusiness.GetAll(transactionFilterModel, user_id);
+                ListDB = await ListDB.ToPagedList(pageNumber, pageSize).ToListAsync();
+                return StatusCode(200,ListDB);
             }
             catch { throw; }
         }
@@ -98,34 +48,34 @@ namespace Wallet.API.Controllers
         /// Mostrar los detalles de una transacción en específico por Id
         /// </summary>
         /// <param name="id">Id de la transacción</param>
-        /// <returns></returns>
-        [HttpGet("Details/{id}")]
+        [HttpGet("{id}")]
         public IActionResult Details(int? id)
         {
             try
             {
                 if (id == null || id <= 0) { throw new CustomException(400, "Id de la transacción no válido"); }
                 var user_id = int.Parse(User.Claims.First(i => i.Type == "UserId").Value);
-                var transaction = tb.Details(id, user_id);
-                return Ok(transaction);
+                var transaction = _transactionBusiness.Details(id, user_id);
+                return StatusCode(200,transaction);
             }
             catch { throw; }
         }
 
         /// <summary>
-        /// Filtrar transacción por campos
+        /// Crear una transacción en pesos
         /// </summary>
-        /// <param name="transaction">Transacción</param>
-        /// <returns></returns>
-        [HttpPost("Filter")]
-        public IActionResult Filter([FromBody] TransactionFilterModel transaction)
+        [HttpPost]
+        public async Task<IActionResult> Create([FromBody] TransactionCreateModel newT)
         {
+            //solo transacciones en ARS
             try
             {
                 var user_id = int.Parse(User.Claims.First(i => i.Type == "UserId").Value);
-                return Ok(tb.Filter(transaction, user_id));
+                await _transactionBusiness.Create(newT,user_id);
+                return StatusCode(201);
             }
-            catch { throw; }
+            catch (Exception) { throw new CustomException(404, "No se pudo crear la transacción"); }
+
         }
 
         /// <summary>
@@ -134,18 +84,18 @@ namespace Wallet.API.Controllers
         /// <param name="tbc">Transacción</param>
         /// <returns></returns>
         /// <remarks>Ingrese si va a comprar o vender, el tipo de divisa y el monto</remarks>
-        [HttpPost("BuyCurrency")]
+        [HttpPost]
+        [Route("BuyCurrencies")]
         public async Task<IActionResult> BuyCurrencyAsync([FromBody] TransactionBuyCurrency tbc)
         {
             try
             {
                 var user_id = int.Parse(User.Claims.First(i => i.Type == "UserId").Value);
-                await tb.BuyCurrency(tbc, user_id);
-                return Ok(new { message = "Transacción realizada con éxito" });
+                await _transactionBusiness.BuyCurrency(tbc, user_id);
+                return StatusCode(201);
             }
             catch { throw; }
         }
-
 
         /// <summary>
         /// Transferir dinero de una cuenta propia a otra cuenta existente de la misma moneda
@@ -157,11 +107,32 @@ namespace Wallet.API.Controllers
             try
             {
                 var userId = int.Parse(User.Claims.First(i => i.Type == "UserId").Value);
-                await tb.Transfer(newTransfer, userId);
-                return Ok(new { message = "Transferencia realizada" });
+                await _transactionBusiness.Transfer(newTransfer, userId);
+                return StatusCode(201);
             }
             catch { throw; }
         }
+
+        /// <summary>
+        /// Editar una transacción
+        /// </summary>
+        /// <param name="id">Id de la transacción</param>
+        /// <param name="NewTransaction">Transacción</param>
+        /// <returns></returns>
+        [HttpPatch("{id}")]
+        public async Task<IActionResult> Edit(int? id, [FromBody] TransactionEditModel NewTransaction)
+        {
+            try
+            {
+                if (id == null || id <= 0) { return BadRequest(); }
+                var user_id = int.Parse(User.Claims.First(i => i.Type == "UserId").Value);
+                await _transactionBusiness.Edit(id, NewTransaction, user_id);
+                return StatusCode(201);
+            }
+            catch { throw; }
+        }
+
+        
     }
 }
 

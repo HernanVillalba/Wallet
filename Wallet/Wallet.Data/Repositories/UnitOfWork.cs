@@ -11,7 +11,7 @@ namespace Wallet.Data.Repositories
         {
             _context = context;
             Users = new UserRepository(_context);
-            Transactions = new TrasactionRepository(_context);
+            Transactions = new TransactionRepository(_context);
             FixedTermDeposits = new FixedTermDepositRepository(_context);
             Accounts = new AccountRepository(_context);
         }
