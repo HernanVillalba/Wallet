@@ -105,7 +105,7 @@ namespace Wallet.API
             #region Repositories and Unit of Work
             services.AddTransient(typeof(IGenericRepository<>), typeof(GenericRepository<>));
             services.AddTransient<IUserRepository, UserRepository>();
-            services.AddTransient<ITransactionRepository, TrasactionRepository>();
+            services.AddTransient<ITransactionRepository, TransactionRepository>();
             services.AddTransient<IFixedTermDepositRepository, FixedTermDepositRepository>();
             services.AddTransient<IAccountRepository, AccountRepository>();
             services.AddTransient<IUnitOfWork, UnitOfWork>();
@@ -141,6 +141,7 @@ namespace Wallet.API
             services.AddTransient<IAccountBusiness, AccountBusiness>();
             services.AddTransient<IUserBusiness, UserBusiness>();
             services.AddTransient<IFixedTermDepositBusiness, FixedTermDepositBusiness>();
+            services.AddTransient<ITransactionBusiness, TransactionBusiness>();
             #endregion
         }
 

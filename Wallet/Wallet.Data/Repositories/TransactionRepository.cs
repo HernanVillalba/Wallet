@@ -8,9 +8,9 @@ using Wallet.Entities;
 
 namespace Wallet.Data.Repositories
 {
-    public class TrasactionRepository : GenericRepository<Transactions>, ITransactionRepository
+    public class TransactionRepository : GenericRepository<Transactions>, ITransactionRepository
     {
-        public TrasactionRepository(WALLETContext context) : base(context)
+        public TransactionRepository(WALLETContext context) : base(context)
         {
 
         }

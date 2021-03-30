@@ -17,12 +17,10 @@ using System.Net.Http.Headers;
 
 namespace Wallet.Business.Logic
 {
-    public class TransactionBusiness
+    public class TransactionBusiness : ITransactionBusiness
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
-
-        public object CreateMap { get; private set; }
 
         public TransactionBusiness(IUnitOfWork unitOfWork, IMapper mapper)
         {
@@ -69,8 +67,11 @@ namespace Wallet.Business.Logic
             return List; 
         }
 
-        public async Task Create(TransactionCreateModel newT)
+        public async Task Create(TransactionCreateModel newT, int user_id)
         {
+            int? ARS_account_id = _unitOfWork.Accounts.GetAccountId(user_id, "ARS");
+            if(ARS_account_id == null || ARS_account_id <= 0 || user_id <= 0) { throw new CustomException(404,"No se pudo obtener alguno de los datos del usuario"); }
+            newT.AccountId = ARS_account_id;
             Transactions transaction = _mapper.Map<Transactions>(newT);
             _unitOfWork.Transactions.Insert(transaction);
             await _unitOfWork.Complete();
@@ -82,7 +83,7 @@ namespace Wallet.Business.Logic
             int? ARS_account_id = _unitOfWork.Accounts.GetAccountId(user_id, "ARS");
 
             if (USD_account_id == null || USD_account_id <= 0 || ARS_account_id == null || ARS_account_id <= 0)
-            { throw new CustomException(404, "No se encontró algunas de las cuentas del usuario"); }
+            { throw new CustomException(404, "No se encontró alguna de las cuentas del usuario"); }
 
             var transaction_buscada = _unitOfWork.Transactions.FindTransaction((int)id, (int)USD_account_id, (int)ARS_account_id);
 

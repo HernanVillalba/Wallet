@@ -20,14 +20,10 @@ namespace Wallet.API.Controllers
 
         ////////////////////////////////////////////////////////////////////////////falta pasar el business como interfaz////////////////////////////////////////////////////////////////////////////
 
-        private readonly IUnitOfWork _unitOfWork;
-        private readonly IMapper _mapper;
-        private readonly TransactionBusiness tb;
-        public TransactionsController(IUnitOfWork unitOfWork, IMapper mapper)
+        private readonly ITransactionBusiness _transactionBusiness;
+        public TransactionsController(ITransactionBusiness transactionBusiness)
         {
-            _unitOfWork = unitOfWork;
-            _mapper = mapper;
-            tb = new TransactionBusiness(_unitOfWork, mapper);
+            _transactionBusiness = transactionBusiness;
         }
 
         /// <summary>
@@ -44,7 +40,7 @@ namespace Wallet.API.Controllers
                 int pageNumber = (int)page, pageSize = 10; //10 registros por página
                 var user_id = int.Parse(User.Claims.First(i => i.Type == "UserId").Value);
 
-                var ListDB = await tb.GetAll(transactionFilterModel, user_id);
+                var ListDB = await _transactionBusiness.GetAll(transactionFilterModel, user_id);
                 ListDB = await ListDB.ToPagedList(pageNumber, pageSize).ToListAsync();
 
                 return Ok(ListDB);
@@ -63,7 +59,7 @@ namespace Wallet.API.Controllers
             {
                 if (id == null || id <= 0) { throw new CustomException(400, "Id de la transacción no válido"); }
                 var user_id = int.Parse(User.Claims.First(i => i.Type == "UserId").Value);
-                var transaction = tb.Details(id, user_id);
+                var transaction = _transactionBusiness.Details(id, user_id);
                 return Ok(transaction);
             }
             catch { throw; }
@@ -79,9 +75,7 @@ namespace Wallet.API.Controllers
             try
             {
                 var user_id = int.Parse(User.Claims.First(i => i.Type == "UserId").Value);
-                int ARS_account_id = _unitOfWork.Accounts.GetAccountId(user_id, "ARS");
-                newT.AccountId = ARS_account_id;
-                await tb.Create(newT);
+                await _transactionBusiness.Create(newT,user_id);
                 return Ok();
             }
             catch (Exception) { throw new CustomException(404, "No se pudo crear la transacción"); }
@@ -101,7 +95,7 @@ namespace Wallet.API.Controllers
             try
             {
                 var user_id = int.Parse(User.Claims.First(i => i.Type == "UserId").Value);
-                await tb.BuyCurrency(tbc, user_id);
+                await _transactionBusiness.BuyCurrency(tbc, user_id);
                 return Ok();
             }
             catch { throw; }
@@ -120,7 +114,7 @@ namespace Wallet.API.Controllers
             {
                 if (id == null || id <= 0) { return BadRequest(); }
                 var user_id = int.Parse(User.Claims.First(i => i.Type == "UserId").Value);
-                await tb.Edit(id, NewTransaction, user_id);
+                await _transactionBusiness.Edit(id, NewTransaction, user_id);
                 return Ok();
             }
             catch { throw; }
@@ -139,7 +133,7 @@ namespace Wallet.API.Controllers
             try
             {
                 var userId = int.Parse(User.Claims.First(i => i.Type == "UserId").Value);
-                await tb.Transfer(newTransfer, userId);
+                await _transactionBusiness.Transfer(newTransfer, userId);
                 return Ok();
             }
             catch { throw; }
