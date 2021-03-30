@@ -17,11 +17,26 @@ namespace Wallet.Data.Repositories
 
         public IEnumerable<Transactions> FilterTransaction(TransactionFilterModel t)
         {
-            IEnumerable<Transactions> list =
+            IEnumerable<Transactions> list;
+            if (t.Concept != "")
+            {
+                list = _context.Transactions.Where(e => e.AccountId == t.AccountId && e.Concept.ToLower() == t.Concept.ToLower()).ToList();
+            }
+            else if (t.Type != "")
+            {
+                list = _context.Transactions.Where(e => e.AccountId == t.AccountId && e.Type.ToLower() == t.Type.ToLower()).ToList();
+            }
+            else
+            {
+                list = _context.Transactions.Where(e => e.AccountId == t.AccountId).ToList();
+            }
+            /*
+            list =
                 _context.Transactions
                 .Where
-                (e => (e.AccountId == t.ARS_Id || e.AccountId == t.USD_Id) && (e.Concept.ToLower().Contains(t.Concept.ToLower()) || e.Type.ToLower().Contains(t.Type.ToLower()) ))
+                (e => (e.AccountId == t.AccountId) && (e.Concept.ToLower().Contains(t.Concept.ToLower()) || e.Type.ToLower().Contains(t.Type.ToLower()) ))
                 .OrderByDescending(e => e.Date);
+            */
             return list;
         }
 
