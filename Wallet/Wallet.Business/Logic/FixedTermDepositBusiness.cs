@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Wallet.Business.EmailSender.Interface;
 using Wallet.Data.Models;
 using Wallet.Data.Repositories.Interfaces;
 using Wallet.Entities;
@@ -14,11 +15,13 @@ namespace Wallet.Business.Logic
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
+        private readonly IEmailSender _emailSender;
 
-        public FixedTermDepositBusiness(IUnitOfWork unitOfWork, IMapper mapper)
+        public FixedTermDepositBusiness(IUnitOfWork unitOfWork, IMapper mapper, IEmailSender emailSender)
         {
             _unitOfWork = unitOfWork;
             _mapper = mapper;
+            _emailSender = emailSender;
         }
 
         public IEnumerable<FixedTermDepositModel> GetAllByUserId(int userId)
@@ -81,7 +84,7 @@ namespace Wallet.Business.Logic
             await _unitOfWork.Complete();
         }
 
-        public async Task CloseFixedTermDeposit(int fixedTermDepositId)
+        public async Task CloseFixedTermDeposit(int fixedTermDepositId, int userId)
         {
             if (fixedTermDepositId <= 0)
                 throw new CustomException(400, "Id inválido");
@@ -131,6 +134,18 @@ namespace Wallet.Business.Logic
 
             // Save changes to database
             await _unitOfWork.Complete();
+
+            // When completed, if no exception has been thrown, send email with details:
+            string email = _unitOfWork.Users.GetById(userId).Email;
+            await _emailSender.SendEmailAsync(email, $"Cierre de plazo fijo",
+            $"El plazo fijo #{fixedTermDepositId} se ha cerrado correctamente!" +
+            "<br>" +
+            "<br>" +
+            $"Monto inicial: ${Math.Round(fixedTermDeposit.Amount, 2)}" +
+            "<br>" +
+            $"Ganancias reportadas: ${Math.Round(total, 2)}" +
+            $"<br>" +
+            $"Intereses generados: ${Math.Round(fixedTermDeposit.Amount - total, 2)}");
         }
     }
 }
