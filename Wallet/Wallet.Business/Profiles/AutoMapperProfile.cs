@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using Newtonsoft.Json.Linq;
+using System.Collections.Generic;
 using Wallet.Business.Operations;
 using Wallet.Data.Models;
 using Wallet.Entities;
@@ -18,6 +19,8 @@ namespace Wallet.Business.Profiles
             CreateMap<FixedTermDeposits, FixedTermDepositModel>().ReverseMap();
             CreateMap<Transactions, TransactionFilterModel>().ReverseMap();
             CreateMap<Users, UserFilterModel>().ReverseMap();
+            CreateMap<Transactions, TransactionDetailsModel>().ReverseMap();
+            CreateMap<TransactionLog, TransactionLogModel>().ReverseMap();
         }
     }
 }
