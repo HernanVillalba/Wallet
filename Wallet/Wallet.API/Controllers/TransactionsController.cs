@@ -1,12 +1,10 @@
-﻿using AutoMapper;
-using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Linq;
 using System.Threading.Tasks;
 using Wallet.Business;
 using Wallet.Business.Logic;
-using Wallet.Data.Repositories.Interfaces;
 using Wallet.Entities;
 using X.PagedList;
 
@@ -33,6 +31,7 @@ namespace Wallet.API.Controllers
         {
             try
             {
+                
                 if (page <= 0) { page = 1; } //asigna la primer página
                 int pageNumber = (int)page, pageSize = 10; //10 registros por página
                 var user_id = int.Parse(User.Claims.First(i => i.Type == "UserId").Value);

@@ -31,16 +31,16 @@ namespace Wallet.Business.Logic
         public async Task<IEnumerable<Transactions>> GetAll(TransactionFilterModel tfm, int user_id)
         {
             if (user_id <= 0) { throw new CustomException(400, "Id de usuario no válido"); }
-
-            IEnumerable<Transactions> listDB;
+            IEnumerable <Transactions> listDB;
             
-            if ( (tfm.Type != "" || tfm.Type != null) ||
-                (tfm.Concept != "" || tfm.Concept != null) ||
-                (tfm.AccountId != null || tfm.AccountId>=1) )
+            //si busca con algún filtro
+            if ( (tfm.Type != "" && tfm.Type != null) ||
+                (tfm.Concept != "" && tfm.Concept != null) ||
+                (tfm.AccountId != null && tfm.AccountId>=1) )
             {
                 listDB = await Filter(tfm, user_id);
             }
-            
+            //si busca sin filtros
             else
             {
                 int ARS_id = _unitOfWork.Accounts.GetAccountId(user_id, "ARS"),
@@ -95,7 +95,13 @@ namespace Wallet.Business.Logic
             {
                 if ((bool)transaction_buscada.Editable)
                 {
+                    var transactionLog = new TransactionLog
+                    {
+                        TransactionId = transaction_buscada.Id,
+                        NewValue = NewTransaction.Concept
+                    };
                     transaction_buscada.Concept = NewTransaction.Concept;
+                    _unitOfWork.TransactionLog.Insert(transactionLog); //inserto el nuevo cambio en transaction log
                     _unitOfWork.Transactions.Update(transaction_buscada);
                     await _unitOfWork.Complete();
                     return;
