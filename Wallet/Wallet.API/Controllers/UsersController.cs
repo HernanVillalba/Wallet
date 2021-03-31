@@ -10,10 +10,10 @@ namespace Wallet.API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class UserController : Controller
+    public class UsersController : Controller
     {
         private readonly IUserBusiness _userBusiness;
-        public UserController(IUserBusiness userBusiness)
+        public UsersController(IUserBusiness userBusiness)
         {
             _userBusiness = userBusiness;
         }
@@ -21,14 +21,14 @@ namespace Wallet.API.Controllers
         /// <summary>
         /// Registrar un usuario nuevo con un email único
         /// </summary>
-        /// <response code="200">Usuario registrado correctamente</response>
+        /// <response code="201">Usuario registrado correctamente</response>
         [HttpPost]
         public async Task<IActionResult> Register([FromBody] RegisterModel newUser)
         {
             try
             {
                 await _userBusiness.RegisterNewUser(newUser);              
-                return Ok(new { message = "Usuario registrado correctamente" });               
+                return StatusCode(201);               
             }
             catch 
             {
@@ -59,8 +59,8 @@ namespace Wallet.API.Controllers
         /// </summary>
         /// <param name="page">Página a mostrar</param>
         [Authorize]
-        [HttpGet("Page/{page}")]
-        public IActionResult GetAll(int page)
+        [HttpGet]
+        public IActionResult GetUsersByPage([FromQuery]int page)
         {
             try
             { 

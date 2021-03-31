@@ -4,7 +4,7 @@ using Wallet.Entities;
 
 namespace Wallet.Business.Logic
 {
-    public interface IAccessBusiness
+    public interface ISessionBusiness
     {
         Task<object> LoginUser(LoginModel userToMap);
     }
