@@ -133,11 +133,11 @@ namespace Wallet.Business.Logic
             $"El plazo fijo #{fixedTermDepositId} se ha cerrado correctamente!" +
             "<br>" +
             "<br>" +
-            $"Monto inicial: ${Math.Round(fixedTermDeposit.Amount, 2)}" +
+            $"Monto inicial: ${Math.Round(interestsCalculation.montoInicial, 2)}" +
             "<br>" +
-            $"Ganancias reportadas: ${Math.Round(total, 2)}" +
+            $"Monto rescatado: ${Math.Round(interestsCalculation.montoFinal, 2)}" +
             $"<br>" +
-            $"Intereses generados: ${Math.Round(fixedTermDeposit.Amount - total, 2)}");
+            $"Intereses generados: ${Math.Round(interestsCalculation.montoFinal - interestsCalculation.montoInicial, 2)}");
         }
 
         public InterestsCalculationModel calculateProfit(string currency, double amount, DateTime from, DateTime to)
