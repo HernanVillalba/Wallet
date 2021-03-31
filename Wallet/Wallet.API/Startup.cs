@@ -137,7 +137,7 @@ namespace Wallet.API
             });
             #endregion
             #region Business Logic
-            services.AddTransient<IAccessBusiness, AccessBusiness>();
+            services.AddTransient<ISessionBusiness, SessionBusiness>();
             services.AddTransient<IAccountBusiness, AccountBusiness>();
             services.AddTransient<IUserBusiness, UserBusiness>();
             services.AddTransient<IFixedTermDepositBusiness, FixedTermDepositBusiness>();
