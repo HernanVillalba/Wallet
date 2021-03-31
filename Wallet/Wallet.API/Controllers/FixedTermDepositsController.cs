@@ -106,8 +106,11 @@ namespace Wallet.API.Controllers
         {
             try
             {
+                // Get the current user's id logged to the API
+                var userId = int.Parse(User.Claims.First(i => i.Type == "UserId").Value);
+
                 // Delegate the logic to business
-                await _fixedTermDepositBusiness.CloseFixedTermDeposit(id);
+                await _fixedTermDepositBusiness.CloseFixedTermDeposit(id, userId);
 
                 return Ok();
             }

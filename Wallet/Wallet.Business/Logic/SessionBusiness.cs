@@ -13,13 +13,13 @@ using Wallet.Entities;
 
 namespace Wallet.Business.Logic
 {
-    public class AccessBusiness : IAccessBusiness
+    public class SessionBusiness : ISessionBusiness
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly IConfiguration _configuration;
         private readonly IMapper _mapper;
 
-        public AccessBusiness(IUnitOfWork unitOfWork, IConfiguration configuration, IMapper mapper)
+        public SessionBusiness(IUnitOfWork unitOfWork, IConfiguration configuration, IMapper mapper)
         {
             _unitOfWork = unitOfWork;
             _configuration = configuration;

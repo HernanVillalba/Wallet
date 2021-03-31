@@ -3,19 +3,17 @@ using System.Threading.Tasks;
 using Wallet.Business.Logic;
 using Wallet.Entities;
 
-// For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
-
 namespace Wallet.API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class AccessController : ControllerBase
+    public class SessionController : ControllerBase
     {
-        private readonly IAccessBusiness _accessBusiness;
+        private readonly ISessionBusiness _sessionBusiness;
 
-        public AccessController( IAccessBusiness accessBusiness)
+        public SessionController( ISessionBusiness sessionBusiness)
         {
-            _accessBusiness= accessBusiness;
+            _sessionBusiness= sessionBusiness;
         }   
         
         /// <summary>
@@ -26,7 +24,7 @@ namespace Wallet.API.Controllers
         {
             try
             {
-                var token =  await _accessBusiness.LoginUser(userToCheck);
+                var token =  await _sessionBusiness.LoginUser(userToCheck);
                 return Ok(token);
             }
             catch

@@ -8,11 +8,11 @@ namespace Wallet.API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class AccountController : ControllerBase
+    public class AccountsController : ControllerBase
     {
         private readonly IAccountBusiness _accountBusiness;
 
-        public AccountController(IAccountBusiness accountBusiness)
+        public AccountsController(IAccountBusiness accountBusiness)
         {
             _accountBusiness= accountBusiness;
         }

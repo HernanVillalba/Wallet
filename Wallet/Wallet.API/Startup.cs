@@ -25,6 +25,8 @@ using Microsoft.AspNetCore.Http;
 using Wallet.Entities;
 using Wallet.Business;
 using Microsoft.AspNetCore.Mvc;
+using Wallet.Business.EmailSender.Interface;
+using Wallet.Business.EmailSender;
 
 namespace Wallet.API
 {
@@ -108,6 +110,7 @@ namespace Wallet.API
             services.AddTransient<ITransactionRepository, TransactionRepository>();
             services.AddTransient<IFixedTermDepositRepository, FixedTermDepositRepository>();
             services.AddTransient<IAccountRepository, AccountRepository>();
+            services.AddTransient<ITransactionLogRepository, TransactionLogRepository>();
             services.AddTransient<IUnitOfWork, UnitOfWork>();
             #endregion
             #region AutoMapper
@@ -137,11 +140,20 @@ namespace Wallet.API
             });
             #endregion
             #region Business Logic
-            services.AddTransient<IAccessBusiness, AccessBusiness>();
+            services.AddTransient<ISessionBusiness, SessionBusiness>();
             services.AddTransient<IAccountBusiness, AccountBusiness>();
             services.AddTransient<IUserBusiness, UserBusiness>();
             services.AddTransient<IFixedTermDepositBusiness, FixedTermDepositBusiness>();
             services.AddTransient<ITransactionBusiness, TransactionBusiness>();
+            #endregion
+            #region Mailer
+            services.AddTransient<IEmailSender, SendGridEmailSender>();
+            services.Configure<SendGridEmailSenderOptions>(options =>
+            {
+                options.ApiKey = Configuration["ExternalProviders:SendGrid:ApiKey"];
+                options.SenderEmail = Configuration["ExternalProviders:SendGrid:SenderEmail"];
+                options.SenderName = Configuration["ExternalProviders:SendGrid:SenderName"];
+            });
             #endregion
         }
 
