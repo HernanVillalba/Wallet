@@ -22,7 +22,7 @@ namespace Wallet.Data.Repositories
             {
                 list =  _context.Transactions.Where(e => e.AccountId == t.AccountId && e.Concept.ToLower().Contains(t.Concept.ToLower()) ).ToListAsync();
             }
-            else if (t.Type != "" && t.Concept != null)
+            else if (t.Type != "" && t.Type != null)
             {
                 list = _context.Transactions.Where(e => e.AccountId == t.AccountId && e.Type.ToLower().Contains(t.Type.ToLower()) ).ToListAsync();
             }

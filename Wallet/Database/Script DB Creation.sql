@@ -33,3 +33,10 @@ Creation_Date Datetime not null DEFAULT(GETDATE()),
 Closing_Date Datetime null,
 Account_Id int not null FOREIGN KEY REFERENCES Accounts(Id)
 )
+GO
+CREATE TABLE TransactionLog	(
+Id INT NOT NULL IDENTITY(1,1) PRIMARY KEY,
+Transaction_Id INT NOT NULL	FOREIGN KEY REFERENCES Transactions(Id),
+New_Value NVARCHAR(100) NOT NULL,
+Modification_Date DATETIME NOT NULL DEFAULT(GETDATE())
+)

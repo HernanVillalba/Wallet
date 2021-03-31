@@ -21,6 +21,7 @@ namespace Wallet.Data.Models
 
         public virtual DbSet<Accounts> Accounts { get; set; }
         public virtual DbSet<FixedTermDeposits> FixedTermDeposits { get; set; }
+        public virtual DbSet<TransactionLog> TransactionLog { get; set; }
         public virtual DbSet<Transactions> Transactions { get; set; }
         public virtual DbSet<Users> Users { get; set; }
         public virtual DbSet<AccountBalance> AccountBalance { get; set; }
@@ -28,6 +29,10 @@ namespace Wallet.Data.Models
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
+            if (!optionsBuilder.IsConfigured)
+            {
+                optionsBuilder.UseSqlServer("name=WalletDB");
+            }
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -42,7 +47,7 @@ namespace Wallet.Data.Models
                     .WithMany(p => p.Accounts)
                     .HasForeignKey(d => d.UserId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK__Accounts__User_I__2D27B809");
+                    .HasConstraintName("FK__Accounts__User_I__286302EC");
             });
 
             modelBuilder.Entity<FixedTermDeposits>(entity =>
@@ -62,7 +67,28 @@ namespace Wallet.Data.Models
                     .WithMany(p => p.FixedTermDeposits)
                     .HasForeignKey(d => d.AccountId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK__FixedTerm__Accou__2E1BDC42");
+                    .HasConstraintName("FK__FixedTerm__Accou__33D4B598");
+            });
+
+            modelBuilder.Entity<TransactionLog>(entity =>
+            {
+                entity.Property(e => e.ModificationDate)
+                    .HasColumnName("Modification_Date")
+                    .HasColumnType("datetime")
+                    .HasDefaultValueSql("(getdate())");
+
+                entity.Property(e => e.NewValue)
+                    .IsRequired()
+                    .HasColumnName("New_Value")
+                    .HasMaxLength(100);
+
+                entity.Property(e => e.TransactionId).HasColumnName("Transaction_Id");
+
+                entity.HasOne(d => d.Transaction)
+                    .WithMany(p => p.TransactionLog)
+                    .HasForeignKey(d => d.TransactionId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK__Transacti__Trans__49C3F6B7");
             });
 
             modelBuilder.Entity<Transactions>(entity =>
@@ -87,13 +113,13 @@ namespace Wallet.Data.Models
                     .WithMany(p => p.Transactions)
                     .HasForeignKey(d => d.AccountId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK__Transacti__Accou__2F10007B");
+                    .HasConstraintName("FK__Transacti__Accou__2E1BDC42");
             });
 
             modelBuilder.Entity<Users>(entity =>
             {
                 entity.HasIndex(e => e.Email)
-                    .HasName("UQ__Users__A9D10534B060BDB9")
+                    .HasName("UQ__Users__A9D1053470790888")
                     .IsUnique();
 
                 entity.Property(e => e.Email)

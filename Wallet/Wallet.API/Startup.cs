@@ -110,6 +110,7 @@ namespace Wallet.API
             services.AddTransient<ITransactionRepository, TransactionRepository>();
             services.AddTransient<IFixedTermDepositRepository, FixedTermDepositRepository>();
             services.AddTransient<IAccountRepository, AccountRepository>();
+            services.AddTransient<ITransactionLogRepository, TransactionLogRepository>();
             services.AddTransient<IUnitOfWork, UnitOfWork>();
             #endregion
             #region AutoMapper
