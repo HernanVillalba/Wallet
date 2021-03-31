@@ -54,8 +54,8 @@ namespace Wallet.API.Controllers
         /// </summary>
         /// <param name="currency">Moneda del plazo fijo</param>
         /// <param name="amount">Monto inicial</param>
-        /// <param name="from">Fecha de inicio (MM/DD/AAAA)</param>
-        /// <param name="to">Fecha de fin (MM/DD/AAAA)</param>
+        /// <param name="from">Fecha de inicio (AAAA-MM-DD)</param>
+        /// <param name="to">Fecha de fin (AAAA-MM-DD)</param>
         [AllowAnonymous]
         [HttpGet]
         [Route("/api/calculateProfit")]
@@ -63,7 +63,9 @@ namespace Wallet.API.Controllers
         {
             try
             {
-                return Ok(_fixedTermDepositBusiness.calculateProfit(currency, amount, from, to));
+                var profit = _fixedTermDepositBusiness.calculateProfit(currency, amount, from, to);
+
+                return Ok(profit);
             }
             catch
             {
