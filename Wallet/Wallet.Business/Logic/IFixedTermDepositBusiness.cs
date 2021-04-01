@@ -13,5 +13,7 @@ namespace Wallet.Business.Logic
         Task CreateFixedTermDeposit(FixedTermDepositCreateModel fixedTermDeposit, int userId);
 
         Task CloseFixedTermDeposit(int fixedTermDepositId, int userId);
+
+        InterestsCalculationModel calculateProfit(string currency, double amount, DateTime from, DateTime to);
     }
 }

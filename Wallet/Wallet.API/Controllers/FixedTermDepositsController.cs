@@ -48,6 +48,31 @@ namespace Wallet.API.Controllers
             }
         }
 
+        // Is it okay to have the calculateProfit() function inside FixedTermDeposit's Controller?
+        /// <summary>
+        /// Calcular intereses de un potencial plazo fijo
+        /// </summary>
+        /// <param name="currency">Moneda del plazo fijo</param>
+        /// <param name="amount">Monto inicial</param>
+        /// <param name="from">Fecha de inicio (AAAA-MM-DD)</param>
+        /// <param name="to">Fecha de fin (AAAA-MM-DD)</param>
+        [AllowAnonymous]
+        [HttpGet]
+        [Route("/api/calculateProfit")]
+        public IActionResult calculateProfit(string currency, double amount, DateTime from, DateTime to)
+        {
+            try
+            {
+                var profit = _fixedTermDepositBusiness.calculateProfit(currency, amount, from, to);
+
+                return Ok(profit);
+            }
+            catch
+            {
+                throw;
+            }
+        }
+
         /// <summary>
         /// Crear un nuevo plazo fijo
         /// </summary>

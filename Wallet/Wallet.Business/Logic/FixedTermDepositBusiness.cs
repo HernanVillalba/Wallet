@@ -104,25 +104,17 @@ namespace Wallet.Business.Logic
             // If it hasn't been closed, we can proceed to close it
 
             fixedTermDeposit.ClosingDate = DateTime.Now; // Closing date isn't null anymore
-            TimeSpan difference = ((DateTime)fixedTermDeposit.ClosingDate) - fixedTermDeposit.CreationDate;
-            int days = difference.Days;
-            // [ASK] if it has to be business days
-
-            if(days < 1)
-            {
-                throw new CustomException(400, "Debe esperar al menos 24 hrs para cerrar el plazo fijo");
-            }
-
-            // Apply 1% for each day, with compound interest
-            double gainRate = 1 / 100d; // 1%
-            double total = fixedTermDeposit.Amount * Math.Pow(1 + gainRate, days);
-            // [ASK] if we can parametrize that 1% to be another number in some configuration table,
-            // just to avoid hard coded it
+            string currency = _unitOfWork.Accounts.GetById(fixedTermDeposit.AccountId).Currency; // Get the currency to give it to the interest calculator which will apply the specific currency % of interest
+            
+            // Calculate the interest
+            InterestsCalculationModel interestsCalculation = 
+                calculateProfit(currency, fixedTermDeposit.Amount, 
+                                fixedTermDeposit.CreationDate, (DateTime)fixedTermDeposit.ClosingDate);
 
             // Now, we have to add a topup transaction with total value
             Transactions newTransaction = new Transactions();
             newTransaction.AccountId = fixedTermDeposit.AccountId;
-            newTransaction.Amount = total;
+            newTransaction.Amount = interestsCalculation.montoFinal;
             newTransaction.Concept = "Plazo Fijo (Cierre)";
             newTransaction.Type = "Topup";
             newTransaction.Editable = false;
@@ -141,11 +133,35 @@ namespace Wallet.Business.Logic
             $"El plazo fijo #{fixedTermDepositId} se ha cerrado correctamente!" +
             "<br>" +
             "<br>" +
-            $"Monto inicial: ${Math.Round(fixedTermDeposit.Amount, 2)}" +
+            $"Monto inicial: ${Math.Round(interestsCalculation.montoInicial, 2)}" +
             "<br>" +
-            $"Ganancias reportadas: ${Math.Round(total, 2)}" +
+            $"Monto rescatado: ${Math.Round(interestsCalculation.montoFinal, 2)}" +
             $"<br>" +
-            $"Intereses generados: ${Math.Round(fixedTermDeposit.Amount - total, 2)}");
+            $"Intereses generados: ${Math.Round(interestsCalculation.montoFinal - interestsCalculation.montoInicial, 2)}");
+        }
+
+        public InterestsCalculationModel calculateProfit(string currency, double amount, DateTime from, DateTime to)
+        {
+            TimeSpan difference = to - from;
+            int days = difference.Days;
+            // [ASK] if it has to be business days
+
+            if (days < 1)
+            {
+                throw new CustomException(400, "El plazo fijo no puede durar menos de 24 hrs");
+            }
+
+            // Apply 1% for each day, with compound interest
+            double gainRate = 1 / 100d; // 1% --> it can be tied to specific currency, but currently it is 1% for every currency
+            double total = amount * Math.Pow(1 + gainRate, days);
+
+            return new InterestsCalculationModel
+            {
+                moneda = currency,
+                montoInicial = amount,
+                montoFinal = total,
+                intereses = total-amount
+            };
         }
     }
 }
