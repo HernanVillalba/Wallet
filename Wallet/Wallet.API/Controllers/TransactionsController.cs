@@ -48,13 +48,13 @@ namespace Wallet.API.Controllers
         /// </summary>
         /// <param name="id">Id de la transacción</param>
         [HttpGet("{id}")]
-        public IActionResult Details(int? id)
+        public async Task<IActionResult> Details(int? id)
         {
             try
             {
                 if (id == null || id <= 0) { throw new CustomException(400, "Id de la transacción no válido"); }
                 var user_id = int.Parse(User.Claims.First(i => i.Type == "UserId").Value);
-                var transaction = _transactionBusiness.Details(id, user_id);
+                var transaction = await _transactionBusiness.Details(id, user_id);
                 return StatusCode(200,transaction);
             }
             catch { throw; }
