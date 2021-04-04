@@ -41,6 +41,11 @@
             <param name="id">Id del plazo fijo</param>
             <response code="200">Plazo fijo cerrado correctamente</response>
         </member>
+        <member name="M:Wallet.API.Controllers.RatesController.GetLatest">
+            <summary>
+            Get the latest 10 rates stored in the database
+            </summary>
+        </member>
         <member name="M:Wallet.API.Controllers.SessionController.Login(Wallet.Entities.LoginModel)">
             <summary>
             Ingresar con email y contraseña para obtener token y poder utilizar la API

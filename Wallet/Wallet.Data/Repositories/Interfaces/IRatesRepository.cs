@@ -8,5 +8,6 @@ namespace Wallet.Data.Repositories.Interfaces
     public interface IRatesRepository : IGenericRepository<Rates>
     {
         Rates GetLastValues();
+        IEnumerable<Rates> GetLatestValuesAsync();
     }
 }

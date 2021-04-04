@@ -14,10 +14,12 @@ namespace Wallet.Business.Logic
     public class RatesBusiness : IRatesBusiness
     {
         private readonly IUnitOfWork _unitOfWork;
+        private readonly IMapper _mapper;
 
-        public RatesBusiness(IUnitOfWork unitOfWork)
+        public RatesBusiness(IUnitOfWork unitOfWork, IMapper mapper)
         {
             _unitOfWork = unitOfWork;
+            _mapper = mapper;
         }
         public async Task<Rates> GetRates()
         {
@@ -67,6 +69,14 @@ namespace Wallet.Business.Logic
             //try inserting into database
             _unitOfWork.Rates.Insert(rate);
             return rate;
+        }
+
+        public IEnumerable<RateModel> GetLatestRates()
+        {
+            var ratesDB = _unitOfWork.Rates.GetLatestValuesAsync();
+            IEnumerable<RateModel> rates = _mapper.Map<IEnumerable<Rates>, IEnumerable<RateModel>>(ratesDB);
+            return rates;
+            
         }
     }
 }
