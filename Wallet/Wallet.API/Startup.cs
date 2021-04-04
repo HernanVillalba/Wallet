@@ -111,6 +111,7 @@ namespace Wallet.API
             services.AddTransient<IFixedTermDepositRepository, FixedTermDepositRepository>();
             services.AddTransient<IAccountRepository, AccountRepository>();
             services.AddTransient<ITransactionLogRepository, TransactionLogRepository>();
+            services.AddTransient<IRatesRepository, RatesRepository>();
             services.AddTransient<IUnitOfWork, UnitOfWork>();
             #endregion
             #region AutoMapper
@@ -145,6 +146,7 @@ namespace Wallet.API
             services.AddTransient<IUserBusiness, UserBusiness>();
             services.AddTransient<IFixedTermDepositBusiness, FixedTermDepositBusiness>();
             services.AddTransient<ITransactionBusiness, TransactionBusiness>();
+            services.AddTransient<IRatesBusiness, RatesBusiness>();
             #endregion
             #region Mailer
             services.AddTransient<IEmailSender, SendGridEmailSender>();

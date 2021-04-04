@@ -40,3 +40,10 @@ Transaction_Id INT NOT NULL	FOREIGN KEY REFERENCES Transactions(Id),
 New_Value NVARCHAR(100) NOT NULL,
 Modification_Date DATETIME NOT NULL DEFAULT(GETDATE())
 )
+GO
+CREATE TABLE Rates (
+    Id int not null identity(1,1) primary key,
+    Date Datetime not null DEFAULT(GETDATE()),
+    Selling_price float not null,
+    Buying_price float not null
+)
