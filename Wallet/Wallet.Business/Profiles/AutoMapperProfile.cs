@@ -1,7 +1,6 @@
 ﻿using AutoMapper;
 using Newtonsoft.Json.Linq;
 using System.Collections.Generic;
-using Wallet.Business.Operations;
 using Wallet.Data.Models;
 using Wallet.Entities;
 

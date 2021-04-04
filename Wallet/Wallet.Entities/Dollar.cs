@@ -1,6 +1,6 @@
 ﻿using System.Text.Json.Serialization;
 
-namespace Wallet.Business.Operations
+namespace Wallet.Entities
 {
     public class Dollar
     {

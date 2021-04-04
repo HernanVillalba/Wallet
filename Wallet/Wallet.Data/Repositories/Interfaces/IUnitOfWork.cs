@@ -10,6 +10,7 @@ namespace Wallet.Data.Repositories.Interfaces
         IFixedTermDepositRepository FixedTermDeposits { get; }
         IAccountRepository Accounts { get; }
         ITransactionLogRepository TransactionLog { get; }
+        IRatesRepository Rates { get; }
         Task<int> Complete();
     }
 }

@@ -1,6 +1,5 @@
 ﻿using System;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Metadata;
 
 // Code scaffolded by EF Core assumes nullable reference types (NRTs) are not used or disabled.
 // If you have enabled NRTs for your project, then un-comment the following line:
@@ -21,19 +20,21 @@ namespace Wallet.Data.Models
 
         public virtual DbSet<Accounts> Accounts { get; set; }
         public virtual DbSet<FixedTermDeposits> FixedTermDeposits { get; set; }
+        public virtual DbSet<Rates> Rates { get; set; }
         public virtual DbSet<TransactionLog> TransactionLog { get; set; }
         public virtual DbSet<Transactions> Transactions { get; set; }
         public virtual DbSet<Users> Users { get; set; }
         public virtual DbSet<AccountBalance> AccountBalance { get; set; }
         public virtual DbSet<UserContact> UserContact { get; set; }
 
-        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-        {
-            if (!optionsBuilder.IsConfigured)
-            {
-                optionsBuilder.UseSqlServer("name=WalletDB");
-            }
-        }
+        //        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+        //        {
+        //            if (!optionsBuilder.IsConfigured)
+        //            {
+        //#warning To protect potentially sensitive information in your connection string, you should move it out of source code. See http://go.microsoft.com/fwlink/?LinkId=723263 for guidance on storing connection strings.
+        //                optionsBuilder.UseSqlServer("Server=.\\SQLEXPRESS;Initial Catalog=WALLET;Integrated Security=True;Connect Timeout=30;Encrypt=False;TrustServerCertificate=False;ApplicationIntent=ReadWrite;MultiSubnetFailover=False;");
+        //            }
+        //        }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -70,6 +71,17 @@ namespace Wallet.Data.Models
                     .HasConstraintName("FK__FixedTerm__Accou__33D4B598");
             });
 
+            modelBuilder.Entity<Rates>(entity =>
+            {
+                entity.Property(e => e.BuyingPrice).HasColumnName("Buying_price");
+
+                entity.Property(e => e.Date)
+                    .HasColumnType("datetime")
+                    .HasDefaultValueSql("(getdate())");
+
+                entity.Property(e => e.SellingPrice).HasColumnName("Selling_price");
+            });
+
             modelBuilder.Entity<TransactionLog>(entity =>
             {
                 entity.Property(e => e.ModificationDate)
@@ -88,7 +100,7 @@ namespace Wallet.Data.Models
                     .WithMany(p => p.TransactionLog)
                     .HasForeignKey(d => d.TransactionId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK__Transacti__Trans__49C3F6B7");
+                    .HasConstraintName("FK__Transacti__Trans__36B12243");
             });
 
             modelBuilder.Entity<Transactions>(entity =>
@@ -119,7 +131,7 @@ namespace Wallet.Data.Models
             modelBuilder.Entity<Users>(entity =>
             {
                 entity.HasIndex(e => e.Email)
-                    .HasName("UQ__Users__A9D1053470790888")
+                    .HasName("UQ__Users__A9D10534CD82C02E")
                     .IsUnique();
 
                 entity.Property(e => e.Email)

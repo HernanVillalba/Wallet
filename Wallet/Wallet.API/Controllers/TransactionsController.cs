@@ -101,7 +101,7 @@ namespace Wallet.API.Controllers
         /// </summary>
         /// <remarks>Ingrese la cuenta de origen, el monto y por último la cuenta de destino</remarks>
         [HttpPost("Transfer")]
-        public async Task<IActionResult> Transfer([FromBody] TransferModel newTransfer)
+        public async Task<IActionResult> TransferAsync([FromBody] TransferModel newTransfer)
         {
             try
             {
