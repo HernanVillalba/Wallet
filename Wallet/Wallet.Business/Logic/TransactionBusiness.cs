@@ -16,12 +16,14 @@ namespace Wallet.Business.Logic
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
         private readonly IRatesBusiness _rates;
+        private readonly IAccountBusiness _accountBusiness;
 
-        public TransactionBusiness(IUnitOfWork unitOfWork, IMapper mapper, IRatesBusiness ratesBusiness)
+        public TransactionBusiness(IUnitOfWork unitOfWork, IMapper mapper, IRatesBusiness ratesBusiness, IAccountBusiness accountBusiness)
         {
             _unitOfWork = unitOfWork;
             _mapper = mapper;
             _rates = ratesBusiness;
+            _accountBusiness = accountBusiness;
         }
 
         public async Task<IEnumerable<Transactions>> GetAll(TransactionFilterModel tfm, int user_id)
@@ -71,7 +73,10 @@ namespace Wallet.Business.Logic
         {
             int? ARS_account_id = _unitOfWork.Accounts.GetAccountId(user_id, "ARS");
             if (ARS_account_id == null || ARS_account_id <= 0 || user_id <= 0) { throw new CustomException(404, "No se pudo obtener alguno de los datos del usuario"); }
-
+            if (newT.Type == "Payment" && _accountBusiness.GetAccountBalance(user_id, "ARS") - newT.Amount < 0)
+            {
+                throw new CustomException(400, "No hay saldo suficiente para realizar la transacción");
+            }
             Transactions transaction = _mapper.Map<Transactions>(newT);
             transaction.AccountId = (int)ARS_account_id;
             _unitOfWork.Transactions.Insert(transaction);
@@ -150,7 +155,7 @@ namespace Wallet.Business.Logic
                 throw new CustomException(400, "Alguno de los datos ingresados es incorrecto");
             }
             //get balance and validate
-            var balance = _unitOfWork.Accounts.GetAccountBalance(senderAccount.UserId, senderAccount.Currency);
+            var balance = _accountBusiness.GetAccountBalance(senderAccount.UserId, senderAccount.Currency);
             if (newTransfer.Amount > balance)
             {
                 throw new CustomException(400, "Saldo insuficiente");
@@ -185,8 +190,8 @@ namespace Wallet.Business.Logic
             //Get accounts and balances
             int ARS_accountId = _unitOfWork.Accounts.GetAccountId(user_id, "ARS");
             int USD_accountId = _unitOfWork.Accounts.GetAccountId(user_id, "USD");
-            double balance_ARS = _unitOfWork.Accounts.GetAccountBalance(user_id, "ARS");
-            double balance_USD = _unitOfWork.Accounts.GetAccountBalance(user_id, "USD");
+            double balance_ARS = _accountBusiness.GetAccountBalance(user_id, "ARS");
+            double balance_USD = _accountBusiness.GetAccountBalance(user_id, "USD");
             double cost;
             Rates rates = await _rates.GetRates();
 

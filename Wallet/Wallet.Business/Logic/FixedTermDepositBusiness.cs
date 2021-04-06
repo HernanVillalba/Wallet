@@ -16,12 +16,14 @@ namespace Wallet.Business.Logic
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
         private readonly IEmailSender _emailSender;
+        private readonly IAccountBusiness _accountBusiness;
 
-        public FixedTermDepositBusiness(IUnitOfWork unitOfWork, IMapper mapper, IEmailSender emailSender)
+        public FixedTermDepositBusiness(IUnitOfWork unitOfWork, IMapper mapper, IEmailSender emailSender, IAccountBusiness accountBusiness)
         {
             _unitOfWork = unitOfWork;
             _mapper = mapper;
             _emailSender = emailSender;
+            _accountBusiness = accountBusiness;
         }
 
         public IEnumerable<FixedTermDepositModel> GetAllByUserId(int userId)
@@ -53,7 +55,7 @@ namespace Wallet.Business.Logic
             string currency = account.Currency;
 
             // Execute the respective stored procedure to get the balance
-            var balance = _unitOfWork.Accounts.GetAccountBalance(userId, currency);
+            var balance = _accountBusiness.GetAccountBalance(userId, currency);
 
             if (balance - fixedTermDeposit.Amount < 0)
             {

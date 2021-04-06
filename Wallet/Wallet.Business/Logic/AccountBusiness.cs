@@ -20,8 +20,8 @@ namespace Wallet.Business.Logic
         {
             BalanceModel balance = new BalanceModel()
             {
-                ArgBalance = _unitOfWork.Accounts.GetAccountBalance(id, "ARS"),
-                UsdBalance = _unitOfWork.Accounts.GetAccountBalance(id, "USD")
+                ArgBalance = GetAccountBalance(id, "ARS"),
+                UsdBalance = GetAccountBalance(id, "USD")
             };
             return balance;
         }
@@ -36,11 +36,29 @@ namespace Wallet.Business.Logic
                     {
                         Id = a.Id,
                         Currency = a.Currency,
-                        Balance = _unitOfWork.Accounts.GetAccountBalance(id, a.Currency)
+                        Balance = GetAccountBalance(id, a.Currency)
                     });
                 }
                 return accountsWithBalance;
+        }
 
+        public double GetAccountBalance(int id, string currency)
+        {
+            int accountId = _unitOfWork.Accounts.GetAccountId(id, currency);
+            var transactions = _unitOfWork.Transactions.GetTransactionsForAccount(accountId);
+            double total = 0;
+            foreach (Transactions t in transactions)
+            {
+                if (t.Type == "Topup")
+                {
+                    total += t.Amount;
+                }
+                else
+                {
+                    total -= t.Amount;
+                }
+            }
+            return total;
         }
     }
 }

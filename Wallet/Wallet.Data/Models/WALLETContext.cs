@@ -27,7 +27,6 @@ namespace Wallet.Data.Models
         public virtual DbSet<TransactionLog> TransactionLog { get; set; }
         public virtual DbSet<Transactions> Transactions { get; set; }
         public virtual DbSet<Users> Users { get; set; }
-        public virtual DbSet<AccountBalance> AccountBalance { get; set; }
         public virtual DbSet<UserContact> UserContact { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -199,7 +198,6 @@ namespace Wallet.Data.Models
                 entity.Property(e => e.Password).IsRequired();
             });
 
-            modelBuilder.Entity<AccountBalance>().HasNoKey();
             modelBuilder.Entity<UserContact>().HasNoKey();
 
             OnModelCreatingPartial(modelBuilder);
