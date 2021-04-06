@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 
 // Code scaffolded by EF Core assumes nullable reference types (NRTs) are not used or disabled.
@@ -11,6 +12,7 @@ namespace Wallet.Data.Models
     {
         public Transactions()
         {
+            RefundRequest = new HashSet<RefundRequest>();
             TransactionLog = new HashSet<TransactionLog>();
         }
 
@@ -21,8 +23,15 @@ namespace Wallet.Data.Models
         public string Type { get; set; }
         public int AccountId { get; set; }
         public bool? Editable { get; set; }
+        public int CategoryId { get; set; }
 
+        [JsonIgnore]
         public virtual Accounts Account { get; set; }
+        [JsonIgnore]
+        public virtual Categories Category { get; set; }
+        [JsonIgnore]
+        public virtual ICollection<RefundRequest> RefundRequest { get; set; }
+        [JsonIgnore]
         public virtual ICollection<TransactionLog> TransactionLog { get; set; }
     }
 }

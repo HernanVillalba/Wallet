@@ -33,8 +33,8 @@ namespace Wallet.Business.Logic
             var fixedTermDepositsDB = _unitOfWork.FixedTermDeposits.GetAllByUserId(userId);
 
             // Map entity model to view model
-            var fixedTermDeposits = _mapper.Map<IEnumerable<FixedTermDeposits>,IEnumerable<FixedTermDepositModel>>(fixedTermDepositsDB);
-            
+            var fixedTermDeposits = _mapper.Map<IEnumerable<FixedTermDeposits>, IEnumerable<FixedTermDepositModel>>(fixedTermDepositsDB);
+
             return fixedTermDeposits;
         }
 
@@ -64,12 +64,15 @@ namespace Wallet.Business.Logic
             // We have enough balance. Lets create the fixed term deposit
 
             // First make a payment transaction
-            Transactions newTransaction = new Transactions();
-            newTransaction.AccountId = fixedTermDeposit.AccountId;
-            newTransaction.Amount = fixedTermDeposit.Amount;
-            newTransaction.Concept = "Plazo Fijo (Apertura)";
-            newTransaction.Type = "Payment";
-            newTransaction.Editable = false;
+            Transactions newTransaction = new Transactions
+            {
+                AccountId = fixedTermDeposit.AccountId,
+                Amount = fixedTermDeposit.Amount,
+                Concept = "Plazo Fijo (Apertura)",
+                Type = "Payment",
+                Editable = false,
+                CategoryId = 3
+            };
             _unitOfWork.Transactions.Insert(newTransaction);
 
             // Having the transaction placed, it's time to make the fixed term deposit
@@ -105,10 +108,10 @@ namespace Wallet.Business.Logic
 
             fixedTermDeposit.ClosingDate = DateTime.Now; // Closing date isn't null anymore
             string currency = _unitOfWork.Accounts.GetById(fixedTermDeposit.AccountId).Currency; // Get the currency to give it to the interest calculator which will apply the specific currency % of interest
-            
+
             // Calculate the interest
-            InterestsCalculationModel interestsCalculation = 
-                calculateProfit(currency, fixedTermDeposit.Amount, 
+            InterestsCalculationModel interestsCalculation =
+                calculateProfit(currency, fixedTermDeposit.Amount,
                                 fixedTermDeposit.CreationDate, (DateTime)fixedTermDeposit.ClosingDate);
 
             // Now, we have to add a topup transaction with total value
@@ -160,7 +163,7 @@ namespace Wallet.Business.Logic
                 moneda = currency,
                 montoInicial = amount,
                 montoFinal = total,
-                intereses = total-amount
+                intereses = total - amount
             };
         }
     }

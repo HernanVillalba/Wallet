@@ -12,6 +12,8 @@ namespace Wallet.Data.Models
         public Users()
         {
             Accounts = new HashSet<Accounts>();
+            RefundRequestSourceUser = new HashSet<RefundRequest>();
+            RefundRequestTargetUset = new HashSet<RefundRequest>();
         }
 
         public int Id { get; set; }
@@ -21,5 +23,7 @@ namespace Wallet.Data.Models
         public string Password { get; set; }
 
         public virtual ICollection<Accounts> Accounts { get; set; }
+        public virtual ICollection<RefundRequest> RefundRequestSourceUser { get; set; }
+        public virtual ICollection<RefundRequest> RefundRequestTargetUset { get; set; }
     }
 }
