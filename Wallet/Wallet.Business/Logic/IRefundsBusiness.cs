@@ -1,11 +1,9 @@
-﻿using System.Collections.Generic;
-using System.Threading.Tasks;
-using Wallet.Data.Models;
+﻿using Wallet.Entities;
 
 namespace Wallet.Business.Logic
 {
     public interface IRefundsBusiness
     {
-        Task<IEnumerable<RefundRequest>> algo();
+        void Create(RefundRequestCreateModel refund, int? user_id);
     }
 }

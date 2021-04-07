@@ -26,7 +26,16 @@ namespace Wallet.Data.Models
         public virtual DbSet<RefundRequest> RefundRequest { get; set; }
         public virtual DbSet<TransactionLog> TransactionLog { get; set; }
         public virtual DbSet<Transactions> Transactions { get; set; }
+        public virtual DbSet<Transfers> Transfers { get; set; }
         public virtual DbSet<Users> Users { get; set; }
+
+        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+        {
+            if (!optionsBuilder.IsConfigured)
+            {
+                optionsBuilder.UseSqlServer("name=WalletDB");
+            }
+        }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -45,6 +54,12 @@ namespace Wallet.Data.Models
 
             modelBuilder.Entity<Categories>(entity =>
             {
+                entity.HasIndex(e => e.Type)
+                    .HasName("UQ__Categori__F9B8A48B83259BD3")
+                    .IsUnique();
+
+                entity.Property(e => e.Editable).HasDefaultValueSql("((1))");
+
                 entity.Property(e => e.Type)
                     .IsRequired()
                     .HasMaxLength(50);
@@ -67,7 +82,7 @@ namespace Wallet.Data.Models
                     .WithMany(p => p.FixedTermDeposits)
                     .HasForeignKey(d => d.AccountId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK__FixedTerm__Accou__36B12243");
+                    .HasConstraintName("FK__FixedTerm__Accou__38996AB5");
             });
 
             modelBuilder.Entity<Rates>(entity =>
@@ -83,38 +98,34 @@ namespace Wallet.Data.Models
 
             modelBuilder.Entity<RefundRequest>(entity =>
             {
-                entity.Property(e => e.SourceUserId).HasColumnName("Source_User_Id");
+                entity.Property(e => e.SourceAccountId).HasColumnName("Source_Account_Id");
 
                 entity.Property(e => e.Status)
                     .IsRequired()
                     .HasMaxLength(10)
                     .HasDefaultValueSql("('Pending')");
 
-                entity.Property(e => e.TargetUsetId).HasColumnName("Target_Uset_Id");
+                entity.Property(e => e.TargetAccountId).HasColumnName("Target_Account_Id");
 
                 entity.Property(e => e.TransactionId).HasColumnName("Transaction_Id");
 
-                entity.Property(e => e.Type)
-                    .IsRequired()
-                    .HasMaxLength(50);
-
-                entity.HasOne(d => d.SourceUser)
-                    .WithMany(p => p.RefundRequestSourceUser)
-                    .HasForeignKey(d => d.SourceUserId)
+                entity.HasOne(d => d.SourceAccount)
+                    .WithMany(p => p.RefundRequestSourceAccount)
+                    .HasForeignKey(d => d.SourceAccountId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK__RefundReq__Sourc__4316F928");
+                    .HasConstraintName("FK__RefundReq__Sourc__44FF419A");
 
-                entity.HasOne(d => d.TargetUset)
-                    .WithMany(p => p.RefundRequestTargetUset)
-                    .HasForeignKey(d => d.TargetUsetId)
+                entity.HasOne(d => d.TargetAccount)
+                    .WithMany(p => p.RefundRequestTargetAccount)
+                    .HasForeignKey(d => d.TargetAccountId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK__RefundReq__Targe__440B1D61");
+                    .HasConstraintName("FK__RefundReq__Targe__45F365D3");
 
                 entity.HasOne(d => d.Transaction)
                     .WithMany(p => p.RefundRequest)
                     .HasForeignKey(d => d.TransactionId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK__RefundReq__Trans__403A8C7D");
+                    .HasConstraintName("FK__RefundReq__Trans__4222D4EF");
             });
 
             modelBuilder.Entity<TransactionLog>(entity =>
@@ -135,7 +146,7 @@ namespace Wallet.Data.Models
                     .WithMany(p => p.TransactionLog)
                     .HasForeignKey(d => d.TransactionId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK__Transacti__Trans__398D8EEE");
+                    .HasConstraintName("FK__Transacti__Trans__3B75D760");
             });
 
             modelBuilder.Entity<Transactions>(entity =>
@@ -154,8 +165,6 @@ namespace Wallet.Data.Models
                     .HasColumnType("datetime")
                     .HasDefaultValueSql("(getdate())");
 
-                entity.Property(e => e.Editable).HasDefaultValueSql("((1))");
-
                 entity.Property(e => e.Type)
                     .IsRequired()
                     .HasMaxLength(10);
@@ -164,20 +173,38 @@ namespace Wallet.Data.Models
                     .WithMany(p => p.Transactions)
                     .HasForeignKey(d => d.AccountId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK__Transacti__Accou__300424B4");
+                    .HasConstraintName("FK__Transacti__Accou__31EC6D26");
 
                 entity.HasOne(d => d.Category)
                     .WithMany(p => p.Transactions)
                     .HasForeignKey(d => d.CategoryId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK__Transacti__Categ__31EC6D26");
+                    .HasConstraintName("FK__Transacti__Categ__33D4B598");
+            });
 
+            modelBuilder.Entity<Transfers>(entity =>
+            {
+                entity.Property(e => e.DestinationTransactionId).HasColumnName("Destination_Transaction_Id");
+
+                entity.Property(e => e.OriginTransactionId).HasColumnName("Origin_Transaction_Id");
+
+                entity.HasOne(d => d.DestinationTransaction)
+                    .WithMany(p => p.TransfersDestinationTransaction)
+                    .HasForeignKey(d => d.DestinationTransactionId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK__Transfers__Desti__49C3F6B7");
+
+                entity.HasOne(d => d.OriginTransaction)
+                    .WithMany(p => p.TransfersOriginTransaction)
+                    .HasForeignKey(d => d.OriginTransactionId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK__Transfers__Origi__48CFD27E");
             });
 
             modelBuilder.Entity<Users>(entity =>
             {
                 entity.HasIndex(e => e.Email)
-                    .HasName("UQ__Users__A9D1053454151707")
+                    .HasName("UQ__Users__A9D10534D2144DD2")
                     .IsUnique();
 
                 entity.Property(e => e.Email)

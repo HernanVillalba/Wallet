@@ -6,7 +6,6 @@ using System.Threading.Tasks;
 using Wallet.Business;
 using Wallet.Business.Logic;
 using Wallet.Entities;
-using X.PagedList;
 
 namespace Wallet.API.Controllers
 {
@@ -31,13 +30,8 @@ namespace Wallet.API.Controllers
         {
             try
             {
-                
-                if (page <= 0) { page = 1; } //asigna la primer página
-                int pageNumber = (int)page, pageSize = 10; //10 registros por página
                 var user_id = int.Parse(User.Claims.First(i => i.Type == "UserId").Value);
-
-                var ListDB = await _transactionBusiness.GetAll(transactionFilterModel, user_id);
-                ListDB = await ListDB.ToPagedList(pageNumber, pageSize).ToListAsync();
+                var ListDB = await _transactionBusiness.GetAll(transactionFilterModel, user_id, page);
                 return StatusCode(200,ListDB);
             }
             catch { throw; }
