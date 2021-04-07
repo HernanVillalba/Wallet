@@ -16,6 +16,7 @@ namespace Wallet.Data.Repositories
             Accounts = new AccountRepository(_context);
             TransactionLog = new TransactionLogRepository(_context);
             Rates = new RatesRepository(_context);
+            RefundRequest = new RefundRequestRepository(_context);
         }
         public IUserRepository Users { get; set; }
         public ITransactionRepository Transactions { get; set; }
@@ -23,6 +24,7 @@ namespace Wallet.Data.Repositories
         public IAccountRepository Accounts { get; set; }
         public ITransactionLogRepository TransactionLog { get; set; }
         public IRatesRepository Rates { get; set; }
+        public IRefundRequestRepository RefundRequest { get; set; }
 
         public async Task<int> Complete()
         {
