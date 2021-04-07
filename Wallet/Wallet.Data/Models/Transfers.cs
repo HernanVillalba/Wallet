@@ -7,17 +7,13 @@ using System.Collections.Generic;
 
 namespace Wallet.Data.Models
 {
-    public partial class Categories
+    public partial class Transfers
     {
-        public Categories()
-        {
-            Transactions = new HashSet<Transactions>();
-        }
-
         public int Id { get; set; }
-        public string Type { get; set; }
-        public bool? Editable { get; set; }
+        public int OriginTransactionId { get; set; }
+        public int DestinationTransactionId { get; set; }
 
-        public virtual ICollection<Transactions> Transactions { get; set; }
+        public virtual Transactions DestinationTransaction { get; set; }
+        public virtual Transactions OriginTransaction { get; set; }
     }
 }
