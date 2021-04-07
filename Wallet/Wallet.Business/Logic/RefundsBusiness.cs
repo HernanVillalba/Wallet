@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using System.Collections;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Wallet.Data.Models;
@@ -21,7 +22,7 @@ namespace Wallet.Business.Logic
             if (user_id <= 0 || user_id == null) { throw new CustomException(404, "Id de usuario no válido"); }
 
             //ceuntas del usuario que pide el reembolso
-            AccountsUsersModel a_ori = _unitOfWork.Accounts.GetAccountsUsers((int)user_id);
+            AccountsUserModel a_ori = _unitOfWork.Accounts.GetAccountsUsers((int)user_id);
             if (!_unitOfWork.Accounts.ValidateAccounts(a_ori)) { throw new CustomException(404, "No se encontró alguna de las cuentas del usuario"); }
 
             var ori_transaction = _unitOfWork.Transactions.FindTransaction(refund.TransactionId, (int)a_ori.IdUSD, (int)a_ori.IdARS);
@@ -59,6 +60,15 @@ namespace Wallet.Business.Logic
                 else { throw new CustomException(404, "El id de alguna de las transacciones no es válido"); }
             }
             else { throw new CustomException(400, "No se encontró la transacción"); }
+        }
+
+        public async Task<IEnumerable<RefundRequestModel>> GetAll(int? user_id)
+        {
+            if(user_id<=0 || user_id == null) { throw new CustomException(404, "El id de usuario no es válido"); }
+            AccountsUserModel accounts = _unitOfWork.Accounts.GetAccountsUsers((int)user_id);
+            var listDB = _unitOfWork.RefundRequest.GetAllByAccountsId(accounts);
+            IEnumerable<RefundRequestModel> list = _mapper.Map<IEnumerable<RefundRequestModel>>(listDB);
+            return list;
         }
     }
 }

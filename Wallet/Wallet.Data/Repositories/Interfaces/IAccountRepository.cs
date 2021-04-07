@@ -10,7 +10,7 @@ namespace Wallet.Data.Repositories.Interfaces
         List<Accounts> GetUserAccounts(int id);
         int GetAccountId(int id_user, string currency);
         Accounts GetAccountById(int id);
-        AccountsUsersModel GetAccountsUsers(int user_id);
-        bool ValidateAccounts(AccountsUsersModel accounts);
+        AccountsUserModel GetAccountsUsers(int user_id);
+        bool ValidateAccounts(AccountsUserModel accounts);
     }
 }

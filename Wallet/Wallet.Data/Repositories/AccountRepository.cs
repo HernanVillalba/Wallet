@@ -38,15 +38,15 @@ namespace Wallet.Data.Repositories
             return _context.Accounts.FirstOrDefault(x => x.Id == id);
         }
 
-        public AccountsUsersModel GetAccountsUsers(int user_id)
+        public AccountsUserModel GetAccountsUsers(int user_id)
         {
-            AccountsUsersModel accounts = new AccountsUsersModel();
+            AccountsUserModel accounts = new AccountsUserModel();
             accounts.IdUSD = GetAccountId(user_id, "USD");
             accounts.IdARS= GetAccountId(user_id, "ARS");
             return accounts;
         }
 
-        public bool ValidateAccounts(AccountsUsersModel accounts)
+        public bool ValidateAccounts(AccountsUserModel accounts)
         {
             //return false if any of the data is wrong
             if(accounts.IdUSD > 0 && accounts.IdUSD != null && accounts.IdARS > 0 && accounts.IdARS != null) { return true; }
