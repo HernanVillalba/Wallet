@@ -70,7 +70,6 @@ namespace Wallet.Business.Logic
                 Amount = fixedTermDeposit.Amount,
                 Concept = "Plazo Fijo (Apertura)",
                 Type = "Payment",
-                Editable = false,
                 CategoryId = 3
             };
             _unitOfWork.Transactions.Insert(newTransaction);
@@ -120,7 +119,6 @@ namespace Wallet.Business.Logic
             newTransaction.Amount = interestsCalculation.montoFinal;
             newTransaction.Concept = "Plazo Fijo (Cierre)";
             newTransaction.Type = "Topup";
-            newTransaction.Editable = false;
             _unitOfWork.Transactions.Insert(newTransaction);
 
             // Having the transaction placed, it's time to update the fixed term deposit

@@ -12,12 +12,11 @@ namespace Wallet.Data.Models
         public int Id { get; set; }
         public int TransactionId { get; set; }
         public string Status { get; set; }
-        public string Type { get; set; }
-        public int SourceUserId { get; set; }
-        public int TargetUsetId { get; set; }
+        public int SourceAccountId { get; set; }
+        public int TargetAccountId { get; set; }
 
-        public virtual Users SourceUser { get; set; }
-        public virtual Users TargetUset { get; set; }
+        public virtual Accounts SourceAccount { get; set; }
+        public virtual Accounts TargetAccount { get; set; }
         public virtual Transactions Transaction { get; set; }
     }
 }
