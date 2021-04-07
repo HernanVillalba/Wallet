@@ -33,23 +33,3 @@ WHERE FixedTermDeposits.Account_Id IN
 ORDER BY FixedTermDeposits.Creation_Date DESC
 
 END
-
-GO
-
-CREATE OR ALTER PROCEDURE SP_GetPagedUsers(	
-	@PageNumber INT,
-	@RowsOfPage INT
-)
-AS
-BEGIN
-
-SELECT id,
-	First_Name,
-	Last_Name,
-	Email
-FROM Users
-ORDER BY Last_Name 
-OFFSET(@PageNumber - 1) * @RowsOfPage ROWS
-FETCH NEXT @RowsOfPage ROWS ONLY
-
-END

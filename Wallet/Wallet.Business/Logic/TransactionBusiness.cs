@@ -194,14 +194,15 @@ namespace Wallet.Business.Logic
             double balance_USD = _accountBusiness.GetAccountBalance(user_id, "USD");
             double cost;
             Rates rates = await _rates.GetRates();
-
+            Transactions transactionOrigin;
+            Transactions transactionDestiny;
             if (tbc.Type == "Compra")
             {
                 cost = tbc.Amount * rates.BuyingPrice;
                 if (balance_ARS >= cost)
                 {
                     //en USD
-                    Transactions transactionOrigin = new Transactions
+                    transactionOrigin = new Transactions
                     {
                         Amount = tbc.Amount,
                         Concept = "Compra de divisas",
@@ -211,7 +212,7 @@ namespace Wallet.Business.Logic
                         CategoryId = 2
                     };
                     //en ARS
-                    Transactions transactionsDestiny = new Transactions
+                    transactionDestiny = new Transactions
                     {
                         Amount = cost,
                         Concept = "Compra de divisas",
@@ -220,10 +221,6 @@ namespace Wallet.Business.Logic
                         Editable = false,
                         CategoryId = 2
                     };
-                    _unitOfWork.Transactions.Insert(transactionOrigin);
-                    _unitOfWork.Transactions.Insert(transactionsDestiny);
-                    await _unitOfWork.Complete();
-                    return;
                 }
                 else { throw new CustomException(400, "Saldo insuficiente"); }
             }        
@@ -233,7 +230,7 @@ namespace Wallet.Business.Logic
                 if (tbc.Amount <= balance_USD)
                 {
                     //en USD
-                    Transactions transactionsOrigin = new Transactions
+                    transactionOrigin = new Transactions
                     {
                         AccountId = (int)USD_accountId,
                         Amount = tbc.Amount,
@@ -243,7 +240,7 @@ namespace Wallet.Business.Logic
                         CategoryId = 2
                     };
                     //en ARS
-                    Transactions transactionsDestiny = new Transactions
+                    transactionDestiny = new Transactions
                     {
                         AccountId = (int)ARS_accountId,
                         Amount = cost,
@@ -253,13 +250,13 @@ namespace Wallet.Business.Logic
                         CategoryId = 2
                     };
 
-                    _unitOfWork.Transactions.Insert(transactionsOrigin);
-                    _unitOfWork.Transactions.Insert(transactionsDestiny);
-                    await _unitOfWork.Complete();
-                    return;
                 }
-                else { throw new CustomException(400, "Saldo insuficiente"); }            
+                else { throw new CustomException(400, "Saldo insuficiente"); }
             }
+            _unitOfWork.Transactions.Insert(transactionOrigin);
+            _unitOfWork.Transactions.Insert(transactionDestiny);
+            await _unitOfWork.Complete();
+            return;
         }
 
     }

@@ -49,7 +49,7 @@ namespace Wallet.Business.Logic
             double total = 0;
             foreach (Transactions t in transactions)
             {
-                if (t.Type == "Topup")
+                if (t.Type.ToLower() == "topup")
                 {
                     total += t.Amount;
                 }
