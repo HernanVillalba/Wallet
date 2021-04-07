@@ -7,13 +7,17 @@ using System.Collections.Generic;
 
 namespace Wallet.Data.Models
 {
-    public partial class TransactionLog
+    public partial class RefundRequest
     {
         public int Id { get; set; }
         public int TransactionId { get; set; }
-        public string NewValue { get; set; }
-        public DateTime ModificationDate { get; set; }
+        public string Status { get; set; }
+        public string Type { get; set; }
+        public int SourceUserId { get; set; }
+        public int TargetUsetId { get; set; }
 
+        public virtual Users SourceUser { get; set; }
+        public virtual Users TargetUset { get; set; }
         public virtual Transactions Transaction { get; set; }
     }
 }

@@ -15,9 +15,5 @@ namespace Wallet.Entities
         [MaxLength(10, ErrorMessage = "Máximo 10 carácteres")]
         [RegularExpression("Topup|topup|Payment|payment", ErrorMessage = "Solo se permite Topup o Payment")]
         public string Type { get; set; }
-        
-        [JsonIgnore]
-        public int? AccountId { get; set; }
-
     }
 }

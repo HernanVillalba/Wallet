@@ -16,6 +16,17 @@ Currency nvarchar(3) CHECK(Currency='USD' or Currency='ARS'),
 User_Id int not null foreign key references Users(Id)
 )
 GO
+CREATE TABLE Categories(
+Id INT NOT NULL IDENTITY(1,1) PRIMARY KEY,
+Type NVARCHAR(50) NOT NULL
+)
+GO
+INSERT INTO Categories(Type)
+Values ('Regular'),
+	   ('Buy currency'),
+	   ('Fixed term deposit'),
+	   ('Transfer')
+GO
 CREATE TABLE Transactions(
 Id int not null identity(1,1) primary key,
 Amount float not null check(Amount>0),
@@ -23,7 +34,8 @@ Concept nvarchar(50) not null,
 Date Datetime not null DEFAULT(GETDATE()),
 Type nvarchar(10) not null CHECK(Type='Topup' or Type='Payment'),
 Account_Id int not null foreign key references Accounts(Id),
-Editable BIT NULL DEFAULT(1)
+Editable BIT NULL DEFAULT(1),
+Category_Id INT NOT NULL DEFAULT(1) FOREIGN KEY REFERENCES Categories(Id)
 )
 GO
 CREATE TABLE FixedTermDeposits(
@@ -46,4 +58,14 @@ CREATE TABLE Rates (
     Date Datetime not null DEFAULT(GETDATE()),
     Selling_price float not null,
     Buying_price float not null
+)
+GO
+CREATE TABLE RefundRequest(
+Id INT NOT NULL PRIMARY KEY IDENTITY(1,1),
+Transaction_Id INT NOT NULL FOREIGN KEY REFERENCES Transactions(Id),
+Status NVARCHAR(10) NOT NULL DEFAULT('Pending') 
+	CHECK(Status = 'Accepted' OR Status = 'Canceled' OR Status = 'Rejected' OR Status = 'Pending'),
+Type NVARCHAR(50) NOT NULL,
+Source_User_Id INT NOT NULL FOREIGN KEY REFERENCES Users(Id),
+Target_Uset_Id INT NOT NULL FOREIGN KEY REFERENCES Users(Id)
 )
