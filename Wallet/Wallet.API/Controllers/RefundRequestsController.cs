@@ -11,16 +11,27 @@ namespace Wallet.API.Controllers
     [Authorize]
     [Route("api/[controller]")]
     [ApiController]
-    public class RefundsController : ControllerBase
+    public class RefundRequestsController : ControllerBase
     {
         private readonly IRefundsBusiness _refundsBusiness;
-        private int user_id ;
-        public RefundsController(IRefundsBusiness refundsBusiness)
+        private int user_id;
+        public RefundRequestsController(IRefundsBusiness refundsBusiness)
         {
             _refundsBusiness = refundsBusiness;
         }
+        [HttpGet]
+        public async Task<IActionResult> GetAllAsync()
+        {
+            try
+            {
+                user_id = int.Parse(User.Claims.First(i => i.Type == "UserId").Value);
+                return Ok(await _refundsBusiness.GetAll(user_id));
+            }
+            catch { throw; }
+        }
+
         [HttpPost]
-        public IActionResult Create([FromBody]RefundRequestCreateModel refund)
+        public IActionResult Create([FromBody] RefundRequestCreateModel refund)
         {
             try
             {

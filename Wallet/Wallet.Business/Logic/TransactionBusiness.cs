@@ -21,7 +21,7 @@ namespace Wallet.Business.Logic
             _rates = ratesBusiness;
         }
 
-        public async Task<IEnumerable<Transactions>> GetAll(TransactionFilterModel tfm, int user_id, int page)
+        public async Task<IEnumerable<TransactionModel>> GetAll(TransactionFilterModel tfm, int user_id, int page)
         {
             if (user_id <= 0) { throw new CustomException(400, "Id de usuario no válido"); }
             IEnumerable<Transactions> listDB;
@@ -36,19 +36,22 @@ namespace Wallet.Business.Logic
             //si busca sin filtros
             else
             {
-                AccountsUsersModel a = _unitOfWork.Accounts.GetAccountsUsers(user_id);
+                AccountsUserModel a = _unitOfWork.Accounts.GetAccountsUsers(user_id);
                 if (_unitOfWork.Accounts.ValidateAccounts(a))
                 {
                     listDB = await _unitOfWork.Transactions.GetTransactionsUser((int)a.IdARS, (int)a.IdUSD);
                 }
                 else { throw new CustomException(404, "No se encontró algunas de las cuentas del usuario"); }
             }
+
+            IEnumerable<TransactionModel> list = _mapper.Map<IEnumerable<TransactionModel>>(listDB);
+
             //paginado con xpagelist
             if (page <= 0) { page = 1; } //asigna la primer página
             int pageNumber = (int)page, pageSize = 10; //10 registros por página
-            listDB = await listDB.ToPagedList(pageNumber, pageSize).ToListAsync();
+            list = await list.ToPagedList(pageNumber, pageSize).ToListAsync();
 
-            return listDB;
+            return list;
         }
 
         public Task<List<Transactions>> Filter(TransactionFilterModel transaction, int user_id)
