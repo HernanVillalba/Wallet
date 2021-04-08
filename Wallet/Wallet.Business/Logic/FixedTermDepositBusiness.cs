@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Wallet.Business.EmailSender;
 using Wallet.Business.EmailSender.Interface;
 using Wallet.Data.Models;
 using Wallet.Data.Repositories.Interfaces;
@@ -132,6 +133,10 @@ namespace Wallet.Business.Logic
 
             // When completed, if no exception has been thrown, send email with details:
             string email = _unitOfWork.Users.GetById(userId).Email;
+            
+
+            // Opcion 2 (como antes, no me gusta porque el cuerpo del mail se pierde entre tanto código,
+            // mejor tenerlo todo centralizado en una clase
             await _emailSender.SendEmailAsync(email, $"Cierre de plazo fijo",
             $"El plazo fijo #{fixedTermDepositId} se ha cerrado correctamente!" +
             "<br>" +
@@ -141,6 +146,48 @@ namespace Wallet.Business.Logic
             $"Monto rescatado: ${Math.Round(interestsCalculation.montoFinal, 2)}" +
             $"<br>" +
             $"Intereses generados: ${Math.Round(interestsCalculation.montoFinal - interestsCalculation.montoInicial, 2)}");
+
+            /*
+             * 
+             * Tabla: EmailTemplates
+             * -Id (PK - int, autoincremental)
+             * -Title (nvarchar(46)) -> ej: Cierre de plazo fijo #{0}
+             * -Template (nvarchar(32767)) -> ej: Hola {0}! El plazo fijo #{1} ha sido creado!
+             * 
+             * Crear un email:
+             * 1) Escribir al final del Script_Email_Templates el INSERT correspondiente al mail,
+             *    con {0}, {1}, ... , {n} según corresponda (el body comienza con {0} por mas 
+             *    que el titulo ya contenga parametros porque se procesan por separado)
+             * 2) Al ser autoincremental, ir al ENUM_MAIL_TEMPLATES y agregar el campo del nuevo
+             *    template al final del mismo, respetando el orden del script
+             * 3) Correr el make.bat para resetear la base (o ejecutar el Script_EmailTemplates)
+             * 4) Ya se tiene el template registrado, solo resta usarlo
+             * 
+             * Uso:
+             * 1) La clase Business que tenga que enviar emails va a tener que ser inyectada 
+             *    con la interfaz IEmailSender
+             * 2) Suponiendo que la inyeccion de dependencia se hizo sobre el miembro 
+             *    _emailSender, el uso es el siguiente:
+             *    
+             *    EmailTemplate emailTemplate = _unitOfWork.EmailTemplates.GetById(ENUM_EMAIL_TEMPLATES.FixedTermDepositCreate);
+             *    - Revisar en la base de datos el template a ver qué parámetros se requieren,
+             *      tanto en el titulo como en el cuerpo del email
+             *    string title = String.Format(emailTemplate.Title, <parametros> );
+             *    string body = String.Format(emailTemplate.Template, <parametros> );
+             *    await _emailSender.SendEmailAsync(email, title, body);
+             */
+
+            // Opcion 3 (tal vez la más sensata, crear los métodos dentro de la clase del emailSender),
+            // pero habrá que inyectar el emailSender en cada controller que quiera hacer uso del mailer
+
+            EmailTemplate emailTemplate = 
+                _unitOfWork.EmailTemplates.GetById(ENUM_EMAIL_TEMPLATES.FixedTermDepositCreate);
+            string title = String.Format(emailTemplate.Title, fixedTermDepositId);
+            string body = String.Format(emailTemplate.Template, fixedTermDepositId,
+                Math.Round(interestsCalculation.montoInicial, 2),
+                Math.Round(interestsCalculation.montoFinal, 2),
+                Math.Round(interestsCalculation.montoFinal - interestsCalculation.montoInicial, 2));
+            await _emailSender.SendEmailAsync(email, title, body);
         }
 
         public InterestsCalculationModel calculateProfit(string currency, double amount, DateTime from, DateTime to)
