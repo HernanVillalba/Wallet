@@ -21,6 +21,8 @@ namespace Wallet.Business.Profiles
             CreateMap<Transactions, TransactionDetailsModel>().ReverseMap();
             CreateMap<TransactionLog, TransactionLogModel>().ReverseMap();
             CreateMap<Rates, RateModel>().ReverseMap();
+            CreateMap<RefundRequest, RefundRequestModel>().ReverseMap();
+            CreateMap<Transactions, TransactionModel>().ReverseMap();
         }
     }
 }

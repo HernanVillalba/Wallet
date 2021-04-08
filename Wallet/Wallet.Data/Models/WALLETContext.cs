@@ -1,5 +1,6 @@
 ﻿using System;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata;
 
 // Code scaffolded by EF Core assumes nullable reference types (NRTs) are not used or disabled.
 // If you have enabled NRTs for your project, then un-comment the following line:
@@ -19,22 +20,22 @@ namespace Wallet.Data.Models
         }
 
         public virtual DbSet<Accounts> Accounts { get; set; }
+        public virtual DbSet<Categories> Categories { get; set; }
         public virtual DbSet<FixedTermDeposits> FixedTermDeposits { get; set; }
         public virtual DbSet<Rates> Rates { get; set; }
+        public virtual DbSet<RefundRequest> RefundRequest { get; set; }
         public virtual DbSet<TransactionLog> TransactionLog { get; set; }
         public virtual DbSet<Transactions> Transactions { get; set; }
+        public virtual DbSet<Transfers> Transfers { get; set; }
         public virtual DbSet<Users> Users { get; set; }
-        public virtual DbSet<AccountBalance> AccountBalance { get; set; }
-        public virtual DbSet<UserContact> UserContact { get; set; }
 
-        //        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-        //        {
-        //            if (!optionsBuilder.IsConfigured)
-        //            {
-        //#warning To protect potentially sensitive information in your connection string, you should move it out of source code. See http://go.microsoft.com/fwlink/?LinkId=723263 for guidance on storing connection strings.
-        //                optionsBuilder.UseSqlServer("Server=.\\SQLEXPRESS;Initial Catalog=WALLET;Integrated Security=True;Connect Timeout=30;Encrypt=False;TrustServerCertificate=False;ApplicationIntent=ReadWrite;MultiSubnetFailover=False;");
-        //            }
-        //        }
+        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+        {
+            if (!optionsBuilder.IsConfigured)
+            {
+                optionsBuilder.UseSqlServer("name=WalletDB");
+            }
+        }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -49,6 +50,19 @@ namespace Wallet.Data.Models
                     .HasForeignKey(d => d.UserId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK__Accounts__User_I__286302EC");
+            });
+
+            modelBuilder.Entity<Categories>(entity =>
+            {
+                entity.HasIndex(e => e.Type)
+                    .HasName("UQ__Categori__F9B8A48B83259BD3")
+                    .IsUnique();
+
+                entity.Property(e => e.Editable).HasDefaultValueSql("((1))");
+
+                entity.Property(e => e.Type)
+                    .IsRequired()
+                    .HasMaxLength(50);
             });
 
             modelBuilder.Entity<FixedTermDeposits>(entity =>
@@ -68,7 +82,7 @@ namespace Wallet.Data.Models
                     .WithMany(p => p.FixedTermDeposits)
                     .HasForeignKey(d => d.AccountId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK__FixedTerm__Accou__33D4B598");
+                    .HasConstraintName("FK__FixedTerm__Accou__38996AB5");
             });
 
             modelBuilder.Entity<Rates>(entity =>
@@ -80,6 +94,38 @@ namespace Wallet.Data.Models
                     .HasDefaultValueSql("(getdate())");
 
                 entity.Property(e => e.SellingPrice).HasColumnName("Selling_price");
+            });
+
+            modelBuilder.Entity<RefundRequest>(entity =>
+            {
+                entity.Property(e => e.SourceAccountId).HasColumnName("Source_Account_Id");
+
+                entity.Property(e => e.Status)
+                    .IsRequired()
+                    .HasMaxLength(10)
+                    .HasDefaultValueSql("('Pending')");
+
+                entity.Property(e => e.TargetAccountId).HasColumnName("Target_Account_Id");
+
+                entity.Property(e => e.TransactionId).HasColumnName("Transaction_Id");
+
+                entity.HasOne(d => d.SourceAccount)
+                    .WithMany(p => p.RefundRequestSourceAccount)
+                    .HasForeignKey(d => d.SourceAccountId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK__RefundReq__Sourc__44FF419A");
+
+                entity.HasOne(d => d.TargetAccount)
+                    .WithMany(p => p.RefundRequestTargetAccount)
+                    .HasForeignKey(d => d.TargetAccountId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK__RefundReq__Targe__45F365D3");
+
+                entity.HasOne(d => d.Transaction)
+                    .WithMany(p => p.RefundRequest)
+                    .HasForeignKey(d => d.TransactionId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK__RefundReq__Trans__4222D4EF");
             });
 
             modelBuilder.Entity<TransactionLog>(entity =>
@@ -100,12 +146,16 @@ namespace Wallet.Data.Models
                     .WithMany(p => p.TransactionLog)
                     .HasForeignKey(d => d.TransactionId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK__Transacti__Trans__36B12243");
+                    .HasConstraintName("FK__Transacti__Trans__3B75D760");
             });
 
             modelBuilder.Entity<Transactions>(entity =>
             {
                 entity.Property(e => e.AccountId).HasColumnName("Account_Id");
+
+                entity.Property(e => e.CategoryId)
+                    .HasColumnName("Category_Id")
+                    .HasDefaultValueSql("((1))");
 
                 entity.Property(e => e.Concept)
                     .IsRequired()
@@ -115,8 +165,6 @@ namespace Wallet.Data.Models
                     .HasColumnType("datetime")
                     .HasDefaultValueSql("(getdate())");
 
-                entity.Property(e => e.Editable).HasDefaultValueSql("((1))");
-
                 entity.Property(e => e.Type)
                     .IsRequired()
                     .HasMaxLength(10);
@@ -125,13 +173,38 @@ namespace Wallet.Data.Models
                     .WithMany(p => p.Transactions)
                     .HasForeignKey(d => d.AccountId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK__Transacti__Accou__2E1BDC42");
+                    .HasConstraintName("FK__Transacti__Accou__31EC6D26");
+
+                entity.HasOne(d => d.Category)
+                    .WithMany(p => p.Transactions)
+                    .HasForeignKey(d => d.CategoryId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK__Transacti__Categ__33D4B598");
+            });
+
+            modelBuilder.Entity<Transfers>(entity =>
+            {
+                entity.Property(e => e.DestinationTransactionId).HasColumnName("Destination_Transaction_Id");
+
+                entity.Property(e => e.OriginTransactionId).HasColumnName("Origin_Transaction_Id");
+
+                entity.HasOne(d => d.DestinationTransaction)
+                    .WithMany(p => p.TransfersDestinationTransaction)
+                    .HasForeignKey(d => d.DestinationTransactionId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK__Transfers__Desti__49C3F6B7");
+
+                entity.HasOne(d => d.OriginTransaction)
+                    .WithMany(p => p.TransfersOriginTransaction)
+                    .HasForeignKey(d => d.OriginTransactionId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK__Transfers__Origi__48CFD27E");
             });
 
             modelBuilder.Entity<Users>(entity =>
             {
                 entity.HasIndex(e => e.Email)
-                    .HasName("UQ__Users__A9D10534CD82C02E")
+                    .HasName("UQ__Users__A9D10534D2144DD2")
                     .IsUnique();
 
                 entity.Property(e => e.Email)
@@ -150,9 +223,6 @@ namespace Wallet.Data.Models
 
                 entity.Property(e => e.Password).IsRequired();
             });
-
-            modelBuilder.Entity<AccountBalance>().HasNoKey();
-            modelBuilder.Entity<UserContact>().HasNoKey();
 
             OnModelCreatingPartial(modelBuilder);
         }

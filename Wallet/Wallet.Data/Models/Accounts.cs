@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 // Code scaffolded by EF Core assumes nullable reference types (NRTs) are not used or disabled.
 // If you have enabled NRTs for your project, then un-comment the following line:
@@ -11,6 +12,8 @@ namespace Wallet.Data.Models
         public Accounts()
         {
             FixedTermDeposits = new HashSet<FixedTermDeposits>();
+            RefundRequestSourceAccount = new HashSet<RefundRequest>();
+            RefundRequestTargetAccount = new HashSet<RefundRequest>();
             Transactions = new HashSet<Transactions>();
         }
 
@@ -20,6 +23,8 @@ namespace Wallet.Data.Models
 
         public virtual Users User { get; set; }
         public virtual ICollection<FixedTermDeposits> FixedTermDeposits { get; set; }
+        public virtual ICollection<RefundRequest> RefundRequestSourceAccount { get; set; }
+        public virtual ICollection<RefundRequest> RefundRequestTargetAccount { get; set; }
         public virtual ICollection<Transactions> Transactions { get; set; }
     }
 }

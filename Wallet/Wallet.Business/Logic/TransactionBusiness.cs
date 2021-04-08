@@ -1,13 +1,10 @@
 ﻿using AutoMapper;
-using Newtonsoft.Json;
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Net.Http;
 using System.Threading.Tasks;
 using Wallet.Data.Models;
 using Wallet.Data.Repositories.Interfaces;
 using Wallet.Entities;
+using X.PagedList;
 
 namespace Wallet.Business.Logic
 {
@@ -16,15 +13,17 @@ namespace Wallet.Business.Logic
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
         private readonly IRatesBusiness _rates;
+        private readonly IAccountBusiness _accountBusiness;
 
-        public TransactionBusiness(IUnitOfWork unitOfWork, IMapper mapper, IRatesBusiness ratesBusiness)
+        public TransactionBusiness(IUnitOfWork unitOfWork, IMapper mapper, IRatesBusiness ratesBusiness, IAccountBusiness accountBusiness)
         {
             _unitOfWork = unitOfWork;
             _mapper = mapper;
             _rates = ratesBusiness;
+            _accountBusiness = accountBusiness;
         }
 
-        public async Task<IEnumerable<Transactions>> GetAll(TransactionFilterModel tfm, int user_id)
+        public async Task<IEnumerable<TransactionModel>> GetAll(TransactionFilterModel tfm, int user_id, int page)
         {
             if (user_id <= 0) { throw new CustomException(400, "Id de usuario no válido"); }
             IEnumerable<Transactions> listDB;
@@ -39,12 +38,22 @@ namespace Wallet.Business.Logic
             //si busca sin filtros
             else
             {
-                int ARS_id = _unitOfWork.Accounts.GetAccountId(user_id, "ARS"),
-                    USD_id = _unitOfWork.Accounts.GetAccountId(user_id, "USD");
-                listDB = await _unitOfWork.Transactions.GetTransactionsUser(ARS_id, USD_id);
+                AccountsUserModel a = _unitOfWork.Accounts.GetAccountsUsers(user_id);
+                if (_unitOfWork.Accounts.ValidateAccounts(a))
+                {
+                    listDB = await _unitOfWork.Transactions.GetTransactionsUser((int)a.IdARS, (int)a.IdUSD);
+                }
+                else { throw new CustomException(404, "No se encontró algunas de las cuentas del usuario"); }
             }
 
-            return listDB;
+            IEnumerable<TransactionModel> list = _mapper.Map<IEnumerable<TransactionModel>>(listDB);
+
+            //paginado con xpagelist
+            if (page <= 0) { page = 1; } //asigna la primer página
+            int pageNumber = (int)page, pageSize = 10; //10 registros por página
+            list = await list.ToPagedList(pageNumber, pageSize).ToListAsync();
+
+            return list;
         }
 
         public Task<List<Transactions>> Filter(TransactionFilterModel transaction, int user_id)
@@ -71,8 +80,12 @@ namespace Wallet.Business.Logic
         {
             int? ARS_account_id = _unitOfWork.Accounts.GetAccountId(user_id, "ARS");
             if (ARS_account_id == null || ARS_account_id <= 0 || user_id <= 0) { throw new CustomException(404, "No se pudo obtener alguno de los datos del usuario"); }
-            newT.AccountId = ARS_account_id;
+            if (newT.Type == "Payment" && _accountBusiness.GetAccountBalance(user_id, "ARS") - newT.Amount < 0)
+            {
+                throw new CustomException(400, "No hay saldo suficiente para realizar la transacción");
+            }
             Transactions transaction = _mapper.Map<Transactions>(newT);
+            transaction.AccountId = (int)ARS_account_id;
             _unitOfWork.Transactions.Insert(transaction);
             await _unitOfWork.Complete();
         }
@@ -91,7 +104,7 @@ namespace Wallet.Business.Logic
 
             if (transaction_buscada != null)
             {
-                if ((bool)transaction_buscada.Editable)
+                if (transaction_buscada.CategoryId == 1)
                 {
                     var transactionLog = new TransactionLog
                     {
@@ -130,93 +143,6 @@ namespace Wallet.Business.Logic
             else { throw new CustomException(404, "No se encontró alguna de las cuentas del usuario"); }
         }
 
-        //public async Task BuyCurrency(TransactionBuyCurrency tbc, int user_id)
-        //{
-        //    TransactionCreateModel transaction = new TransactionCreateModel(); //transacción que uso para crearla
-        //    DollarBusiness db = new DollarBusiness(); //separé la logica del consumo de la API en DollarBusiness
-        //    var dollar = db.GetDollarByName("Dolar blue"); //aca trae el dolar blue, pero puede traer otros como el oficial
-
-        //    if (dollar == null) { throw new CustomException(404, "No se pudo obtener el valor del dólar"); }
-
-        //    //datos necesarios del usario para realizar las transacciones
-        //    int? ARS_accountId = _unitOfWork.Accounts.GetAccountId(user_id, "ARS");
-        //    int? USD_accountId = _unitOfWork.Accounts.GetAccountId(user_id, "USD");
-        //    double? balance_ARS = _unitOfWork.Accounts.GetAccountBalance(user_id, "ARS");
-        //    double? balance_USD = _unitOfWork.Accounts.GetAccountBalance(user_id, "USD");
-        //    double cost; // costo de las operaciones
-
-
-        //    ///Logica para ahorrar código///
-        //    ///entender la lógica de que comprar dólares es vender pesos y
-        //    ///vender dólares es comprar pesos, me ahorró mucho código repetitivo
-
-        //    if ((tbc.Type.ToLower() == "compra" && tbc.Currency.ToLower() == "usd") ||
-        //        (tbc.Type.ToLower() == "venta" && tbc.Currency.ToLower() == "ars")) // si quiere comprar usd, quiere vender pesos
-        //    {
-        //        cost = tbc.Amount * Convert.ToDouble(dollar.Casa.Venta);
-
-        //        if (balance_ARS >= cost) // si se cumple, quiere decir que tengo saldo suficiente
-        //        {
-        //            //en USD
-        //            Transactions transactionOrigin = new Transactions
-        //            {
-        //                Amount = tbc.Amount,
-        //                Concept = "Compra de divisas",
-        //                Type = "Topup",
-        //                AccountId = (int)USD_accountId,
-        //                Editable = false
-        //            };
-        //            //en ARS
-        //            Transactions transactionsDestiny = new Transactions
-        //            {
-        //                Amount = cost,
-        //                Concept = "Compra de divisas",
-        //                Type = "Payment",
-        //                AccountId = (int)ARS_accountId,
-        //                Editable = false
-        //            };
-        //            _unitOfWork.Transactions.Insert(transactionOrigin);
-        //            _unitOfWork.Transactions.Insert(transactionsDestiny);
-        //            await _unitOfWork.Complete();
-        //            return;
-        //        }
-        //        else { throw new CustomException(400, "Saldo insuficiente"); }
-        //    }
-        //    else if ((tbc.Type.ToLower() == "venta" && tbc.Currency.ToLower() == "usd") ||
-        //             (tbc.Type.ToLower() == "compra" && tbc.Currency.ToLower() == "ars")) //si quiere vender dolares, quiere comprar pesos
-        //    {
-        //        cost = tbc.Amount * Convert.ToDouble(dollar.Casa.Compra);
-        //        if (tbc.Amount <= balance_USD) //si la cantidad que quiero vender...
-        //        {
-        //            //en USD
-        //            Transactions transactionsOrigin = new Transactions
-        //            {
-        //                AccountId = (int)USD_accountId,
-        //                Amount = tbc.Amount,
-        //                Concept = "Compra de divisas",
-        //                Type = "Payment",
-        //                Editable = false
-        //            };
-        //            //en ARS
-        //            Transactions transactionsDestiny = new Transactions
-        //            {
-        //                AccountId = (int)ARS_accountId,
-        //                Amount = cost,
-        //                Concept = "Compra de divisas",
-        //                Type = "Topup",
-        //                Editable = false
-        //            };
-
-        //            _unitOfWork.Transactions.Insert(transactionsOrigin);
-        //            _unitOfWork.Transactions.Insert(transactionsDestiny);
-        //            await _unitOfWork.Complete();
-        //            return;
-        //        }
-        //        else { throw new CustomException(400, "Saldo insuficiente"); }
-        //    }
-        //    else { throw new CustomException(400, "Algunos de los datos ingresados son incorrectos"); }
-        //}
-
         public async Task Transfer(TransferModel newTransfer, int id)
         {
             //get accounts to compare
@@ -236,7 +162,7 @@ namespace Wallet.Business.Logic
                 throw new CustomException(400, "Alguno de los datos ingresados es incorrecto");
             }
             //get balance and validate
-            var balance = _unitOfWork.Accounts.GetAccountBalance(senderAccount.UserId, senderAccount.Currency);
+            var balance = _accountBusiness.GetAccountBalance(senderAccount.UserId, senderAccount.Currency);
             if (newTransfer.Amount > balance)
             {
                 throw new CustomException(400, "Saldo insuficiente");
@@ -248,7 +174,7 @@ namespace Wallet.Business.Logic
                 Concept = $"Transferencia de cuenta {newTransfer.AccountId}",
                 Type = "Topup",
                 AccountId = newTransfer.RecipientAccountId,
-                Editable = false
+                CategoryId = 4
             };
             Transactions transferPayment = new Transactions
             {
@@ -256,12 +182,23 @@ namespace Wallet.Business.Logic
                 Concept = $"Transferencia a la cuenta {newTransfer.RecipientAccountId}",
                 Type = "Payment",
                 AccountId = newTransfer.AccountId,
-                Editable = false
+                CategoryId = 4
             };
             //try inserting into database
-            _unitOfWork.Transactions.Insert(transferTopup);
             _unitOfWork.Transactions.Insert(transferPayment);
+            _unitOfWork.Transactions.Insert(transferTopup);
             await _unitOfWork.Complete();
+            if (transferTopup.Id > 0 && transferPayment.Id > 0)
+            {
+                Transfers transfer = new Transfers()
+                {
+                    OriginTransactionId = transferPayment.Id,
+                    DestinationTransactionId = transferTopup.Id
+                };
+                _unitOfWork.Transfers.Insert(transfer);
+                await _unitOfWork.Complete();
+            }
+            else { throw new CustomException(404, "No se creó la transferencia"); }
         }
 
         public async Task BuyCurrency(TransactionBuyCurrency tbc, int user_id)
@@ -269,72 +206,69 @@ namespace Wallet.Business.Logic
             //Get accounts and balances
             int ARS_accountId = _unitOfWork.Accounts.GetAccountId(user_id, "ARS");
             int USD_accountId = _unitOfWork.Accounts.GetAccountId(user_id, "USD");
-            double balance_ARS = _unitOfWork.Accounts.GetAccountBalance(user_id, "ARS");
-            double balance_USD = _unitOfWork.Accounts.GetAccountBalance(user_id, "USD");
+            double balance_ARS = _accountBusiness.GetAccountBalance(user_id, "ARS");
+            double balance_USD = _accountBusiness.GetAccountBalance(user_id, "USD");
             double cost;
             Rates rates = await _rates.GetRates();
-
+            Transactions transactionOrigin;
+            Transactions transactionDestiny;
             if (tbc.Type == "Compra")
             {
                 cost = tbc.Amount * rates.BuyingPrice;
                 if (balance_ARS >= cost)
                 {
                     //en USD
-                    Transactions transactionOrigin = new Transactions
+                    transactionOrigin = new Transactions
                     {
                         Amount = tbc.Amount,
                         Concept = "Compra de divisas",
                         Type = "Topup",
                         AccountId = USD_accountId,
-                        Editable = false
+                        CategoryId = 2
                     };
                     //en ARS
-                    Transactions transactionsDestiny = new Transactions
+                    transactionDestiny = new Transactions
                     {
                         Amount = cost,
                         Concept = "Compra de divisas",
                         Type = "Payment",
                         AccountId = ARS_accountId,
-                        Editable = false
+                        CategoryId = 2
                     };
-                    _unitOfWork.Transactions.Insert(transactionOrigin);
-                    _unitOfWork.Transactions.Insert(transactionsDestiny);
-                    await _unitOfWork.Complete();
-                    return;
                 }
                 else { throw new CustomException(400, "Saldo insuficiente"); }
-            }        
+            }
             else
             {
                 cost = tbc.Amount * rates.SellingPrice;
                 if (tbc.Amount <= balance_USD)
                 {
                     //en USD
-                    Transactions transactionsOrigin = new Transactions
+                    transactionOrigin = new Transactions
                     {
                         AccountId = (int)USD_accountId,
                         Amount = tbc.Amount,
                         Concept = "Compra de divisas",
                         Type = "Payment",
-                        Editable = false
+                        CategoryId = 2
                     };
                     //en ARS
-                    Transactions transactionsDestiny = new Transactions
+                    transactionDestiny = new Transactions
                     {
                         AccountId = (int)ARS_accountId,
                         Amount = cost,
                         Concept = "Compra de divisas",
                         Type = "Topup",
-                        Editable = false
+                        CategoryId = 2
                     };
 
-                    _unitOfWork.Transactions.Insert(transactionsOrigin);
-                    _unitOfWork.Transactions.Insert(transactionsDestiny);
-                    await _unitOfWork.Complete();
-                    return;
                 }
-                else { throw new CustomException(400, "Saldo insuficiente"); }            
+                else { throw new CustomException(400, "Saldo insuficiente"); }
             }
+            _unitOfWork.Transactions.Insert(transactionOrigin);
+            _unitOfWork.Transactions.Insert(transactionDestiny);
+            await _unitOfWork.Complete();
+            return;
         }
 
     }

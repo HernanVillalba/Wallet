@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -49,7 +50,7 @@ namespace Wallet.Business.Logic
         public async Task<Rates> SetRates()
         {
             string dollarApi = "https://www.dolarsi.com/api/api.php?type=valoresprincipales";
-            List<Root> dollarValues = new List<Root>();
+            List<Dollar> dollarValues = new List<Dollar>();
 
             //Call API and deserialize json
             using (var HttpClient = new HttpClient())
@@ -57,7 +58,7 @@ namespace Wallet.Business.Logic
                 using (var response = await HttpClient.GetAsync(dollarApi))
                 {
                     string apiResponse = await response.Content.ReadAsStringAsync();
-                    dollarValues = JsonConvert.DeserializeObject<List<Root>>(apiResponse);
+                    dollarValues = JsonConvert.DeserializeObject<List<Dollar>>(apiResponse);
                 }
             }
             //Map json response to database model

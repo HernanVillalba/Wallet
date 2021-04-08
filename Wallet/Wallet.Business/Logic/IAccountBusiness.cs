@@ -7,5 +7,6 @@ namespace Wallet.Business.Logic
     {
         BalanceModel GetBalances(int id);
         List<AccountModel> GetAccountsWithBalance(int id);
+        double GetAccountBalance(int id, string currency);
     }
 }

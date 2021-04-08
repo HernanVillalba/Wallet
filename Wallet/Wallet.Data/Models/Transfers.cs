@@ -7,11 +7,13 @@ using System.Collections.Generic;
 
 namespace Wallet.Data.Models
 {
-    public partial class Rates
+    public partial class Transfers
     {
         public int Id { get; set; }
-        public DateTime Date { get; set; }
-        public double SellingPrice { get; set; }
-        public double BuyingPrice { get; set; }
+        public int OriginTransactionId { get; set; }
+        public int DestinationTransactionId { get; set; }
+
+        public virtual Transactions DestinationTransaction { get; set; }
+        public virtual Transactions OriginTransaction { get; set; }
     }
 }

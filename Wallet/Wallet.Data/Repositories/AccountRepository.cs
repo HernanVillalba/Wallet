@@ -6,6 +6,7 @@ using Wallet.Data.Models;
 using Wallet.Data.Repositories.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Data.SqlClient;
+using Wallet.Entities;
 
 namespace Wallet.Data.Repositories
 {
@@ -13,12 +14,6 @@ namespace Wallet.Data.Repositories
     {
         public AccountRepository(WALLETContext context) : base(context)
         {
-        }
-
-        public double GetAccountBalance(int user_id, string currency)
-        {
-            var balance = _context.AccountBalance.FromSqlRaw($"EXEC SP_GetBalance {user_id}, {currency}").ToList();
-            return balance[0].Balance;
         }
 
         public List<Accounts> GetUserAccounts(int id)
@@ -35,6 +30,21 @@ namespace Wallet.Data.Repositories
         public Accounts GetAccountById(int id)
         {
             return _context.Accounts.FirstOrDefault(x => x.Id == id);
+        }
+
+        public AccountsUserModel GetAccountsUsers(int user_id)
+        {
+            AccountsUserModel accounts = new AccountsUserModel();
+            accounts.IdUSD = GetAccountId(user_id, "USD");
+            accounts.IdARS= GetAccountId(user_id, "ARS");
+            return accounts;
+        }
+
+        public bool ValidateAccounts(AccountsUserModel accounts)
+        {
+            //return false if any of the data is wrong
+            if(accounts.IdUSD > 0 && accounts.IdUSD != null && accounts.IdARS > 0 && accounts.IdARS != null) { return true; }
+            else { return false; }
         }
     }
 }
