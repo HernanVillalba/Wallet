@@ -95,7 +95,6 @@
             <summary>
             Registrar un usuario nuevo con un email único
             </summary>
-            <response code="201">Usuario registrado correctamente</response>
         </member>
         <member name="M:Wallet.API.Controllers.UsersController.GetUserById(System.Int32)">
             <summary>
@@ -103,11 +102,12 @@
             </summary>
             <param name="userId">Id del usuario</param>
         </member>
-        <member name="M:Wallet.API.Controllers.UsersController.GetUsersByPage(System.Int32)">
+        <member name="M:Wallet.API.Controllers.UsersController.GetUsersByPage(System.Int32,Wallet.Entities.UserFilterModel)">
             <summary>
             Mostrar lista paginada de usuarios ordenada por apellido ascendente
             </summary>
             <param name="page">Página a mostrar</param>
+            <param name="user">Filtros</param>
         </member>
     </members>
 </doc>
