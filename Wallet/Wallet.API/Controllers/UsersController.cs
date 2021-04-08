@@ -21,7 +21,6 @@ namespace Wallet.API.Controllers
         /// <summary>
         /// Registrar un usuario nuevo con un email único
         /// </summary>
-        /// <response code="201">Usuario registrado correctamente</response>
         [HttpPost]
         public async Task<IActionResult> Register([FromBody] RegisterModel newUser)
         {
@@ -58,13 +57,14 @@ namespace Wallet.API.Controllers
         /// Mostrar lista paginada de usuarios ordenada por apellido ascendente
         /// </summary>
         /// <param name="page">Página a mostrar</param>
+        /// <param name="user">Filtros</param>
         [Authorize]
         [HttpGet]
-        public IActionResult GetUsersByPage([FromQuery]int page)
+        public IActionResult GetUsersByPage([FromQuery]int page, [FromQuery]UserFilterModel user)
         {
             try
             { 
-                return Ok(_userBusiness.PagedUsers(page));
+                return Ok(_userBusiness.PagedUsers(page, user));
             }
             catch 
             {

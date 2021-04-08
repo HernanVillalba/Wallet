@@ -10,7 +10,7 @@ namespace Wallet.Data.Repositories.Interfaces
         bool FindEmail(string email);
         Task<Users> FindUser(string email);
         Task AddAccounts(Users user);
-        IEnumerable<UserContact> GetByPage(int page);
+        IEnumerable<UserContact> GetByPage(int page, UserFilterModel user);
         List<Users> Filter(UserFilterModel user);
     }
 }
