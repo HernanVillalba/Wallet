@@ -104,7 +104,7 @@ namespace Wallet.Business.Logic
 
             if (transaction_buscada != null)
             {
-                if (transaction_buscada.CategoryId == 1)
+                if ((bool)transaction_buscada.Category.Editable)
                 {
                     var transactionLog = new TransactionLog
                     {
