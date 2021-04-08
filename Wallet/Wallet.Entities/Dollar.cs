@@ -2,7 +2,14 @@
 
 namespace Wallet.Entities
 {
+
     public class Dollar
+    {
+        [JsonPropertyName("casa")]
+        public Casa Casa;
+    }
+
+    public class Casa
     {
         [JsonPropertyName("compra")]
         public string Compra;
@@ -24,11 +31,5 @@ namespace Wallet.Entities
 
         [JsonPropertyName("decimales")]
         public string Decimales;
-    }
-
-    public class Root
-    {
-        [JsonPropertyName("casa")]
-        public Dollar Casa;
     }
 }

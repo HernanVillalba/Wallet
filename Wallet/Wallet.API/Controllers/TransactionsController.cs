@@ -67,7 +67,7 @@ namespace Wallet.API.Controllers
                 await _transactionBusiness.Create(newT,user_id);
                 return StatusCode(201);
             }
-            catch (Exception) { throw new CustomException(404, "No se pudo crear la transacción"); }
+            catch (Exception) { throw; }
 
         }
 

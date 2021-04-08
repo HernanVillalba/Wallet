@@ -63,5 +63,10 @@ namespace Wallet.Data.Repositories
                    .Where(e => e.AccountId == ARS_id || e.AccountId == USD_id)
                    .OrderByDescending(e => e.Date).ToListAsync();
         }
+
+        public IEnumerable<Transactions> GetTransactionsForAccount(int accountId)
+        {
+            return _context.Transactions.Where(e => e.AccountId == accountId).ToList();
+        }
     }
 }

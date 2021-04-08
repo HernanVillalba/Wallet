@@ -43,7 +43,16 @@ namespace Wallet.Data.Repositories
         public IEnumerable<UserContact> GetByPage(int page)
         {
             int pageSize = 10;
-            return _context.UserContact.FromSqlRaw($"execute SP_GetPagedUsers {page}, {pageSize}");
+            return _context.Users.Skip((page - 1) * pageSize)
+                .Take(pageSize)
+                .Select(p => new UserContact
+                {
+                       Id = p.Id,
+                       FirstName = p.FirstName,
+                       LastName = p.LastName,
+                       Email = p.Email
+                }
+                ).ToList();
         }
 
         public List<Users> Filter(UserFilterModel user)
