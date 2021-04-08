@@ -51,13 +51,13 @@ namespace Wallet.Business.Logic
             return user;
         }
 
-        public IEnumerable<UserContact> PagedUsers(int page)
+        public IEnumerable<UserContact> PagedUsers(int page, UserFilterModel user)
         {
-            if (page < 1)
+            if (page <= 0)
             {
-                throw new CustomException(400, "Ingrese un valor mayor a cero");
+                page = 1;
             }
-            var users = _unitOfWork.Users.GetByPage(page);  
+            var users = _unitOfWork.Users.GetByPage(page, user);  
             if (users.Any())
             {
                 return users;

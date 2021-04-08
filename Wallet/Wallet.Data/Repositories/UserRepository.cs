@@ -40,10 +40,14 @@ namespace Wallet.Data.Repositories
             await _context.SaveChangesAsync();
         }
 
-        public IEnumerable<UserContact> GetByPage(int page)
+        public IEnumerable<UserContact> GetByPage(int page, UserFilterModel user)
         {
             int pageSize = 10;
-            return _context.Users.Skip((page - 1) * pageSize)
+            return _context.Users                
+                .Where(e => (string.IsNullOrEmpty(user.FirstName) || e.FirstName.ToLower() == user.FirstName.ToLower()) &&
+                            (string.IsNullOrEmpty(user.LastName) || e.LastName.ToLower() == user.LastName.ToLower()) &&
+                            (string.IsNullOrEmpty(user.Email) || e.Email.ToLower() == user.Email.ToLower()))
+                .Skip((page - 1) * pageSize)
                 .Take(pageSize)
                 .Select(p => new UserContact
                 {
