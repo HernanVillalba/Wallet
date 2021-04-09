@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Wallet.Business;
 using Wallet.Business.Logic;
 using Wallet.Entities;
 
@@ -42,22 +43,22 @@ namespace Wallet.API.Controllers
             catch { throw; }
         }
 
-        [HttpPut("id")]
-        public async Task<IActionResult> UpdateStatus(int id, [FromQuery]string action)
+        [HttpPatch("{id}")]
+        public async Task<IActionResult> UpdateStatus(int id, [FromBody]RefundRequestActionModel action)
         {
             int userId = int.Parse(User.Claims.First(i => i.Type == "UserId").Value);
-            if (action == "aceptar")
+            switch (action.Action.ToLower())
             {
-                try
-                {
-                    await _refundsBusiness.Accept(userId, id);
-                    return Ok();
-                }
-                catch { throw; }
-            }
-            else
-            {
-                return Ok("ToDo");
+                case "accept":
+                    try
+                    {
+                        await _refundsBusiness.Accept(userId, id);
+                        return Ok();
+                    }
+                    catch { throw; }
+                //TODO: case cancelar y declinar
+                default:
+                    throw new CustomException(400, "Ingrese una acción válida");
             }
         }
     }

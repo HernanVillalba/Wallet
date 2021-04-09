@@ -99,8 +99,8 @@ namespace Wallet.Business.Logic
                 throw new CustomException(400, "No posee saldo suficiente para aceptar el reembolso");
             }
             //Accept the refund
-            //Change the status to refunded
-            refundRequest.Status = "refunded";
+            //Change the status to accepted
+            refundRequest.Status = "Accepted";
             _unitOfWork.RefundRequest.Update(refundRequest);
             //Create inverse transactions
             Transactions transferTopup = new Transactions
@@ -121,6 +121,7 @@ namespace Wallet.Business.Logic
             };
             _unitOfWork.Transactions.Insert(transferTopup);
             _unitOfWork.Transactions.Insert(transferPayment);
+            await _unitOfWork.Complete();
             //Add to transfers table
             Transfers transfer = new Transfers()
             {
