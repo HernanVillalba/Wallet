@@ -19,7 +19,7 @@ namespace Wallet.Business.Logic
             _mapper = mapper;
             _accountBusiness = accountBusiness;
         }
-        public void Create(RefundRequestCreateModel refund, int? user_id)
+        public async Task Create(RefundRequestCreateModel refund, int? user_id)
         {
             if (user_id <= 0 || user_id == null) { throw new CustomException(404, "Id de usuario no válido"); }
 
@@ -51,7 +51,7 @@ namespace Wallet.Business.Logic
                         if (_unitOfWork.RefundRequest.ValidateRefundRequest(refundRequest))
                         {
                             _unitOfWork.RefundRequest.Insert(refundRequest);
-                            _unitOfWork.Complete();
+                            await _unitOfWork.Complete();
                             return;
                         }
                         else { throw new CustomException(400, "Reembolso no válido"); }
@@ -64,7 +64,7 @@ namespace Wallet.Business.Logic
             else { throw new CustomException(400, "No se encontró la transacción"); }
         }
 
-        public async Task<IEnumerable<RefundRequestModel>> GetAll(int? user_id)
+        public IEnumerable<RefundRequestModel> GetAll(int? user_id)
         {
             if(user_id<=0 || user_id == null) { throw new CustomException(404, "El id de usuario no es válido"); }
             AccountsUserModel accounts = _unitOfWork.Accounts.GetAccountsUsers((int)user_id);

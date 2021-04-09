@@ -20,23 +20,23 @@ namespace Wallet.API.Controllers
             _refundsBusiness = refundsBusiness;
         }
         [HttpGet]
-        public async Task<IActionResult> GetAllAsync()
+        public IActionResult GetAll()
         {
             try
             {
                 user_id = int.Parse(User.Claims.First(i => i.Type == "UserId").Value);
-                return Ok(await _refundsBusiness.GetAll(user_id));
+                return Ok(_refundsBusiness.GetAll(user_id));
             }
             catch { throw; }
         }
 
         [HttpPost]
-        public IActionResult Create([FromBody] RefundRequestCreateModel refund)
+        public async Task<IActionResult> Create([FromBody] RefundRequestCreateModel refund)
         {
             try
             {
                 user_id = int.Parse(User.Claims.First(i => i.Type == "UserId").Value);
-                _refundsBusiness.Create(refund, user_id);
+                await _refundsBusiness.Create(refund, user_id);
                 return StatusCode(201);
             }
             catch { throw; }
