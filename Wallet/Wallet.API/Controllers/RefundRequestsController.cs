@@ -47,19 +47,19 @@ namespace Wallet.API.Controllers
         public async Task<IActionResult> UpdateStatus(int id, [FromBody]RefundRequestActionModel action)
         {
             int userId = int.Parse(User.Claims.First(i => i.Type == "UserId").Value);
-            switch (action.Action.ToLower())
+            try 
             {
-                case "accept":
-                    try
-                    {
+                switch (action.Action.ToLower())
+                {
+                    case "accept":
                         await _refundsBusiness.Accept(userId, id);
                         return Ok();
-                    }
-                    catch { throw; }
-                //TODO: case cancelar y declinar
-                default:
-                    throw new CustomException(400, "Ingrese una acción válida");
+                    //TODO: case cancelar y declinar
+                    default:
+                        throw new CustomException(400, "Ingrese una acción válida");
+                }
             }
+            catch { throw; }
         }
     }
 }

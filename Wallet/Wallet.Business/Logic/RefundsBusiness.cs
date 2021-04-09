@@ -93,7 +93,7 @@ namespace Wallet.Business.Logic
             }
             //Check if the account has enough money to accept the refund
             var transaction = _unitOfWork.Transactions.GetById(refundRequest.TransactionId);
-            var balance = _accountBusiness.GetAccountBalance(targetAccount.Id, targetAccount.Currency);
+            var balance = _accountBusiness.GetAccountBalance(targetAccount.UserId, targetAccount.Currency);
             if (balance < transaction.Amount)
             {
                 throw new CustomException(400, "No posee saldo suficiente para aceptar el reembolso");
