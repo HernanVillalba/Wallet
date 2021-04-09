@@ -13,6 +13,7 @@ namespace Wallet.Data.Repositories.Interfaces
         IRatesRepository Rates { get; }
         IRefundRequestRepository RefundRequest { get; }
         ITransfersRepository Transfers { get; }
+        IEmailTemplatesRepository EmailTemplates { get; }
         Task<int> Complete();
     }
 }

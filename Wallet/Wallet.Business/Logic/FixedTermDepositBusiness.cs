@@ -156,18 +156,18 @@ namespace Wallet.Business.Logic
              * 2) Suponiendo que la inyeccion de dependencia se hizo sobre el miembro 
              *    _emailSender, el uso es el siguiente:
              *    
-             *    EmailTemplate emailTemplate = _unitOfWork.EmailTemplates.GetById(ENUM_EMAIL_TEMPLATES.FixedTermDepositCreate);
+             *    EmailTemplate emailTemplate = _unitOfWork.EmailTemplates.GetById((int)ENUM_EMAIL_TEMPLATES.Tipo_De_Email);
              *    - Revisar en la base de datos el template a ver qué parámetros se requieren,
              *      tanto en el titulo como en el cuerpo del email
              *    string title = String.Format(emailTemplate.Title, <parametros> );
-             *    string body = String.Format(emailTemplate.Template, <parametros> );
+             *    string body = String.Format(emailTemplate.Body, <parametros> );
              *    await _emailSender.SendEmailAsync(email, title, body);
              */
 
             EmailTemplates emailTemplate = 
-                _unitOfWork.EmailTemplates.GetById(ENUM_EMAIL_TEMPLATES.FixedTermDepositCreate);
-            string title = String.Format(emailTemplate.Title, fixedTermDepositId);
-            string body = String.Format(emailTemplate.Template, fixedTermDepositId,
+                _unitOfWork.EmailTemplates.GetById((int)ENUM_EMAIL_TEMPLATES.FixedTermDepositClosed);
+            string title = emailTemplate.Title;
+            string body = String.Format(emailTemplate.Body, fixedTermDepositId,
                 Math.Round(interestsCalculation.montoInicial, 2),
                 Math.Round(interestsCalculation.montoFinal, 2),
                 Math.Round(interestsCalculation.montoFinal - interestsCalculation.montoInicial, 2));

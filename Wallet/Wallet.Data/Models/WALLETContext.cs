@@ -21,6 +21,7 @@ namespace Wallet.Data.Models
 
         public virtual DbSet<Accounts> Accounts { get; set; }
         public virtual DbSet<Categories> Categories { get; set; }
+        public virtual DbSet<EmailTemplates> EmailTemplates { get; set; }
         public virtual DbSet<FixedTermDeposits> FixedTermDeposits { get; set; }
         public virtual DbSet<Rates> Rates { get; set; }
         public virtual DbSet<RefundRequest> RefundRequest { get; set; }
@@ -47,7 +48,7 @@ namespace Wallet.Data.Models
             modelBuilder.Entity<Categories>(entity =>
             {
                 entity.HasIndex(e => e.Type)
-                    .HasName("UQ__Categori__F9B8A48B83259BD3")
+                    .HasName("UQ__Categori__F9B8A48BDA3C6C66")
                     .IsUnique();
 
                 entity.Property(e => e.Editable).HasDefaultValueSql("((1))");
@@ -55,6 +56,15 @@ namespace Wallet.Data.Models
                 entity.Property(e => e.Type)
                     .IsRequired()
                     .HasMaxLength(50);
+            });
+
+            modelBuilder.Entity<EmailTemplates>(entity =>
+            {
+                entity.Property(e => e.Body)
+                    .IsRequired()
+                    .HasMaxLength(4000);
+
+                entity.Property(e => e.Title).HasMaxLength(46);
             });
 
             modelBuilder.Entity<FixedTermDeposits>(entity =>
@@ -196,7 +206,7 @@ namespace Wallet.Data.Models
             modelBuilder.Entity<Users>(entity =>
             {
                 entity.HasIndex(e => e.Email)
-                    .HasName("UQ__Users__A9D10534D2144DD2")
+                    .HasName("UQ__Users__A9D1053435B8A63E")
                     .IsUnique();
 
                 entity.Property(e => e.Email)
