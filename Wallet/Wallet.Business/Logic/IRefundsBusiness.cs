@@ -6,7 +6,7 @@ namespace Wallet.Business.Logic
 {
     public interface IRefundsBusiness
     {
-        void Create(RefundRequestCreateModel refund, int? user_id);
-        Task<IEnumerable<RefundRequestModel>> GetAll(int? user_id);
+       Task Create(RefundRequestCreateModel refund, int? user_id);
+       IEnumerable<RefundRequestModel> GetAll(int? user_id);
     }
 }
