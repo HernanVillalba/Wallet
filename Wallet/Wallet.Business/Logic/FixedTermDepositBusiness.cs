@@ -133,26 +133,13 @@ namespace Wallet.Business.Logic
 
             // When completed, if no exception has been thrown, send email with details:
             string email = _unitOfWork.Users.GetById(userId).Email;
-            
-
-            // Opcion 2 (como antes, no me gusta porque el cuerpo del mail se pierde entre tanto código,
-            // mejor tenerlo todo centralizado en una clase
-            await _emailSender.SendEmailAsync(email, $"Cierre de plazo fijo",
-            $"El plazo fijo #{fixedTermDepositId} se ha cerrado correctamente!" +
-            "<br>" +
-            "<br>" +
-            $"Monto inicial: ${Math.Round(interestsCalculation.montoInicial, 2)}" +
-            "<br>" +
-            $"Monto rescatado: ${Math.Round(interestsCalculation.montoFinal, 2)}" +
-            $"<br>" +
-            $"Intereses generados: ${Math.Round(interestsCalculation.montoFinal - interestsCalculation.montoInicial, 2)}");
 
             /*
              * 
              * Tabla: EmailTemplates
              * -Id (PK - int, autoincremental)
              * -Title (nvarchar(46)) -> ej: Cierre de plazo fijo #{0}
-             * -Template (nvarchar(32767)) -> ej: Hola {0}! El plazo fijo #{1} ha sido creado!
+             * -Body (nvarchar(4000)) -> ej: Hola {0}! El plazo fijo #{1} ha sido creado!
              * 
              * Crear un email:
              * 1) Escribir al final del Script_Email_Templates el INSERT correspondiente al mail,
@@ -177,10 +164,7 @@ namespace Wallet.Business.Logic
              *    await _emailSender.SendEmailAsync(email, title, body);
              */
 
-            // Opcion 3 (tal vez la más sensata, crear los métodos dentro de la clase del emailSender),
-            // pero habrá que inyectar el emailSender en cada controller que quiera hacer uso del mailer
-
-            EmailTemplate emailTemplate = 
+            EmailTemplates emailTemplate = 
                 _unitOfWork.EmailTemplates.GetById(ENUM_EMAIL_TEMPLATES.FixedTermDepositCreate);
             string title = String.Format(emailTemplate.Title, fixedTermDepositId);
             string body = String.Format(emailTemplate.Template, fixedTermDepositId,
