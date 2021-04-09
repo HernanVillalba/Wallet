@@ -18,6 +18,7 @@ namespace Wallet.Data.Repositories
             Rates = new RatesRepository(_context);
             RefundRequest = new RefundRequestRepository(_context);
             Transfers = new TransfersRepository(_context);
+            EmailTemplates = new EmailTemplatesRepository(_context);
         }
         public IUserRepository Users { get; set; }
         public ITransactionRepository Transactions { get; set; }
@@ -27,6 +28,7 @@ namespace Wallet.Data.Repositories
         public IRatesRepository Rates { get; set; }
         public IRefundRequestRepository RefundRequest { get; set; }
         public ITransfersRepository Transfers { get; set; }
+        public IEmailTemplatesRepository EmailTemplates { get; set; }
 
         public async Task<int> Complete()
         {
