@@ -8,5 +8,6 @@ namespace Wallet.Business.Logic
     {
         void Create(RefundRequestCreateModel refund, int? user_id);
         Task<IEnumerable<RefundRequestModel>> GetAll(int? user_id);
+        Task Accept(int userId, int id);
     }
 }

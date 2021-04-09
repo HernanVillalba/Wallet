@@ -41,5 +41,24 @@ namespace Wallet.API.Controllers
             }
             catch { throw; }
         }
+
+        [HttpPut("id")]
+        public async Task<IActionResult> UpdateStatus(int id, [FromQuery]string action)
+        {
+            int userId = int.Parse(User.Claims.First(i => i.Type == "UserId").Value);
+            if (action == "aceptar")
+            {
+                try
+                {
+                    await _refundsBusiness.Accept(userId, id);
+                    return Ok();
+                }
+                catch { throw; }
+            }
+            else
+            {
+                return Ok("ToDo");
+            }
+        }
     }
 }

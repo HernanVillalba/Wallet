@@ -40,7 +40,7 @@ namespace Wallet.API.Controllers
         /// Mostrar balances de las cuentas en pesos y dolares del usuario actual
         /// </summary>
         [Authorize]
-        [HttpGet("balance")]
+        [HttpGet("{balance}")]
         public IActionResult ListBalance()
         {
             var id = int.Parse(User.Claims.First(i => i.Type == "UserId").Value);
