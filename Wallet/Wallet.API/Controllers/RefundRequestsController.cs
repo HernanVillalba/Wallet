@@ -31,6 +31,19 @@ namespace Wallet.API.Controllers
             catch { throw; }
         }
 
+        [HttpGet("{id}")]
+        public IActionResult Details(int id)
+        {
+            try
+            {
+                return Ok(_refundsBusiness.Details(id));
+            }
+            catch
+            {
+                throw;
+            }
+        }
+
         [HttpPost]
         public async Task<IActionResult> Create([FromBody] RefundRequestCreateModel refund)
         {
