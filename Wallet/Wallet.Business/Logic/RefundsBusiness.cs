@@ -12,10 +12,12 @@ namespace Wallet.Business.Logic
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
-        public RefundsBusiness(IUnitOfWork unitOfWork, IMapper mapper)
+        private readonly IAccountBusiness _accountBusiness;
+        public RefundsBusiness(IUnitOfWork unitOfWork, IMapper mapper, IAccountBusiness accountBusiness)
         {
             _unitOfWork = unitOfWork;
             _mapper = mapper;
+            _accountBusiness = accountBusiness;
         }
         public async Task Create(RefundRequestCreateModel refund, int? user_id)
         {
@@ -69,6 +71,66 @@ namespace Wallet.Business.Logic
             var listDB = _unitOfWork.RefundRequest.GetAllByAccountsId(accounts);
             IEnumerable<RefundRequestModel> list = _mapper.Map<IEnumerable<RefundRequestModel>>(listDB);
             return list;
+        }
+
+        public async Task Accept(int userId, int refundRequestId)
+        {
+            //Check if request exists and is pending
+            RefundRequest refundRequest = _unitOfWork.RefundRequest.GetById(refundRequestId);
+            if(refundRequest == null)
+            {
+                throw new CustomException(404, "Solicitud de reembolso no existente");
+            }
+            if (refundRequest.Status != "Pending" )
+            {
+                throw new CustomException(400, "Esta solicitud ya ha sido procesada");
+            }
+            //Check if the target account is owned by the current user
+            var targetAccount = _unitOfWork.Accounts.GetById(refundRequest.TargetAccountId);
+            if (targetAccount.UserId != userId)
+            {
+                throw new CustomException(400, "Solo puede aceptar reembolsos de transacciones realizadas a una cuenta propia");
+            }
+            //Check if the account has enough money to accept the refund
+            var transaction = _unitOfWork.Transactions.GetById(refundRequest.TransactionId);
+            var balance = _accountBusiness.GetAccountBalance(targetAccount.UserId, targetAccount.Currency);
+            if (balance < transaction.Amount)
+            {
+                throw new CustomException(400, "No posee saldo suficiente para aceptar el reembolso");
+            }
+            //Accept the refund
+            //Change the status to accepted
+            refundRequest.Status = "Accepted";
+            _unitOfWork.RefundRequest.Update(refundRequest);
+            //Create inverse transactions
+            Transactions transferTopup = new Transactions
+            {
+                Amount = transaction.Amount,
+                Concept = "Reembolso de una transacción",
+                Type = "Topup",
+                AccountId = refundRequest.SourceAccountId,
+                CategoryId = 4
+            };
+            Transactions transferPayment = new Transactions
+            {
+                Amount = transaction.Amount,
+                Concept = "Reembolso de una transacción",
+                Type = "Payment",
+                AccountId = refundRequest.TargetAccountId,
+                CategoryId = 4
+            };
+            _unitOfWork.Transactions.Insert(transferTopup);
+            _unitOfWork.Transactions.Insert(transferPayment);
+            await _unitOfWork.Complete();
+            //Add to transfers table
+            Transfers transfer = new Transfers()
+            {
+                OriginTransactionId = transferPayment.Id,
+                DestinationTransactionId = transferTopup.AccountId
+            };
+            _unitOfWork.Transfers.Insert(transfer);
+            //Save all changes
+            await _unitOfWork.Complete();
         }
     }
 }
