@@ -1,6 +1,6 @@
 ﻿namespace Wallet.Business
 {
-    public enum ENUM_EMAIL_TEMPLATES
+    public enum EmailTemplatesEnum
     {
         FixedTermDepositClosed = 1,
         RefundRequestCanceled,
