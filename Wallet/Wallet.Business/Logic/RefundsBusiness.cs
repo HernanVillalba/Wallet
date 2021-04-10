@@ -70,5 +70,21 @@ namespace Wallet.Business.Logic
             IEnumerable<RefundRequestModel> list = _mapper.Map<IEnumerable<RefundRequestModel>>(listDB);
             return list;
         }
+
+        public RefundRequestModel Details(int refundRequestId)
+        {
+            if (refundRequestId <= 0)
+                throw new CustomException(400, "Id de reembolso inválido");
+
+            var refundRequest = _unitOfWork.RefundRequest.GetById(refundRequestId);
+
+            if (refundRequest == null)
+                throw new CustomException(400, "No se pudo encontrar el reembolso");
+
+            // Maps the refund request db entity to view model entity
+            RefundRequestModel refundRequestModel = _mapper.Map<RefundRequestModel>(refundRequest);
+
+            return refundRequestModel;
+        }
     }
 }
