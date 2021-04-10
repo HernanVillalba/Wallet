@@ -117,11 +117,14 @@ namespace Wallet.Business.Logic
                                 fixedTermDeposit.CreationDate, (DateTime)fixedTermDeposit.ClosingDate);
 
             // Now, we have to add a topup transaction with total value
-            Transactions newTransaction = new Transactions();
-            newTransaction.AccountId = fixedTermDeposit.AccountId;
-            newTransaction.Amount = interestsCalculation.montoFinal;
-            newTransaction.Concept = "Plazo Fijo (Cierre)";
-            newTransaction.Type = "Topup";
+            Transactions newTransaction = new Transactions
+            {
+                AccountId = fixedTermDeposit.AccountId,
+                Amount = interestsCalculation.montoFinal,
+                Concept = $"Plazo Fijo #{fixedTermDepositId} (Cierre)",
+                Type = "Topup",
+                CategoryId = 3
+            };
             _unitOfWork.Transactions.Insert(newTransaction);
 
             // Having the transaction placed, it's time to update the fixed term deposit
@@ -134,38 +137,8 @@ namespace Wallet.Business.Logic
             // When completed, if no exception has been thrown, send email with details:
             string email = _unitOfWork.Users.GetById(userId).Email;
 
-            /*
-             * 
-             * Tabla: EmailTemplates
-             * -Id (PK - int, autoincremental)
-             * -Title (nvarchar(46)) -> ej: Cierre de plazo fijo #{0}
-             * -Body (nvarchar(4000)) -> ej: Hola {0}! El plazo fijo #{1} ha sido creado!
-             * 
-             * Crear un email:
-             * 1) Escribir al final del Script_Email_Templates el INSERT correspondiente al mail,
-             *    con {0}, {1}, ... , {n} según corresponda (el body comienza con {0} por mas 
-             *    que el titulo ya contenga parametros porque se procesan por separado)
-             * 2) Al ser autoincremental, ir al ENUM_MAIL_TEMPLATES y agregar el campo del nuevo
-             *    template al final del mismo, respetando el orden del script
-             * 3) Correr el make.bat para resetear la base (o ejecutar el Script_EmailTemplates)
-             * 4) Ya se tiene el template registrado, solo resta usarlo
-             * 
-             * Uso:
-             * 1) La clase Business que tenga que enviar emails va a tener que ser inyectada 
-             *    con la interfaz IEmailSender
-             * 2) Suponiendo que la inyeccion de dependencia se hizo sobre el miembro 
-             *    _emailSender, el uso es el siguiente:
-             *    
-             *    EmailTemplate emailTemplate = _unitOfWork.EmailTemplates.GetById((int)ENUM_EMAIL_TEMPLATES.Tipo_De_Email);
-             *    - Revisar en la base de datos el template a ver qué parámetros se requieren,
-             *      tanto en el titulo como en el cuerpo del email
-             *    string title = String.Format(emailTemplate.Title, <parametros> );
-             *    string body = String.Format(emailTemplate.Body, <parametros> );
-             *    await _emailSender.SendEmailAsync(email, title, body);
-             */
-
             EmailTemplates emailTemplate = 
-                _unitOfWork.EmailTemplates.GetById((int)ENUM_EMAIL_TEMPLATES.FixedTermDepositClosed);
+                _unitOfWork.EmailTemplates.GetById((int)EmailTemplatesEnum.FixedTermDepositClosed);
             string title = emailTemplate.Title;
             string body = String.Format(emailTemplate.Body, fixedTermDepositId,
                 Math.Round(interestsCalculation.montoInicial, 2),
