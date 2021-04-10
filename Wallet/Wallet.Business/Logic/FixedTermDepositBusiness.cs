@@ -117,11 +117,14 @@ namespace Wallet.Business.Logic
                                 fixedTermDeposit.CreationDate, (DateTime)fixedTermDeposit.ClosingDate);
 
             // Now, we have to add a topup transaction with total value
-            Transactions newTransaction = new Transactions();
-            newTransaction.AccountId = fixedTermDeposit.AccountId;
-            newTransaction.Amount = interestsCalculation.montoFinal;
-            newTransaction.Concept = "Plazo Fijo (Cierre)";
-            newTransaction.Type = "Topup";
+            Transactions newTransaction = new Transactions
+            {
+                AccountId = fixedTermDeposit.AccountId,
+                Amount = interestsCalculation.montoFinal,
+                Concept = $"Plazo Fijo #{fixedTermDepositId} (Cierre)",
+                Type = "Topup",
+                CategoryId = 3
+            };
             _unitOfWork.Transactions.Insert(newTransaction);
 
             // Having the transaction placed, it's time to update the fixed term deposit
