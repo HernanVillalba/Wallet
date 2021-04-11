@@ -164,7 +164,7 @@ namespace Wallet.Business.Logic
             await _unitOfWork.Complete();
         }
 
-            public RefundRequestModel Details(int refundRequestId)
+        public RefundRequestModel Details(int refundRequestId)
         {
             if (refundRequestId <= 0)
                 throw new CustomException(400, "Id de reembolso inválido");
