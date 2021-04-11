@@ -133,6 +133,37 @@ namespace Wallet.Business.Logic
             await _unitOfWork.Complete();
         }
 
+        public async Task Cancel(int userId, int refundRequestId)
+        {
+            if (refundRequestId <= 0)
+                throw new CustomException(400, "Id de reembolso inválido");
+
+            // Knowing that refundRequestId is valid, try to retrieve the respective refund request
+            RefundRequest refundRequest = _unitOfWork.RefundRequest.GetById(refundRequestId);
+            if (refundRequest == null)
+            {
+                throw new CustomException(404, "Solicitud de reembolso inexistente");
+            }
+            if (refundRequest.Status != "Pending")
+            {
+                throw new CustomException(400, "Esta solicitud ya ha sido procesada");
+            }
+
+            // The current user id must be the same as the source account id in order to cancel the refund request
+            var sourceAccount = _unitOfWork.Accounts.GetById(refundRequest.SourceAccountId);
+            if (sourceAccount.UserId != userId)
+            {
+                throw new CustomException(403, "La solicitud de reembolso no le pertenece");
+            }
+
+            // Proceed to cancel the refund request
+            refundRequest.Status = "Canceled";
+            _unitOfWork.RefundRequest.Update(refundRequest);
+
+            // Save changes
+            await _unitOfWork.Complete();
+        }
+
         public RefundRequestModel Details(int refundRequestId)
         {
             if (refundRequestId <= 0)
@@ -141,7 +172,7 @@ namespace Wallet.Business.Logic
             var refundRequest = _unitOfWork.RefundRequest.GetById(refundRequestId);
 
             if (refundRequest == null)
-                throw new CustomException(400, "No se pudo encontrar el reembolso");
+                throw new CustomException(404, "No se pudo encontrar el reembolso");
 
             // Maps the refund request db entity to view model entity
             RefundRequestModel refundRequestModel = _mapper.Map<RefundRequestModel>(refundRequest);
