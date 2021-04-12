@@ -1,6 +1,9 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata;
+using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Threading.Tasks;
 using Wallet.Data.Models;
 using Wallet.Data.Repositories.Interfaces;
@@ -36,6 +39,16 @@ namespace Wallet.Data.Repositories
         {
             if (refund.TransactionId > 0 && refund.SourceAccountId > 0 && refund.TargetAccountId > 0 && refund != null) { return true; }
             else { return false; }
+        }
+
+        public RefundRequest GetByIdExtended(int id, params Expression<Func<RefundRequest, object>>[] includes)
+        {
+            var query = _context.Set<RefundRequest>().AsQueryable();
+            foreach (var include in includes)
+            {
+                query = query.Include(include);
+            }
+            return query.FirstOrDefault(m => m.Id == id);
         }
     }
 }
