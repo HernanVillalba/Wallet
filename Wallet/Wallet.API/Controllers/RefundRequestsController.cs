@@ -70,7 +70,9 @@ namespace Wallet.API.Controllers
                     case "cancel":
                         await _refundsBusiness.Cancel(userId, id);
                         return Ok();
-                    //TODO: case declinar
+                    case "reject":
+                        await _refundsBusiness.Reject(userId, id);
+                        return Ok();
                     default:
                         throw new CustomException(400, "Ingrese una acción válida");
                 }
