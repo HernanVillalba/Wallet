@@ -10,6 +10,7 @@ namespace Wallet.Business.Logic
         IEnumerable<RefundRequestModel> GetAll(int? user_id);
         Task Accept(int userId, int refundRequestId);
         Task Cancel(int userId, int refundRequestId);
+        Task Reject(int userId, int refundRequestId);
         RefundRequestModel Details(int refundRequestId);
     }
 }

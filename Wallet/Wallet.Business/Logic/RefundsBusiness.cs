@@ -114,7 +114,7 @@ namespace Wallet.Business.Logic
             var targetAccount = _unitOfWork.Accounts.GetById(refundRequest.TargetAccountId);
             if (targetAccount.UserId != userId)
             {
-                throw new CustomException(400, "Solo puede aceptar reembolsos de transacciones realizadas a una cuenta propia");
+                throw new CustomException(403, "Solo puede aceptar reembolsos de transacciones realizadas a una cuenta propia");
             }
             //Check if the account has enough money to accept the refund
             var transaction = _unitOfWork.Transactions.GetById(refundRequest.TransactionId);
@@ -204,5 +204,31 @@ namespace Wallet.Business.Logic
 
             return refundRequestModel;
         }
+
+        public async Task Reject(int userId, int refundRequestId)
+        {
+            //Check if request exists and is pending
+            RefundRequest refundRequest = _unitOfWork.RefundRequest.GetById(refundRequestId);
+            if (refundRequest == null)
+            {
+                throw new CustomException(404, "Solicitud de reembolso no existente");
+            }
+            if (refundRequest.Status != "Pending")
+            {
+                throw new CustomException(400, "Esta solicitud ya ha sido procesada");
+            }
+            //Check if the target account is owned by the current user
+            var targetAccount = _unitOfWork.Accounts.GetById(refundRequest.TargetAccountId);
+            if (targetAccount.UserId != userId)
+            {
+                throw new CustomException(403, "Solo puede aceptar reembolsos de transacciones realizadas a una cuenta propia");
+            }
+            //Reject the refund
+            //Change the status to rejected
+            refundRequest.Status = "Rejected";
+            _unitOfWork.RefundRequest.Update(refundRequest);
+            await _unitOfWork.Complete();
+        }
+
     }
 }
