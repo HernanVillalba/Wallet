@@ -34,9 +34,9 @@ namespace Wallet.Business.Logic
 
             if (ori_transaction != null)
             {
-                if (_unitOfWork.RefundRequest.PendingRequestExist(ori_transaction.Id)) 
+                if (_unitOfWork.RefundRequest.NotRefundable(ori_transaction.Id)) 
                 { 
-                    throw new CustomException(400, "Ya existe una solicitud pendiente"); 
+                    throw new CustomException(400, "No se puede crear la solicitud"); 
                 }
 
                 var transfer = _unitOfWork.Transfers.GetTransfer(ori_transaction.Id);
