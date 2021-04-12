@@ -80,8 +80,8 @@ namespace Wallet.Business.Logic
         public async Task Accept(int userId, int refundRequestId)
         {
             //Check if request exists and is pending
-            RefundRequest refundRequest = _unitOfWork.RefundRequest.GetById(refundRequestId);
-            if(refundRequest == null)
+            RefundRequest refundRequest = _unitOfWork.RefundRequest.GetByIdExtended(refundRequestId, m => m.SourceAccount.User, m => m.TargetAccount.User);
+            if (refundRequest == null)
             {
                 throw new CustomException(404, "Solicitud de reembolso no existente");
             }
@@ -90,14 +90,13 @@ namespace Wallet.Business.Logic
                 throw new CustomException(400, "Esta solicitud ya ha sido procesada");
             }
             //Check if the target account is owned by the current user
-            var targetAccount = _unitOfWork.Accounts.GetById(refundRequest.TargetAccountId);
-            if (targetAccount.UserId != userId)
+            if (refundRequest.TargetAccount.UserId != userId)
             {
                 throw new CustomException(403, "Solo puede aceptar reembolsos de transacciones realizadas a una cuenta propia");
             }
             //Check if the account has enough money to accept the refund
             var transaction = _unitOfWork.Transactions.GetById(refundRequest.TransactionId);
-            var balance = _accountBusiness.GetAccountBalance(targetAccount.UserId, targetAccount.Currency);
+            var balance = _accountBusiness.GetAccountBalance(refundRequest.TargetAccount.UserId, refundRequest.TargetAccount.Currency);
             if (balance < transaction.Amount)
             {
                 throw new CustomException(400, "No posee saldo suficiente para aceptar el reembolso");
@@ -135,6 +134,8 @@ namespace Wallet.Business.Logic
             _unitOfWork.Transfers.Insert(transfer);
             //Save all changes
             await _unitOfWork.Complete();
+            //Send email
+            await EmailStatusChange(refundRequest.TargetAccount.User, "aceptado", refundRequest.TransactionId, refundRequest.SourceAccount.User);
         }
 
         public async Task Cancel(int userId, int refundRequestId)
@@ -202,7 +203,7 @@ namespace Wallet.Business.Logic
         public async Task Reject(int userId, int refundRequestId)
         {
             //Check if request exists and is pending
-            RefundRequest refundRequest = _unitOfWork.RefundRequest.GetById(refundRequestId);
+            RefundRequest refundRequest = _unitOfWork.RefundRequest.GetByIdExtended(refundRequestId, m => m.SourceAccount.User, m => m.TargetAccount.User);
             if (refundRequest == null)
             {
                 throw new CustomException(404, "Solicitud de reembolso no existente");
@@ -212,8 +213,7 @@ namespace Wallet.Business.Logic
                 throw new CustomException(400, "Esta solicitud ya ha sido procesada");
             }
             //Check if the target account is owned by the current user
-            var targetAccount = _unitOfWork.Accounts.GetById(refundRequest.TargetAccountId);
-            if (targetAccount.UserId != userId)
+            if (refundRequest.TargetAccount.UserId != userId)
             {
                 throw new CustomException(403, "Solo puede aceptar reembolsos de transacciones realizadas a una cuenta propia");
             }
@@ -222,7 +222,18 @@ namespace Wallet.Business.Logic
             refundRequest.Status = "Rejected";
             _unitOfWork.RefundRequest.Update(refundRequest);
             await _unitOfWork.Complete();
+            //Send email
+            await EmailStatusChange(refundRequest.TargetAccount.User, "rechazado", refundRequest.TransactionId, refundRequest.SourceAccount.User);
         }
 
+        //Send email when refund request is accepted or rejected
+        public async Task EmailStatusChange(Users sourceUser, string status, int transactionId, Users targetUser)
+        {
+            EmailTemplates emailTemplate =
+                _unitOfWork.EmailTemplates.GetById((int)EmailTemplatesEnum.RefundRequestStatusChanged);
+            string title = emailTemplate.Title;
+            string body = string.Format(emailTemplate.Body, sourceUser.FirstName, sourceUser.LastName, sourceUser.Id, status, transactionId);
+            await _emailSender.SendEmailAsync(targetUser.Email, title, body);
+        }
     }
 }
