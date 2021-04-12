@@ -3,6 +3,7 @@ using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Wallet.API.Controllers;
+using Wallet.Business;
 using Wallet.Business.Logic;
 using Wallet.Business.Profiles;
 using Wallet.Data.Models;
@@ -15,11 +16,20 @@ namespace Wallet.Test
     public class UnitTest1
     {
         static UsersController usersController;
+        static RegisterModel registerModel1 = new RegisterModel()
+        {
+            FirstName = "Juanpi",
+            LastName = "Taladro",
+            Email = "jt@mail.com",
+            Password = "Pass1234!"
+        };
+
         static UnitTest1()
         {
             //Debe haber una forma mejor de convertir AutoMapperProfile a IMapper, pero no encontre
             //var mapper = (IMapper)new AutoMapperProfile();
-            var configuration = new MapperConfiguration(cfg => {
+            var configuration = new MapperConfiguration(cfg =>
+            {
                 cfg.CreateMap<Users, RegisterModel>().ReverseMap();
                 cfg.CreateMap<Users, LoginModel>().ReverseMap();
                 cfg.CreateMap<Users, UserContact>().ReverseMap();
@@ -45,21 +55,60 @@ namespace Wallet.Test
         }
 
         [Fact]
-        public async void TestRegister()
+        public async void Test01Register()
         {
-            var registerModel = new RegisterModel()
-            {
-                FirstName = "Juanpi",
-                LastName = "Taladro",
-                Email = "jt@mail.com",
-                Password = "Pass1234!"
-            };
+            //RegisterModel registerModel1 = new RegisterModel()
+            //{
+            //    FirstName = "Juanpi",
+            //    LastName = "Taladro",
+            //    Email = "jt@mail.com",
+            //    Password = "Pass1234!"
+            //};
 
-            var result = await usersController.Register(registerModel);
+            var result = await usersController.Register(registerModel1);
 
             Assert.IsType<StatusCodeResult>(result);
             var statusCodeResult = (StatusCodeResult)result;
             Assert.Equal(201, statusCodeResult.StatusCode);
+        }
+
+        [Fact]
+        public async void Test02RegisterDuplicated()
+        {
+            //RegisterModel registerModel1 = new RegisterModel()
+            //{
+            //    FirstName = "Juanpi",
+            //    LastName = "Taladro",
+            //    Email = "jt@mail.com",
+            //    Password = "Pass1234!"
+            //};
+
+            try
+            {
+                _ = await usersController.Register(registerModel1);
+            }
+            catch (Exception ex)
+            {
+                Assert.IsType<CustomException>(ex);
+                var customException = (CustomException)ex;
+                Assert.Equal("Usuario ya registrado", customException.Error);
+            }
+        }
+
+        [Fact]
+        public void Test03GetUserById()
+        {
+            var userId = 1;
+
+            var response = usersController.GetUserById(userId);
+
+            Assert.IsType<OkObjectResult>(response);
+
+            var responseOkResut = (OkObjectResult)response;
+            Assert.IsType<UserContact>(responseOkResut.Value);
+
+            var userContact = (UserContact)responseOkResut.Value;
+            Assert.Equal(registerModel1.Email, userContact.Email);
         }
     }
 }
