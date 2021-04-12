@@ -1,5 +1,4 @@
 ﻿using AutoMapper;
-using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -70,7 +69,7 @@ namespace Wallet.Business.Logic
                                 string origin_names = origin_user.FirstName + " " + origin_user.LastName; 
                                 EmailTemplates emailTemplate = _unitOfWork.EmailTemplates.GetById((int)EmailTemplatesEnum.RefundRequestCreated);
                                 string title = emailTemplate.Title;
-                                string body = String.Format(emailTemplate.Body, (int)user_id, origin_names, des_transaction.Amount, transfer.DestinationTransactionId);
+                                string body = string.Format(emailTemplate.Body, (int)user_id, origin_names, des_transaction.Amount, transfer.DestinationTransactionId);
                                 await _emailSender.SendEmailAsync(email, title, body);
                                 return;
                             }
@@ -163,8 +162,8 @@ namespace Wallet.Business.Logic
             if (refundRequestId <= 0)
                 throw new CustomException(400, "Id de reembolso inválido");
 
-            // Knowing that refundRequestId is valid, try to retrieve the respective refund request
-            RefundRequest refundRequest = _unitOfWork.RefundRequest.GetById(refundRequestId);
+            // Knowing that refundRequestId is valid, try to retrieve the respective refund request with extra data that I'll need later
+            RefundRequest refundRequest = _unitOfWork.RefundRequest.GetByIdExtended(refundRequestId, m => m.SourceAccount.User, m => m.TargetAccount.User);
             if (refundRequest == null)
             {
                 throw new CustomException(404, "Solicitud de reembolso inexistente");
@@ -175,8 +174,7 @@ namespace Wallet.Business.Logic
             }
 
             // The current user id must be the same as the source account id in order to cancel the refund request
-            var sourceAccount = _unitOfWork.Accounts.GetById(refundRequest.SourceAccountId);
-            if (sourceAccount.UserId != userId)
+            if (refundRequest.SourceAccount.UserId != userId)
             {
                 throw new CustomException(403, "La solicitud de reembolso no le pertenece");
             }
@@ -187,6 +185,22 @@ namespace Wallet.Business.Logic
 
             // Save changes
             await _unitOfWork.Complete();
+
+            // Once the refund request was canceled, we're ready to send the respective email
+            // In order to send the email, we need extra info, lets get it
+
+            string sourceUserName = _mapper.Map<UserContact>(refundRequest.SourceAccount.User).Name();
+            string email = refundRequest.TargetAccount.User.Email;
+
+            EmailTemplates emailTemplate =
+                _unitOfWork.EmailTemplates.GetById((int)EmailTemplatesEnum.RefundRequestCanceled);
+            
+            // Formatting email with current data
+            string title = emailTemplate.Title;
+            string body = string.Format(emailTemplate.Body, refundRequestId, sourceUserName, refundRequest.TransactionId);
+            
+            // Send email
+            await _emailSender.SendEmailAsync(email, title, body);
         }
 
         public RefundRequestModel Details(int refundRequestId)
