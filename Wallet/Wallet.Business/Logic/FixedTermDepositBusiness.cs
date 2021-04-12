@@ -95,9 +95,14 @@ namespace Wallet.Business.Logic
                 throw new CustomException(400, "Id inválido");
 
             // First check if this fixed term deposit exists
-            var fixedTermDeposit = _unitOfWork.FixedTermDeposits.GetById((int)fixedTermDepositId);
+            var fixedTermDeposit = _unitOfWork.FixedTermDeposits.GetById(fixedTermDepositId);
             if (fixedTermDeposit == null)
                 throw new CustomException(404, "Plazo fijo inexistente"); // Fixed term deposit doesn't exist
+
+            // Check if the fixed term deposits belongs to the current user
+            var account = _unitOfWork.Accounts.GetAccountById(fixedTermDeposit.AccountId);
+            if (account.UserId != userId)
+                throw new CustomException(403, "El plazo fijo no le pertenece");
 
             // Now that we know it exists, we have to change the closing date,
             // calculate the days and apply the topup transaction
