@@ -1,5 +1,4 @@
 ﻿using AutoMapper;
-using Microsoft.EntityFrameworkCore.Metadata;
 using System.Collections;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -35,14 +34,18 @@ namespace Wallet.Business.Logic
 
             if (ori_transaction != null)
             {
-                if (_unitOfWork.RefundRequest.PendingRequestExist(ori_transaction.Id)) { throw new CustomException(400, "Ya existe una solicitud pendiente"); }
+                if (_unitOfWork.RefundRequest.PendingRequestExist(ori_transaction.Id)) 
+                { 
+                    throw new CustomException(400, "Ya existe una solicitud pendiente"); 
+                }
+
                 var transfer = _unitOfWork.Transfers.GetTransfer(ori_transaction.Id);
+
                 if (_unitOfWork.Transfers.ValidateTransfer(transfer))
                 {
                     var des_transaction = _unitOfWork.Transactions.GetById(transfer.DestinationTransactionId);
                     if (des_transaction == null) { throw new CustomException(404, "No se encontró la transacción de destino"); }
-                    //4 es el id de transfer
-                    //if (transfer.OriginTransaction.CategoryId != 4 || transfer.DestinationTransaction.CategoryId != 4)
+
                     if (ori_transaction.CategoryId == 4 || des_transaction.CategoryId == 4)
                     {
                         RefundRequest refundRequest = new RefundRequest()
@@ -56,7 +59,24 @@ namespace Wallet.Business.Logic
                         {
                             _unitOfWork.RefundRequest.Insert(refundRequest);
                             await _unitOfWork.Complete();
-                            return;
+
+                            //send email
+                            int? des_user_id = _unitOfWork.Accounts.GetById(transfer.DestinationTransaction.AccountId).UserId;
+                            if(des_user_id != null && des_user_id > 0)
+                            {
+                                var origin_user = _unitOfWork.Users.GetById((int)user_id);
+                                string email = _unitOfWork.Users.GetById((int)des_user_id).Email;
+                                string origin_names = origin_user.FirstName + " " + origin_user.LastName; 
+                                EmailTemplates emailTemplate = _unitOfWork.EmailTemplates.GetById((int)EmailTemplatesEnum.RefundRequestCreated);
+                                string title = emailTemplate.Title;
+                                string body = string.Format(emailTemplate.Body, (int)user_id, origin_names, des_transaction.Amount, transfer.DestinationTransactionId);
+                                await _emailSender.SendEmailAsync(email, title, body);
+                                return;
+                            }
+                            else
+                            {
+                                throw new CustomException(404, "No se pudo enviar el email de solicitud de reembolso");
+                            }
                         }
                         else { throw new CustomException(400, "Reembolso no válido"); }
                     }
@@ -70,7 +90,7 @@ namespace Wallet.Business.Logic
 
         public IEnumerable<RefundRequestModel> GetAll(int? user_id)
         {
-            if(user_id<=0 || user_id == null) { throw new CustomException(404, "El id de usuario no es válido"); }
+            if (user_id <= 0 || user_id == null) { throw new CustomException(404, "El id de usuario no es válido"); }
             AccountsUserModel accounts = _unitOfWork.Accounts.GetAccountsUsers((int)user_id);
             var listDB = _unitOfWork.RefundRequest.GetAllByAccountsId(accounts);
             IEnumerable<RefundRequestModel> list = _mapper.Map<IEnumerable<RefundRequestModel>>(listDB);
@@ -85,7 +105,7 @@ namespace Wallet.Business.Logic
             {
                 throw new CustomException(404, "Solicitud de reembolso no existente");
             }
-            if (refundRequest.Status != "Pending" )
+            if (refundRequest.Status != "Pending")
             {
                 throw new CustomException(400, "Esta solicitud ya ha sido procesada");
             }
