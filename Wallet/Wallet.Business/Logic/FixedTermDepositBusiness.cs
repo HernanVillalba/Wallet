@@ -53,6 +53,10 @@ namespace Wallet.Business.Logic
             if (account == null)
                 throw new CustomException(404, "Cuenta inexistente");
 
+            // Check if the account id belongs to the current user
+            if (account.UserId != userId)
+                throw new CustomException(403, "La cuenta no le pertenece");
+
             string currency = account.Currency;
 
             // Execute the respective stored procedure to get the balance
