@@ -22,7 +22,7 @@ namespace Wallet.Data.Repositories
         {
             var list = _context.RefundRequest.Where(e => e.SourceAccountId == accounts.IdARS || e.TargetAccountId == accounts.IdARS ||
                 e.SourceAccountId == accounts.IdUSD || e.SourceAccountId == accounts.IdUSD)
-                .ToList();
+                .ToList().OrderByDescending(e=>e.Id);
 
             return list;
         }
