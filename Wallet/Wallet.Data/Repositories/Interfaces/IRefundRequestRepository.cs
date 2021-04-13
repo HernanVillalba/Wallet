@@ -11,7 +11,7 @@ namespace Wallet.Data.Repositories.Interfaces
     public interface IRefundRequestRepository : IGenericRepository<RefundRequest>
     {
         bool ValidateRefundRequest(RefundRequest refund);
-        bool PendingRequestExist(int trasaction_id);
+        bool NotRefundable(int trasaction_id);
         IEnumerable<RefundRequest> GetAllByAccountsId(AccountsUserModel accounts);
         RefundRequest GetByIdExtended(int id, params Expression<Func<RefundRequest, object>>[] includes);
     }
