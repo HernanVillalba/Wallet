@@ -21,7 +21,7 @@ namespace Wallet.Data.Repositories
         public IEnumerable<RefundRequest> GetAllByAccountsId(AccountsUserModel accounts)
         {
             var list = _context.RefundRequest.Where(e => e.SourceAccountId == accounts.IdARS || e.TargetAccountId == accounts.IdARS ||
-                e.SourceAccountId == accounts.IdUSD || e.SourceAccountId == accounts.IdUSD)
+                e.SourceAccountId == accounts.IdUSD || e.TargetAccountId == accounts.IdUSD)
                 .ToList().OrderByDescending(e=>e.Id);
 
             return list;

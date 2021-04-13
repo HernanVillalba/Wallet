@@ -1,0 +1,24 @@
+Session Alice:
+
+Register Alice Test
+Login Alice
+Cargar token
+Create transaction
+Buy currency
+Get user accounts (mostrar balance)
+Transfer
+Get transactions (la primera es la que se necesita)
+Create refund request
+Get refund requests
+
+Session Bob:
+Mostrar email (bob-alkemy@yopmail.com)
+Login
+Cargar token
+Get refund request (buscar id)
+Accept refund request
+Mostrar email (alice-alkemy@yopmail.com)
+Get fixed term deposit
+Close fixed term deposit
+Mostrar email (bob-alkemy@yopmail.com)
+
