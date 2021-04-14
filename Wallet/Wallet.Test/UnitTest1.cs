@@ -15,6 +15,7 @@ namespace Wallet.Test
 {
     public class UnitTest1
     {
+        private static IMapper _mapper;
         static UsersController usersController;
         static RegisterModel registerModel1 = new RegisterModel()
         {
@@ -26,31 +27,25 @@ namespace Wallet.Test
 
         static UnitTest1()
         {
-            //Debe haber una forma mejor de convertir AutoMapperProfile a IMapper, pero no encontre
-            //var mapper = (IMapper)new AutoMapperProfile();
-            var configuration = new MapperConfiguration(cfg =>
-            {
-                cfg.CreateMap<Users, RegisterModel>().ReverseMap();
-                cfg.CreateMap<Users, LoginModel>().ReverseMap();
-                cfg.CreateMap<Users, UserContact>().ReverseMap();
-                cfg.CreateMap<Transactions, TransactionCreateModel>().ReverseMap();
-                cfg.CreateMap<FixedTermDeposits, FixedTermDepositCreateModel>().ReverseMap();
-                cfg.CreateMap<FixedTermDeposits, FixedTermDepositModel>().ReverseMap();
-                cfg.CreateMap<Transactions, TransactionFilterModel>().ReverseMap();
-                cfg.CreateMap<Users, UserFilterModel>().ReverseMap();
-                cfg.CreateMap<Transactions, TransactionDetailsModel>().ReverseMap();
-                cfg.CreateMap<TransactionLog, TransactionLogModel>().ReverseMap();
-                cfg.CreateMap<Rates, RateModel>().ReverseMap();
-                cfg.CreateMap<RefundRequest, RefundRequestModel>().ReverseMap();
-                cfg.CreateMap<Transactions, TransactionModel>().ReverseMap();
-            });
-            var mapper = new Mapper(configuration);
-
-
+            // Set Database in memory
             var options = new DbContextOptionsBuilder<WALLETContext>().UseInMemoryDatabase(databaseName: "WalletDB").Options;
             var context = new WALLETContext(options);
+
+            // Set Unit of Work
             var unitOfWork = new UnitOfWork(context);
-            var userBusiness = new UserBusiness(unitOfWork, mapper);
+
+            // Set Mapper
+            var mappingConfig = new MapperConfiguration(mc =>
+            {
+                mc.AddProfile(new AutoMapperProfile());
+            });
+
+            _mapper = mappingConfig.CreateMapper();
+
+            // Create Business
+            var userBusiness = new UserBusiness(unitOfWork, _mapper);
+
+            // Create user controller
             usersController = new UsersController(userBusiness);
         }
 
