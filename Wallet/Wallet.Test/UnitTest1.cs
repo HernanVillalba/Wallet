@@ -13,9 +13,8 @@ using Xunit;
 
 namespace Wallet.Test
 {
-    public class UnitTest1
+    public class UnitTest1 : TestBase
     {
-        private static IMapper _mapper;
         static UsersController usersController;
         static RegisterModel registerModel1 = new RegisterModel()
         {
@@ -25,26 +24,9 @@ namespace Wallet.Test
             Password = "Pass1234!"
         };
 
-        static UnitTest1()
+        public UnitTest1() : base()
         {
-            // Set Database in memory
-            var options = new DbContextOptionsBuilder<WALLETContext>().UseInMemoryDatabase(databaseName: "WalletDB").Options;
-            var context = new WALLETContext(options);
-
-            // Set Unit of Work
-            var unitOfWork = new UnitOfWork(context);
-
-            // Set Mapper
-            var mappingConfig = new MapperConfiguration(mc =>
-            {
-                mc.AddProfile(new AutoMapperProfile());
-            });
-
-            _mapper = mappingConfig.CreateMapper();
-
-            // Create Business
-            var userBusiness = new UserBusiness(unitOfWork, _mapper);
-
+            var userBusiness = new UserBusiness(_unitOfWork, _mapper);
             // Create user controller
             usersController = new UsersController(userBusiness);
         }

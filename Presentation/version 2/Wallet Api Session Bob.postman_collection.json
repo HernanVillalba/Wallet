@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "f715d144-3b1f-4d0f-b284-7f30d661db21",
+		"_postman_id": "fb11af61-e1cf-43ed-852c-6361afe8ec51",
 		"name": "Wallet Api Session Bob",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
@@ -35,6 +35,26 @@
 			"response": []
 		},
 		{
+			"name": "Get user accounts",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "https://localhost:44330/api/accounts",
+					"protocol": "https",
+					"host": [
+						"localhost"
+					],
+					"port": "44330",
+					"path": [
+						"api",
+						"accounts"
+					]
+				}
+			},
+			"response": []
+		},
+		{
 			"name": "Get refund requests",
 			"request": {
 				"method": "GET",
@@ -58,14 +78,55 @@
 		{
 			"name": "Accept refund request",
 			"request": {
-				"method": "GET",
+				"method": "PATCH",
 				"header": [],
-				"url": null
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"action\": \"accept\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://localhost:44330/api/refundRequests/1",
+					"protocol": "https",
+					"host": [
+						"localhost"
+					],
+					"port": "44330",
+					"path": [
+						"api",
+						"refundRequests",
+						"1"
+					]
+				}
 			},
 			"response": []
 		},
 		{
-			"name": "Get fixed term deposit",
+			"name": "Get user accounts",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "https://localhost:44330/api/accounts",
+					"protocol": "https",
+					"host": [
+						"localhost"
+					],
+					"port": "44330",
+					"path": [
+						"api",
+						"accounts"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get fixed term deposits",
 			"request": {
 				"method": "GET",
 				"header": [],
@@ -105,6 +166,26 @@
 				}
 			},
 			"response": []
+		},
+		{
+			"name": "Get transactions",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "https://localhost:44330/api/transactions",
+					"protocol": "https",
+					"host": [
+						"localhost"
+					],
+					"port": "44330",
+					"path": [
+						"api",
+						"transactions"
+					]
+				}
+			},
+			"response": []
 		}
 	],
 	"auth": {
@@ -112,7 +193,7 @@
 		"bearer": [
 			{
 				"key": "token",
-				"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJVc2VySWQiOiIyIiwibmJmIjoxNjE4Mjc1NDIzLCJleHAiOjE2MTgzNjE4MjMsImlhdCI6MTYxODI3NTQyM30.sgz9TDbRAwgPc7wV1JSjtSS3Charii514XoolNUJfzs",
+				"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJVc2VySWQiOiIyIiwibmJmIjoxNjE4MzM4NzAzLCJleHAiOjE2MTg0MjUxMDMsImlhdCI6MTYxODMzODcwM30.eGxnGplpK0Kg7KdG-DQLAk5sJMT2-r0tdYByFNZSojs",
 				"type": "string"
 			}
 		]

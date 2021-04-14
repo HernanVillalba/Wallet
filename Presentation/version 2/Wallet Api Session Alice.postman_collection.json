@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "6314e113-1266-4578-a1e4-69ae1b824b76",
+		"_postman_id": "4bcfc529-f96c-4df7-a589-7ae4e07a19f5",
 		"name": "Wallet Api Session Alice",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
@@ -177,7 +177,18 @@
 			"request": {
 				"method": "GET",
 				"header": [],
-				"url": null
+				"url": {
+					"raw": "https://localhost:44330/api/transactions",
+					"protocol": "https",
+					"host": [
+						"localhost"
+					],
+					"port": "44330",
+					"path": [
+						"api",
+						"transactions"
+					]
+				}
 			},
 			"response": []
 		},
@@ -237,7 +248,7 @@
 		"bearer": [
 			{
 				"key": "token",
-				"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJVc2VySWQiOiIzIiwibmJmIjoxNjE4Mjc0NzIzLCJleHAiOjE2MTgzNjExMjMsImlhdCI6MTYxODI3NDcyM30.Ql5aKHd8dYs2qGUeeWdrYBQNJMiBxMTgjIK5QfVEUkU",
+				"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJVc2VySWQiOiIzIiwibmJmIjoxNjE4MzM3Nzk5LCJleHAiOjE2MTg0MjQxOTksImlhdCI6MTYxODMzNzc5OX0.AX5PK6C2Wuuy_fcjDxnJbNfAOF3GW-zQ8vNAsE0B27Q",
 				"type": "string"
 			}
 		]
