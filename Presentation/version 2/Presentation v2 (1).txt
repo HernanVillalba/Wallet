@@ -1,0 +1,27 @@
+Session Alice:
+
+Register Alice Test
+Login Alice
+Load token
+Create transaction (+ ARS 1000)
+Buy currency (+ USD 5, - ARS 500 ~)
+Get user accounts (show balance)
+Transfer (5 USD to Bob) [NO TENEMOS FORMA FACIL DE OBTENER EL ID DE BOB SIN HARDCODEARLO]
+Get transactions (we need the first one)
+Create refund request (we regret the operation)
+Get refund requests (show that it is created and have "pending" status)
+
+Session Bob:
+Show email (bob-alkemy@yopmail.com)
+Login
+Load token
+Get user accounts (show balance)
+Get refund request (search id)
+Accept refund request
+Show email (alice-alkemy@yopmail.com)
+Get user accounts
+Get fixed term deposit
+Close fixed term deposit
+Get transactions
+Show email (bob-alkemy@yopmail.com)
+
