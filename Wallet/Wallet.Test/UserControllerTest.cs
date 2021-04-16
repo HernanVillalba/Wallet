@@ -17,9 +17,9 @@ namespace Wallet.Test
         //Arrange for register
         private readonly RegisterModel registerModel = new()
         {
-            FirstName = "Juanpi11111",
-            LastName = "Taladro",
-            Email = "jt@mail.com",
+            FirstName = "alice",
+            LastName = "prueba",
+            Email = "alice@mail.com",
             Password = "Pass1234!"
         };
         public UserControllerTest()
@@ -36,6 +36,7 @@ namespace Wallet.Test
         {
             //Act        
             var result = await usersController.Register(registerModel);
+
             //Assert
             Assert.IsType<StatusCodeResult>(result);
             var statusCodeResult = (StatusCodeResult)result;

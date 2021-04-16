@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -37,8 +38,7 @@ namespace Wallet.Test
                 new Claim("UserId", "1"),
             });
             // Set Database in memory
-            var options = new DbContextOptionsBuilder<WALLETContext>().UseInMemoryDatabase(databaseName: "WalletDB").Options;
-            context = new WALLETContext(options);
+            context = new WALLETContext(GetDbOptionsBuilder().Options);
             DataInitializer.Initialize(context);
             var c = context.Users.ToList();
             // Set Unit of Work
@@ -51,13 +51,24 @@ namespace Wallet.Test
             });
             _mapper = mappingConfig.CreateMapper();
         }
-        public List<Users> lista()
+        private static DbContextOptionsBuilder<WALLETContext> GetDbOptionsBuilder()
         {
-            return context.Users.ToList();
-        }
-        ~TestBase()
-        {
-            context.Database.EnsureDeleted();
+            // The key to keeping the databases unique and not shared is 
+            // generating a unique db name for each.
+            string dbName = Guid.NewGuid().ToString();
+
+            // Create a fresh service provider, and therefore a fresh 
+            // InMemory database instance.
+            var serviceProvider = new ServiceCollection()
+                .AddEntityFrameworkInMemoryDatabase()
+                .BuildServiceProvider();
+
+            // Create a new options instance telling the context to use an
+            // InMemory database and the new service provider.
+            var builder = new DbContextOptionsBuilder<WALLETContext>();
+            builder.UseInMemoryDatabase(dbName)
+                   .UseInternalServiceProvider(serviceProvider);
+            return builder;
         }
     }
 }
