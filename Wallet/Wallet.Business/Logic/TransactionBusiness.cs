@@ -22,6 +22,11 @@ namespace Wallet.Business.Logic
             _rates = ratesBusiness;
             _accountBusiness = accountBusiness;
         }
+        public TransactionBusiness(IUnitOfWork unitOfWork, IMapper mapper)
+        {
+            _unitOfWork = unitOfWork;
+            _mapper = mapper;
+        }
 
         public async Task<IEnumerable<TransactionModel>> GetAll(TransactionFilterModel tfm, int user_id, int page)
         {

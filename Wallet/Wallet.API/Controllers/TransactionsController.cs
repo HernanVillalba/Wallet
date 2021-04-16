@@ -30,7 +30,9 @@ namespace Wallet.API.Controllers
         {
             try
             {
-                var user_id = int.Parse(User.Claims.First(i => i.Type == "UserId").Value);
+                //this is commented until the user can log in
+                //var user_id = int.Parse(User.Claims.First(i => i.Type == "UserId").Value);
+                int user_id = 1;
                 var ListDB = await _transactionBusiness.GetAll(transactionFilterModel, user_id, page);
                 return StatusCode(200,ListDB);
             }
@@ -63,7 +65,8 @@ namespace Wallet.API.Controllers
             //solo transacciones en ARS
             try
             {
-                var user_id = int.Parse(User.Claims.First(i => i.Type == "UserId").Value);
+                //var user_id = int.Parse(User.Claims.First(i => i.Type == "UserId").Value);
+                int user_id = 1;
                 await _transactionBusiness.Create(newT,user_id);
                 return StatusCode(201);
             }

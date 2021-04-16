@@ -69,5 +69,10 @@ namespace Wallet.Data.Repositories
         {
             return _context.Transactions.Where(e => e.AccountId == accountId).ToList();
         }
+
+        public IEnumerable<Transactions> GetTransactionsByUserId(int user_id)
+        {
+            return _context.Transactions.Where(e=>e.Account.UserId == user_id).ToList();
+        }
     }
 }

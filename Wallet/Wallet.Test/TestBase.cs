@@ -25,7 +25,7 @@ namespace Wallet.Test
 
             // Set Unit of Work
             _unitOfWork = new UnitOfWork(context);
-
+            var algo = context.Transactions.ToList();
             // Set Mapper
             var mappingConfig = new MapperConfiguration(mc =>
             {
