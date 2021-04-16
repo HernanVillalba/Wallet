@@ -27,7 +27,7 @@ namespace Wallet.Test
         protected ClaimsPrincipal _user;
         protected ControllerContext _controllerContext;
         protected WALLETContext context;
-        public TestBase()
+        public TestBase(int userId = 1)
         {
             //Set Mock identity
             _identity = new ClaimsIdentity();
@@ -35,10 +35,10 @@ namespace Wallet.Test
             _controllerContext = new ControllerContext { HttpContext = new DefaultHttpContext { User = _user } };
             _identity.AddClaims(new[]
             {
-                new Claim("UserId", "1"),
+                new Claim("UserId", userId.ToString()),
             });
             // Set Database in memory
-            context = new WALLETContext(GetDbOptionsBuilder().Options);
+           context = new WALLETContext(GetDbOptionsBuilder().Options);
             DataInitializer.Initialize(context);
             var c = context.Users.ToList();
             // Set Unit of Work
@@ -51,6 +51,7 @@ namespace Wallet.Test
             });
             _mapper = mappingConfig.CreateMapper();
         }
+        //Configure DB to create new instance for every test
         private static DbContextOptionsBuilder<WALLETContext> GetDbOptionsBuilder()
         {
             // The key to keeping the databases unique and not shared is 

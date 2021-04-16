@@ -51,7 +51,7 @@ namespace Wallet.Test
 
         [Fact]
         public async void Register_Duplicated_Error()
-        {
+        {            
             //Act
             await usersController.Register(registerModel);
             //Try register same user
