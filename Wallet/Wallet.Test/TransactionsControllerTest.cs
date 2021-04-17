@@ -14,7 +14,6 @@ namespace Wallet.Test
     public class TransactionsTest : TestBase
     {
         static TransactionsController transactionsController;
-        public UnitTest1 test = new UnitTest1();
         //data definition
         static TransactionFilterModel filterModel = new TransactionFilterModel();
         static TransactionCreateModel createModel = new TransactionCreateModel()
@@ -28,8 +27,6 @@ namespace Wallet.Test
         {
             var transactionsBusiness = new TransactionBusiness(_unitOfWork, _mapper);
             transactionsController = new TransactionsController(transactionsBusiness);
-            test.Test01Register();
-            //test.logueo();
         }
 
         [Fact]
@@ -47,15 +44,23 @@ namespace Wallet.Test
         public async void Test02GetAll()
         {
             var result = await transactionsController.GetAll(1, filterModel);
+            
+            //check status code ok
+            Assert.IsType<StatusCodeResult>(result);
+            var statusCodeResult = (OkResult)result;
+            Assert.Equal(200, statusCodeResult.StatusCode);
 
-            ObjectResult objectResult = (ObjectResult)result;
+            //check object (list returned by controller)
+            Assert.IsType<ObjectResult>(result);
+            var objectResult = (ObjectResult)result;
 
+            //check which list has transactions
             var list = (IEnumerable<TransactionModel>)objectResult.Value;
-            Assert.True(list.Count() > 0);
+            Assert.True(list.Any());
         }
         [Fact]
         public async void Test03FilterByAccountId()
-        {
+        { 
             filterModel.AccountId = 2;
             var result = await transactionsController.GetAll(1, filterModel);
 
