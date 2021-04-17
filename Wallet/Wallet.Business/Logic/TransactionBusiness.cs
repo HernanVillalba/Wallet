@@ -22,11 +22,6 @@ namespace Wallet.Business.Logic
             _rates = ratesBusiness;
             _accountBusiness = accountBusiness;
         }
-        public TransactionBusiness(IUnitOfWork unitOfWork, IMapper mapper)
-        {
-            _unitOfWork = unitOfWork;
-            _mapper = mapper;
-        }
 
         public async Task<IEnumerable<TransactionModel>> GetAll(TransactionFilterModel tfm, int user_id, int page)
         {
@@ -83,29 +78,40 @@ namespace Wallet.Business.Logic
 
         public async Task Create(TransactionCreateModel newT, int user_id)
         {
-            int? ARS_account_id = _unitOfWork.Accounts.GetAccountId(user_id, "ARS");
-            if (ARS_account_id == null || ARS_account_id <= 0 || user_id <= 0) { throw new CustomException(404, "No se pudo obtener alguno de los datos del usuario"); }
+            AccountsUserModel acc = new AccountsUserModel()
+            {
+                IdARS = _unitOfWork.Accounts.GetAccountId(user_id, "ARS")
+            };
+
+
+            if (acc.IdARS == null || acc.IdARS <= 0 || user_id <= 0)
+            {
+                throw new CustomException(404, "No se pudo obtener alguno de los datos del usuario");
+            }
+
             if (newT.Type == "Payment" && _accountBusiness.GetAccountBalance(user_id, "ARS") - newT.Amount < 0)
             {
                 throw new CustomException(400, "No hay saldo suficiente para realizar la transacción");
             }
+
             Transactions transaction = _mapper.Map<Transactions>(newT);
-            transaction.AccountId = (int)ARS_account_id;
+            transaction.AccountId = (int)acc.IdARS;
             _unitOfWork.Transactions.Insert(transaction);
             await _unitOfWork.Complete();
         }
 
         public async Task Edit(int? id, TransactionEditModel NewTransaction, int user_id)
         {
-            int? USD_account_id = _unitOfWork.Accounts.GetAccountId(user_id, "USD");
-            int? ARS_account_id = _unitOfWork.Accounts.GetAccountId(user_id, "ARS");
+            AccountsUserModel acc = new AccountsUserModel();
+            acc.IdARS = _unitOfWork.Accounts.GetAccountId(user_id, "ARS");
+            acc.IdUSD = _unitOfWork.Accounts.GetAccountId(user_id, "USD");
 
-            if (USD_account_id == null || USD_account_id <= 0 || ARS_account_id == null || ARS_account_id <= 0)
+            if (acc.IdUSD == null || acc.IdUSD <= 0 || acc.IdARS == null || acc.IdARS <= 0)
             {
                 throw new CustomException(404, "No se encontró alguna de las cuentas del usuario");
             }
 
-            var transaction_buscada = _unitOfWork.Transactions.FindTransaction((int)id, (int)USD_account_id, (int)ARS_account_id);
+            var transaction_buscada = _unitOfWork.Transactions.FindTransaction((int)id, (int)acc.IdUSD, (int)acc.IdARS);
 
             if (transaction_buscada != null)
             {
@@ -130,12 +136,14 @@ namespace Wallet.Business.Logic
         public async Task<TransactionDetailsModel> Details(int? id, int user_id)
         {
             if (user_id <= 0) { throw new CustomException(404, "Id de usario no válido"); }
-            int? ARS_account_id = _unitOfWork.Accounts.GetAccountId(user_id, "ARS");
-            int? USD_account_id = _unitOfWork.Accounts.GetAccountId(user_id, "USD");
+            AccountsUserModel acc = new AccountsUserModel();
+            acc.IdARS = _unitOfWork.Accounts.GetAccountId(user_id, "ARS");
+            acc.IdUSD = _unitOfWork.Accounts.GetAccountId(user_id, "USD");
 
-            if (ARS_account_id != null && USD_account_id != null)
+            if (acc.IdARS != null && acc.IdUSD != null)
             {
-                var transaction = _unitOfWork.Transactions.FindTransaction((int)id, (int)USD_account_id, (int)ARS_account_id);
+                var transaction = _unitOfWork.Transactions.FindTransaction((int)id, (int)acc.IdUSD, (int)acc.IdUSD);
+
                 if (transaction != null)
                 {
                     TransactionDetailsModel tdm = _mapper.Map<TransactionDetailsModel>(transaction);
