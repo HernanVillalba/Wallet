@@ -33,10 +33,20 @@ namespace Wallet.Test
             },
             new Transactions
             {
+                Id = 1,
                 Amount = 100,
                 Concept = "Recarga por defecto",
                 Type = "Topup",
                 AccountId = 2,
+                Date = DateTime.Now
+            },
+            new Transactions
+            {
+                Id = 2,
+                Amount = 150,
+                Concept = "Recarga por defecto sin usuario",
+                Type = "Topup",
+                AccountId = 4,
                 Date = DateTime.Now
             },
         };              

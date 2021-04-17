@@ -88,7 +88,7 @@ namespace Wallet.Business.Logic
             {
                 throw new CustomException(404, "No se pudo obtener alguno de los datos del usuario");
             }
-
+            var saldo = _accountBusiness.GetAccountBalance(user_id, "ARS");
             if (newT.Type == "Payment" && _accountBusiness.GetAccountBalance(user_id, "ARS") - newT.Amount < 0)
             {
                 throw new CustomException(400, "No hay saldo suficiente para realizar la transacción");
@@ -142,7 +142,7 @@ namespace Wallet.Business.Logic
 
             if (acc.IdARS != null && acc.IdUSD != null)
             {
-                var transaction = _unitOfWork.Transactions.FindTransaction((int)id, (int)acc.IdUSD, (int)acc.IdUSD);
+                var transaction = _unitOfWork.Transactions.FindTransaction((int)id, (int)acc.IdUSD, (int)acc.IdARS);
 
                 if (transaction != null)
                 {

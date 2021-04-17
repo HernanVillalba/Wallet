@@ -4,18 +4,13 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
-using System.Text;
-using System.Threading.Tasks;
-using Wallet.API.Controllers;
 using Wallet.Business.Logic;
 using Wallet.Business.Profiles;
 using Wallet.Data.Models;
 using Wallet.Data.Repositories;
 using Wallet.Data.Repositories.Interfaces;
-using Wallet.Entities;
 
 namespace Wallet.Test
 {
