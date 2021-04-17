@@ -11,7 +11,7 @@ using Xunit;
 
 namespace Wallet.Test
 {
-    public class TransactionsTest : TestBase
+    public class TransactionsControllerTest : TestBase
     {
         static TransactionsController transactionsController;
         //data definition
@@ -23,10 +23,13 @@ namespace Wallet.Test
             Type = "Topup"
         };
         //constructor
-        public TransactionsTest() : base()
+        public TransactionsControllerTest() : base()
         {
             var transactionsBusiness = new TransactionBusiness(_unitOfWork, _mapper);
-            transactionsController = new TransactionsController(transactionsBusiness);
+            transactionsController = new TransactionsController(transactionsBusiness)
+            {
+                ControllerContext = _controllerContext
+            };
         }
 
         [Fact]
@@ -44,15 +47,14 @@ namespace Wallet.Test
         public async void Test02GetAll()
         {
             var result = await transactionsController.GetAll(1, filterModel);
-            
+
             //check status code ok
-            Assert.IsType<StatusCodeResult>(result);
-            var statusCodeResult = (OkResult)result;
-            Assert.Equal(200, statusCodeResult.StatusCode);
 
             //check object (list returned by controller)
             Assert.IsType<ObjectResult>(result);
             var objectResult = (ObjectResult)result;
+
+            Assert.Equal(200, objectResult.StatusCode);
 
             //check which list has transactions
             var list = (IEnumerable<TransactionModel>)objectResult.Value;
@@ -60,7 +62,7 @@ namespace Wallet.Test
         }
         [Fact]
         public async void Test03FilterByAccountId()
-        { 
+        {
             filterModel.AccountId = 2;
             var result = await transactionsController.GetAll(1, filterModel);
 
