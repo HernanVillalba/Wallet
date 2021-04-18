@@ -6,6 +6,7 @@ using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Linq;
 using System.Security.Claims;
+using Wallet.Business.EmailSender.Interface;
 using Wallet.Business.Logic;
 using Wallet.Business.Profiles;
 using Wallet.Data.Models;
@@ -19,6 +20,7 @@ namespace Wallet.Test
         #region Declaration of variables
         protected readonly IMapper _mapper;
         protected readonly IUnitOfWork _unitOfWork;
+        protected readonly IEmailSender _emailSender;
         protected readonly IAccountBusiness _accountBusiness;
         protected readonly IRatesBusiness _ratesBusiness;
         protected ClaimsIdentity _identity;
