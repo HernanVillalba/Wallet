@@ -47,9 +47,10 @@ namespace Wallet.Data.Repositories
 
         public Transactions FindTransaction(int id_transaction, int USD_account_id, int ARS_account_id)
         {
-            return _context.Transactions
-                .Include(t => t.Category)
+            var tra =_context.Transactions
+                //.Include(t => t.Category)
                 .FirstOrDefault(e => e.Id == id_transaction && (e.AccountId == ARS_account_id || e.AccountId == USD_account_id));
+            return tra;
         }
 
 
@@ -68,6 +69,11 @@ namespace Wallet.Data.Repositories
         public IEnumerable<Transactions> GetTransactionsForAccount(int accountId)
         {
             return _context.Transactions.Where(e => e.AccountId == accountId).ToList();
+        }
+
+        public IEnumerable<Transactions> GetTransactionsByUserId(int user_id)
+        {
+            return _context.Transactions.Where(e=>e.Account.UserId == user_id).ToList();
         }
     }
 }

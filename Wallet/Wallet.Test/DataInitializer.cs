@@ -13,7 +13,7 @@ namespace Wallet.Test
         public static readonly List<object> lista = new()
         {
             new Users
-            {                
+            {
                 FirstName = "Juanpi",
                 LastName = "Taladro",
                 Email = "jt11@mail.com",
@@ -30,6 +30,24 @@ namespace Wallet.Test
                 Id = 2,
                 Currency = "ARS",
                 UserId = 1
+            },
+            new Transactions
+            {
+                Id = 1,
+                Amount = 100,
+                Concept = "Recarga por defecto",
+                Type = "Topup",
+                AccountId = 2,
+                Date = DateTime.Now
+            },
+            new Transactions
+            {
+                Id = 2,
+                Amount = 150,
+                Concept = "Recarga por defecto sin usuario",
+                Type = "Topup",
+                AccountId = 4,
+                Date = DateTime.Now
             },
         };              
         public static void Initialize(WALLETContext _context)

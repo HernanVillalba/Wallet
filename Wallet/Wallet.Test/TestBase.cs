@@ -4,31 +4,33 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
-using System.Text;
-using System.Threading.Tasks;
-using Wallet.API.Controllers;
 using Wallet.Business.Logic;
 using Wallet.Business.Profiles;
 using Wallet.Data.Models;
 using Wallet.Data.Repositories;
 using Wallet.Data.Repositories.Interfaces;
-using Wallet.Entities;
 
 namespace Wallet.Test
 {
     public class TestBase
     {
+        #region Declaration of variables
         protected readonly IMapper _mapper;
         protected readonly IUnitOfWork _unitOfWork;
+        protected readonly IAccountBusiness _accountBusiness;
+        protected readonly IRatesBusiness _ratesBusiness;
         protected ClaimsIdentity _identity;
         protected ClaimsPrincipal _user;
         protected ControllerContext _controllerContext;
         protected WALLETContext context;
+        #endregion 
+
+        #region set properties
         public TestBase(int userId = 1)
         {
+
             //Set Mock identity
             _identity = new ClaimsIdentity();
             _user = new ClaimsPrincipal(_identity);
@@ -38,11 +40,18 @@ namespace Wallet.Test
                 new Claim("UserId", userId.ToString()),
             });
             // Set Database in memory
-           context = new WALLETContext(GetDbOptionsBuilder().Options);
+            context = new WALLETContext(GetDbOptionsBuilder().Options);
             DataInitializer.Initialize(context);
             var c = context.Users.ToList();
+
             // Set Unit of Work
             _unitOfWork = new UnitOfWork(context);
+
+            // Set account businness
+            _accountBusiness = new AccountBusiness(_unitOfWork, _mapper);
+
+            // Set rates
+            _ratesBusiness = new RatesBusiness(_unitOfWork, _mapper);
 
             // Set Mapper
             var mappingConfig = new MapperConfiguration(mc =>
@@ -51,6 +60,9 @@ namespace Wallet.Test
             });
             _mapper = mappingConfig.CreateMapper();
         }
+        #endregion
+
+        #region Configuration new DB instance
         //Configure DB to create new instance for every test
         private static DbContextOptionsBuilder<WALLETContext> GetDbOptionsBuilder()
         {
@@ -71,5 +83,6 @@ namespace Wallet.Test
                    .UseInternalServiceProvider(serviceProvider);
             return builder;
         }
+        #endregion
     }
 }

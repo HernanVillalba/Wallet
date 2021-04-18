@@ -26,13 +26,14 @@ namespace Wallet.API.Controllers
         /// <param name="page">Página</param>
         /// <param name="transactionFilterModel">Transacción</param>
         [HttpGet]
-        public async Task<IActionResult> GetAll([FromQuery] int page, [FromQuery]TransactionFilterModel transactionFilterModel)
+        public async Task<IActionResult> GetAll([FromQuery] int page, [FromQuery] TransactionFilterModel transactionFilterModel)
         {
             try
             {
+                //this is commented until the user can log in
                 var user_id = int.Parse(User.Claims.First(i => i.Type == "UserId").Value);
                 var ListDB = await _transactionBusiness.GetAll(transactionFilterModel, user_id, page);
-                return StatusCode(200,ListDB);
+                return StatusCode(200, ListDB);
             }
             catch { throw; }
         }
@@ -49,7 +50,7 @@ namespace Wallet.API.Controllers
                 if (id == null || id <= 0) { throw new CustomException(400, "Id de la transacción no válido"); }
                 var user_id = int.Parse(User.Claims.First(i => i.Type == "UserId").Value);
                 var transaction = await _transactionBusiness.Details(id, user_id);
-                return StatusCode(200,transaction);
+                return StatusCode(200, transaction);
             }
             catch { throw; }
         }
@@ -64,7 +65,7 @@ namespace Wallet.API.Controllers
             try
             {
                 var user_id = int.Parse(User.Claims.First(i => i.Type == "UserId").Value);
-                await _transactionBusiness.Create(newT,user_id);
+                await _transactionBusiness.Create(newT, user_id);
                 return StatusCode(201);
             }
             catch (Exception) { throw; }
@@ -125,7 +126,7 @@ namespace Wallet.API.Controllers
             catch { throw; }
         }
 
-        
+
     }
 }
 
