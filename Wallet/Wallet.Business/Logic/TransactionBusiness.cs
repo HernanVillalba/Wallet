@@ -136,9 +136,11 @@ namespace Wallet.Business.Logic
         public async Task<TransactionDetailsModel> Details(int? id, int user_id)
         {
             if (user_id <= 0) { throw new CustomException(404, "Id de usario no válido"); }
-            AccountsUserModel acc = new AccountsUserModel();
-            acc.IdARS = _unitOfWork.Accounts.GetAccountId(user_id, "ARS");
-            acc.IdUSD = _unitOfWork.Accounts.GetAccountId(user_id, "USD");
+            AccountsUserModel acc = new AccountsUserModel
+            {
+                IdARS = _unitOfWork.Accounts.GetAccountId(user_id, "ARS"),
+                IdUSD = _unitOfWork.Accounts.GetAccountId(user_id, "USD")
+            };
 
             if (acc.IdARS != null && acc.IdUSD != null)
             {
@@ -147,11 +149,15 @@ namespace Wallet.Business.Logic
                 if (transaction != null)
                 {
                     TransactionDetailsModel tdm = _mapper.Map<TransactionDetailsModel>(transaction);
+
+                    // I ask if its editable to show the field
+                    if ((bool)transaction.Category.Editable) { tdm.Editable = true; }
+                    else{ tdm.Editable = false; }
+
                     tdm.TransactionLog = _mapper.Map<List<TransactionLogModel>>(await _unitOfWork.TransactionLog.GetByTransactionId(transaction.Id));
                     return tdm;
                 }
                 else { throw new CustomException(400, "No se encontró la transacción"); }
-
             }
             else { throw new CustomException(404, "No se encontró alguna de las cuentas del usuario"); }
         }
