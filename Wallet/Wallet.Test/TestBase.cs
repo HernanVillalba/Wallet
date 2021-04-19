@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Linq;
@@ -18,6 +19,7 @@ namespace Wallet.Test
     public class TestBase
     {
         #region Declaration of variables
+        protected readonly IConfiguration _configuration;
         protected readonly IMapper _mapper;
         protected readonly IUnitOfWork _unitOfWork;
         protected readonly IEmailSender _emailSender;
@@ -26,14 +28,18 @@ namespace Wallet.Test
         protected ClaimsIdentity _identity;
         protected ClaimsPrincipal _user;
         protected ControllerContext _controllerContext;
-        protected WALLETContext context;
+        protected WALLETContext context;       
+        
         #endregion 
 
         #region set properties
         public TestBase(int userId = 1)
         {
-
-            //Set Mock identity
+            // Set appsettings configuration
+            _configuration = new ConfigurationBuilder()
+                .AddJsonFile("appsettings.test.json")
+                .Build();
+            // Set Mock identity
             _identity = new ClaimsIdentity();
             _user = new ClaimsPrincipal(_identity);
             _controllerContext = new ControllerContext { HttpContext = new DefaultHttpContext { User = _user } };
@@ -44,9 +50,8 @@ namespace Wallet.Test
             // Set Database in memory
             context = new WALLETContext(GetDbOptionsBuilder().Options);
             DataInitializer.Initialize(context);
-            var c = context.Users.ToList();
 
-            // Set Unit of Work
+             // Set Unit of Work
             _unitOfWork = new UnitOfWork(context);
 
             // Set account businness
@@ -85,6 +90,7 @@ namespace Wallet.Test
                    .UseInternalServiceProvider(serviceProvider);
             return builder;
         }
-        #endregion
+
+        #endregion       
     }
 }

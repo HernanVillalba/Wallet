@@ -1,7 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using System;
-using System.Security.Claims;
 using System.Threading.Tasks;
 using Wallet.API.Controllers;
 using Wallet.Business;
@@ -25,33 +23,35 @@ namespace Wallet.Test
         public UserControllerTest()
         {
             var userBusiness = new UserBusiness(_unitOfWork, _mapper);
+            context.ChangeTracker.Clear();
             // Create user controller
             usersController = new UsersController(userBusiness)
             {
                 ControllerContext = _controllerContext
             };
         }
+
         [Fact]
         public async void Register_New_Ok()
         {
             //Act        
             var result = await usersController.Register(registerModel);
-
             //Assert
             Assert.IsType<StatusCodeResult>(result);
             var statusCodeResult = (StatusCodeResult)result;
             // Test correct status code
             Assert.Equal(201, statusCodeResult.StatusCode);
             // Test user creation
-            Assert.NotNull(_unitOfWork.Users.GetById(1));
+            Assert.NotNull(_unitOfWork.Users.GetById(2));
             // Test accounts creation
-            Assert.NotNull(_unitOfWork.Accounts.GetById(1));
-            Assert.NotNull(_unitOfWork.Accounts.GetById(2));
+            Assert.NotNull(_unitOfWork.Accounts.GetById(3));
+            Assert.NotNull(_unitOfWork.Accounts.GetById(4));
+
         }
 
         [Fact]
         public async void Register_Duplicated_Error()
-        {            
+        {
             //Act
             await usersController.Register(registerModel);
             //Try register same user
