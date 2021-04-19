@@ -160,5 +160,82 @@ namespace Wallet.Test
             // Cannot assert anything about .CreationDate because the in-memory database does not save current datetime
             Assert.Null(createdFixedTermDeposit.ClosingDate);
         }
+
+        [Fact]
+        public async void Create_Fail_Invalid_Account()
+        {
+            // Arrange
+            FixedTermDepositCreateModel fixedTermDeposit = new FixedTermDepositCreateModel
+            {
+                AccountId = 10,
+                Amount = 10
+            };
+
+            // Act
+            Func<Task> result = () => _controller.CreateFixedTermDeposit(fixedTermDeposit);
+
+            // Assert
+            var exception = await Assert.ThrowsAsync<CustomException>(result);
+            Assert.Equal(404, exception.StatusCode);
+            // TODO: Assert for equality of message error
+        }
+
+        [Fact]
+        public async void Create_Fail_Not_Self_Account()
+        {
+            // Arrange
+            // Create new user manually
+            Users newUser = new Users()
+            {
+                Email = "asd@asd.com",
+                FirstName = "pepe",
+                LastName = "pompin",
+                Password = "123"
+            };
+            context.Users.Add(newUser);
+            await _unitOfWork.Users.AddAccounts(newUser);
+            // Create transactions
+            Transactions firstTransaction = new Transactions
+            {
+                AccountId = 3,
+                Amount = 100,
+                CategoryId = 4,
+                Type = "Topup"
+            };
+            context.Transactions.Add(firstTransaction);
+            // It should be a better way to arrange the data
+            FixedTermDepositCreateModel fixedTermDeposit = new FixedTermDepositCreateModel
+            {
+                AccountId = 3,
+                Amount = 10
+            };
+
+            // Act
+            Func<Task> result = () => _controller.CreateFixedTermDeposit(fixedTermDeposit);
+
+            // Assert
+            var exception = await Assert.ThrowsAsync<CustomException>(result);
+            Assert.Equal(403, exception.StatusCode);
+            // TODO: Assert for equality of message error
+        }
+
+        [Fact]
+        public async void Create_Fail_Not_Enough_Balance()
+        {
+            // Arrange
+            FixedTermDepositCreateModel fixedTermDeposit = new FixedTermDepositCreateModel
+            {
+                AccountId = 1,
+                Amount = 1000
+            };
+
+            // Act
+            Func<Task> result = () => _controller.CreateFixedTermDeposit(fixedTermDeposit);
+
+            // Assert
+            var exception = await Assert.ThrowsAsync<CustomException>(result);
+            Assert.Equal(400, exception.StatusCode);
+            // TODO: Assert for equality of message error
+        }
     }
 }
