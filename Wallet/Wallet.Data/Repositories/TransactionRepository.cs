@@ -35,20 +35,13 @@ namespace Wallet.Data.Repositories
                 list =  _context.Transactions.Where(e => e.AccountId == usd_id || e.AccountId == ars_id).ToListAsync();
             }
 
-            /*
-            list =
-                _context.Transactions
-                .Where
-                (e => (e.AccountId == t.AccountId) && (e.Concept.ToLower().Contains(t.Concept.ToLower()) || e.Type.ToLower().Contains(t.Type.ToLower()) ))
-                .OrderByDescending(e => e.Date);
-            */
             return list;
         }
 
         public Transactions FindTransaction(int id_transaction, int USD_account_id, int ARS_account_id)
         {
             var tra =_context.Transactions
-                //.Include(t => t.Category)
+                .Include(t => t.Category)
                 .FirstOrDefault(e => e.Id == id_transaction && (e.AccountId == ARS_account_id || e.AccountId == USD_account_id));
             return tra;
         }

@@ -118,10 +118,10 @@ namespace Wallet.API.Controllers
         {
             try
             {
-                if (id == null || id <= 0) { return BadRequest(); }
+                if (id == null || id <= 0) { throw new CustomException(400, "Id no válido"); }
                 var user_id = int.Parse(User.Claims.First(i => i.Type == "UserId").Value);
                 await _transactionBusiness.Edit(id, NewTransaction, user_id);
-                return StatusCode(201);
+                return StatusCode(200);
             }
             catch { throw; }
         }
