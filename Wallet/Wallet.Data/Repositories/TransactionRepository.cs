@@ -35,13 +35,6 @@ namespace Wallet.Data.Repositories
                 list =  _context.Transactions.Where(e => e.AccountId == usd_id || e.AccountId == ars_id).ToListAsync();
             }
 
-            /*
-            list =
-                _context.Transactions
-                .Where
-                (e => (e.AccountId == t.AccountId) && (e.Concept.ToLower().Contains(t.Concept.ToLower()) || e.Type.ToLower().Contains(t.Type.ToLower()) ))
-                .OrderByDescending(e => e.Date);
-            */
             return list;
         }
 
