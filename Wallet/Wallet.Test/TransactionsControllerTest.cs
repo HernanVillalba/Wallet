@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
@@ -26,6 +27,7 @@ namespace Wallet.Test
         public TransactionsControllerTest() : base()
         {
             var transactionsBusiness = new TransactionBusiness(_unitOfWork, _mapper, _ratesBusiness, _accountBusiness);
+            context.ChangeTracker.Clear();
             _controller = new TransactionsController(transactionsBusiness)
             {
                 ControllerContext = _controllerContext
@@ -145,11 +147,21 @@ namespace Wallet.Test
         [Trait("Details", "Not found")]
         public async void Details_Error_NotFound()
         { // Transaction does not belong to you
+            var t = new Transactions
+            {
+                Id = 100,
+                Amount = 150,
+                Concept = "Recarga por defecto sin usuario",
+                Type = "Topup",
+                AccountId = 4,
+                Date = DateTime.Now
+            };
+            context.Transactions.Add(t);
+            context.SaveChanges();
 
-            int id = 2;
-
+            var algo = context.Transactions.ToList();
             // Act
-            async Task result() => await  _controller.Details(id);
+            async Task result() => await  _controller.Details(t.Id);
 
             // Catch exception
             var ex = await Assert.ThrowsAsync<CustomException>(result);
@@ -159,6 +171,10 @@ namespace Wallet.Test
 
             // Check message exception
             Assert.Equal("No se encontró la transacción", ex.Error);
+
+            // delete the record
+            context.Transactions.Remove(t);
+            context.SaveChanges();
         }
 
         [Fact]
