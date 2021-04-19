@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Wallet.API.Controllers;
+using Wallet.Business;
 using Wallet.Business.Logic;
 using Wallet.Data.Models;
 using Wallet.Entities;
@@ -26,7 +27,7 @@ namespace Wallet.Test
         }
 
         [Theory]
-        [MemberData(nameof(DataDeposits))]
+        [MemberData(nameof(Data_Get_All))]
         public void Get_All(List<FixedTermDeposits> newDeposits, int expectedDeposits)
         {
             // Arrange
@@ -46,7 +47,7 @@ namespace Wallet.Test
             context.FixedTermDeposits.RemoveRange(newDeposits);
             context.SaveChanges();
         }
-        public static IEnumerable<object[]> DataDeposits =>
+        public static IEnumerable<object[]> Data_Get_All =>
         new List<object[]>
         {
             new object[] { new List<FixedTermDeposits>(), 0 },
@@ -64,6 +65,80 @@ namespace Wallet.Test
                            }, 3},
         };
 
+        [Theory]
+        [MemberData(nameof(Data_Profit_Ok))]
+        public void Calculate_Profit_Ok(double amount, DateTime from, DateTime to, double expected)
+        {
+            // Arrange at initialization
 
+            // Act
+            var result = _controller.calculateProfit("", amount, from, to);
+
+            // Assert
+            Assert.IsType<OkObjectResult>(result);
+            var castResult = (OkObjectResult)result;
+            var modelResult = (InterestsCalculationModel)castResult.Value;
+            Assert.Equal(expected, Math.Round(modelResult.montoFinal, 4));
+        }
+        public static IEnumerable<object[]> Data_Profit_Ok =>
+        new List<object[]>
+        {
+            new object[] { 100, DateTime.Now, DateTime.Now.AddDays(1), 101 },
+            new object[] { 100, DateTime.Now, DateTime.Now.AddDays(1.99), 101 },
+            new object[] { 100, DateTime.Now, DateTime.Now.AddDays(2), 102.01 },
+            new object[] { 100, DateTime.Now, DateTime.Now.AddDays(2.01), 102.01 },
+            new object[] { 100, DateTime.Now, DateTime.Now.AddDays(3), 103.0301 },
+        };
+
+        [Theory]
+        [MemberData(nameof(Data_Profit_Error_Day))]
+        public void Calculate_Profit_Error_Day(double amount, DateTime from, DateTime to)
+        {
+            // Arrange at initialization
+
+            // Act
+            Func<IActionResult> result = () => _controller.calculateProfit("", amount, from, to);
+
+            // Assert
+            var exception = Assert.Throws<CustomException>(result);
+            Assert.Equal(400, exception.StatusCode);
+            // TODO: Assert for equality of message error
+        }
+        public static IEnumerable<object[]> Data_Profit_Error_Day =>
+        new List<object[]>
+        {
+            new object[] { 100, DateTime.Now, DateTime.Now },
+            new object[] { 100, DateTime.Now, DateTime.Now.AddDays(0.01) },
+            new object[] { 100, DateTime.Now, DateTime.Now.AddDays(0.99) },
+            new object[] { 100, DateTime.Now, DateTime.Now.AddDays(-0.01) },
+            new object[] { 100, DateTime.Now, DateTime.Now.AddDays(-0.99) },
+            new object[] { 100, DateTime.Now, DateTime.Now.AddDays(-1) },
+            new object[] { 100, DateTime.Now, DateTime.Now.AddDays(-2) },
+        };
+
+        [Theory]
+        [MemberData(nameof(Data_Profit_Error_Amount))]
+        public void Calculate_Profit_Error_Amount(double amount, DateTime from, DateTime to)
+        {
+            // Arrange at initialization
+
+            // Act
+            Func<IActionResult> result = () => _controller.calculateProfit("", amount, from, to);
+
+            // Assert
+            var exception = Assert.Throws<CustomException>(result);
+            Assert.Equal(400, exception.StatusCode);
+            // TODO: Assert for equality of message error
+        }
+        public static IEnumerable<object[]> Data_Profit_Error_Amount =>
+        new List<object[]>
+        {
+            new object[] { 0, DateTime.Now, DateTime.Now.AddDays(1) },
+            new object[] { -double.Epsilon, DateTime.Now, DateTime.Now.AddDays(1) },
+            new object[] { -0.1, DateTime.Now, DateTime.Now.AddDays(1) },
+            new object[] { -0.99, DateTime.Now, DateTime.Now.AddDays(1) },
+            new object[] { -1, DateTime.Now, DateTime.Now.AddDays(1) },
+            new object[] { -100, DateTime.Now, DateTime.Now.AddDays(1) },
+        };
     }
 }
