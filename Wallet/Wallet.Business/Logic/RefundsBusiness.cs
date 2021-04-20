@@ -27,10 +27,10 @@ namespace Wallet.Business.Logic
             if (user_id <= 0 || user_id == null) { throw new CustomException(404, "Id de usuario no válido"); }
 
             //ceuntas del usuario que pide el reembolso
-            AccountsUserModel a_ori = _unitOfWork.Accounts.GetAccountsUsers((int)user_id);
-            if (!_unitOfWork.Accounts.ValidateAccounts(a_ori)) { throw new CustomException(404, "No se encontró alguna de las cuentas del usuario"); }
+            AccountsUserModel acc_ori = _unitOfWork.Accounts.GetAccountsUsers((int)user_id);
+            if (!_unitOfWork.Accounts.ValidateAccounts(acc_ori)) { throw new CustomException(404, "No se encontró alguna de las cuentas del usuario"); }
 
-            var ori_transaction = _unitOfWork.Transactions.FindTransaction(refund.TransactionId, (int)a_ori.IdUSD, (int)a_ori.IdARS);
+            var ori_transaction = _unitOfWork.Transactions.FindTransaction(refund.TransactionId, (int)acc_ori.IdUSD, (int)acc_ori.IdARS);
 
             if (ori_transaction != null)
             {
@@ -68,9 +68,13 @@ namespace Wallet.Business.Logic
                                 string email = _unitOfWork.Users.GetById((int)des_user_id).Email;
                                 string origin_names = origin_user.FirstName + " " + origin_user.LastName; 
                                 EmailTemplates emailTemplate = _unitOfWork.EmailTemplates.GetById((int)EmailTemplatesEnum.RefundRequestCreated);
-                                string title = emailTemplate.Title;
-                                string body = string.Format(emailTemplate.Body, (int)user_id, origin_names, des_transaction.Amount, transfer.DestinationTransactionId);
-                                await _emailSender.SendEmailAsync(email, title, body);
+
+                                if (emailTemplate != null)
+                                {
+                                    string title = emailTemplate.Title;
+                                    string body = string.Format(emailTemplate.Body, (int)user_id, origin_names, des_transaction.Amount, transfer.DestinationTransactionId);
+                                    await _emailSender.SendEmailAsync(email, title, body);
+                                }
                                 return;
                             }
                             else
