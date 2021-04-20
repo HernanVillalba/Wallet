@@ -55,7 +55,7 @@ namespace Wallet.Test
             _unitOfWork = new UnitOfWork(context);
 
             // Set account businness
-            _accountBusiness = new AccountBusiness(_unitOfWork, _mapper);
+            _accountBusiness = new AccountBusiness(_unitOfWork);
 
             // Set rates
             _ratesBusiness = new RatesBusiness(_unitOfWork, _mapper);
