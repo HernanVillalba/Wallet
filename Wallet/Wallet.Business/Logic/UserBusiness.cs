@@ -44,7 +44,10 @@ namespace Wallet.Business.Logic
 
             // Search the user by id in the database
             Users userDB = _unitOfWork.Users.GetById(userId);
-            
+            if (userDB == null)
+            {
+                throw new CustomException(404, "Usuario no encontrado");
+            }
             // Map the user database model to user view model (without password for example)
             UserContact user = _mapper.Map<UserContact>(userDB);
 

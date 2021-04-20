@@ -61,6 +61,48 @@ namespace Wallet.Test
             Assert.Equal(400, exception.StatusCode);
             Assert.Equal("Usuario ya registrado", exception.Error);
         }
+
+        [Fact]
+        public void GetById_Exists_Ok()
+        {
+            //Act
+            //Search user already created in data initialization
+            var user = usersController.GetUserById(1);
+            //Assert
+            Assert.IsType<OkObjectResult>(user);
+            var result = (OkObjectResult)user;
+            //Test correct status code
+            Assert.Equal(200, result.StatusCode);
+            //Test return type
+            Assert.IsType<UserContact>(result.Value);
+        }
+
+        [Theory]
+        [InlineData(0)]  //zero or less
+        [InlineData(-1)]
+        [InlineData(Int32.MinValue)]
+        public void GetById_InvalidId_Error(int id)
+        {
+            //Act
+            IActionResult result() => usersController.GetUserById(id);
+            //Assert
+            var exception = Assert.Throws<CustomException>(result);
+            Assert.Equal(400, exception.StatusCode);
+            Assert.Equal("Id inválido", exception.Error);
+        }
+
+        [Theory]
+        [InlineData(100)]
+        [InlineData(Int32.MaxValue)]
+        public void GetById_nonexistentUser_Error(int id)
+        {
+            //Act
+            IActionResult result() => usersController.GetUserById(id);
+            //Assert
+            var exception = Assert.Throws<CustomException>(result);
+            Assert.Equal(404, exception.StatusCode);
+            Assert.Equal("Usuario no encontrado", exception.Error);
+        }
     }
 }
 

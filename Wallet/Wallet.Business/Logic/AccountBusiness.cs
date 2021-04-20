@@ -9,11 +9,9 @@ namespace Wallet.Business.Logic
     public class AccountBusiness : IAccountBusiness
     {
         private readonly IUnitOfWork _unitOfWork;
-        private readonly IMapper _mapper;
-        public AccountBusiness(IUnitOfWork unitOfWork, IMapper mapper)
+        public AccountBusiness(IUnitOfWork unitOfWork)
         {
             _unitOfWork = unitOfWork;
-            _mapper = mapper;
         }
 
         public BalanceModel GetBalances(int id)
