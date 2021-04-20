@@ -30,7 +30,7 @@ namespace Wallet.Data.Repositories
         public bool NotRefundable(int trasaction_id)
         {
             //check if there are any pending request
-            var algo = _context.RefundRequest.FirstOrDefault(e => e.TransactionId == trasaction_id && e.Status == "Accepted" || e.Status == "Pending");
+            var algo = _context.RefundRequest.FirstOrDefault(e => e.TransactionId == trasaction_id && (e.Status == "Accepted" || e.Status == "Pending"));
             if (algo != null) { return true; }
             else { return false; }
         }

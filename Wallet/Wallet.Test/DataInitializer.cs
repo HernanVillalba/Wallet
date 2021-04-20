@@ -38,22 +38,15 @@ namespace Wallet.Test
                 Concept = "Recarga por defecto",
                 Type = "Topup",
                 AccountId = 2,
-                Date = DateTime.Now
+                Date = DateTime.Now,
+                Category = new Categories { Id= 1, Editable = true}
             },
-            new Transactions
-            {
-                Id = 2,
-                Amount = 150,
-                Concept = "Recarga por defecto sin usuario",
-                Type = "Topup",
-                AccountId = 4,
-                Date = DateTime.Now
-            },
-        };              
+        };
         public static void Initialize(WALLETContext _context)
         {
             _context.AddRange(lista);
             _context.SaveChanges();
+
         }
     }
 }

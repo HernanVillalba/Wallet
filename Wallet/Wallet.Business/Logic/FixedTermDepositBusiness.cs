@@ -158,6 +158,11 @@ namespace Wallet.Business.Logic
 
         public InterestsCalculationModel calculateProfit(string currency, double amount, DateTime from, DateTime to)
         {
+            if(amount <= 0)
+            {
+                throw new CustomException(400, "El monto debe ser mayor a cero");
+            }
+
             TimeSpan difference = to - from;
             int days = difference.Days;
             // [ASK] if it has to be business days

@@ -58,21 +58,25 @@ namespace Wallet.Business.Logic
 
         public Task<List<Transactions>> Filter(TransactionFilterModel transaction, int user_id)
         {
-            int? ARS_account_id = _unitOfWork.Accounts.GetAccountId(user_id, "ARS");
-            int? USD_account_id = _unitOfWork.Accounts.GetAccountId(user_id, "USD");
-            if (ARS_account_id == null || USD_account_id == null) { throw new CustomException(404, "No se encontró algunas de las cuentas del usuario"); }
+            AccountsUserModel acc = new AccountsUserModel()
+            {
+                IdARS = _unitOfWork.Accounts.GetAccountId(user_id, "ARS"),
+                IdUSD = _unitOfWork.Accounts.GetAccountId(user_id, "USD")
+            };
+            
+            if (!_unitOfWork.Accounts.ValidateAccounts(acc) ) { throw new CustomException(404, "No se encontró algunas de las cuentas del usuario"); }
 
             //si el id de account es null o menor a 0 se asume que busca en pesos
             if (transaction.AccountId == null || transaction.AccountId <= 0)
             {
-                transaction.AccountId = (int)ARS_account_id;
+                transaction.AccountId = (int)acc.IdARS;
             }
 
-            if (transaction.AccountId != ARS_account_id && transaction.AccountId != USD_account_id) //si el id de la account ingresado es distinta a alguna de la suyas, se asume que busca en pesos
+            if (transaction.AccountId != acc.IdARS && transaction.AccountId != acc.IdUSD) //si el id de la account ingresado es distinta a alguna de la suyas, se asume que busca en pesos
             {
-                transaction.AccountId = (int)ARS_account_id;
+                transaction.AccountId = (int)acc.IdARS;
             }
-            Task<List<Transactions>> List = _unitOfWork.Transactions.FilterTransaction(transaction, (int)USD_account_id, (int)ARS_account_id);
+            Task<List<Transactions>> List = _unitOfWork.Transactions.FilterTransaction(transaction, (int)acc.IdUSD, (int)acc.IdARS);
             return List;
         }
 
@@ -102,9 +106,11 @@ namespace Wallet.Business.Logic
 
         public async Task Edit(int? id, TransactionEditModel NewTransaction, int user_id)
         {
-            AccountsUserModel acc = new AccountsUserModel();
-            acc.IdARS = _unitOfWork.Accounts.GetAccountId(user_id, "ARS");
-            acc.IdUSD = _unitOfWork.Accounts.GetAccountId(user_id, "USD");
+            AccountsUserModel acc = new AccountsUserModel
+            {
+                IdARS = _unitOfWork.Accounts.GetAccountId(user_id, "ARS"),
+                IdUSD = _unitOfWork.Accounts.GetAccountId(user_id, "USD")
+            };
 
             if (acc.IdUSD == null || acc.IdUSD <= 0 || acc.IdARS == null || acc.IdARS <= 0)
             {
@@ -136,9 +142,11 @@ namespace Wallet.Business.Logic
         public async Task<TransactionDetailsModel> Details(int? id, int user_id)
         {
             if (user_id <= 0) { throw new CustomException(404, "Id de usario no válido"); }
-            AccountsUserModel acc = new AccountsUserModel();
-            acc.IdARS = _unitOfWork.Accounts.GetAccountId(user_id, "ARS");
-            acc.IdUSD = _unitOfWork.Accounts.GetAccountId(user_id, "USD");
+            AccountsUserModel acc = new AccountsUserModel
+            {
+                IdARS = _unitOfWork.Accounts.GetAccountId(user_id, "ARS"),
+                IdUSD = _unitOfWork.Accounts.GetAccountId(user_id, "USD")
+            };
 
             if (acc.IdARS != null && acc.IdUSD != null)
             {
@@ -147,11 +155,15 @@ namespace Wallet.Business.Logic
                 if (transaction != null)
                 {
                     TransactionDetailsModel tdm = _mapper.Map<TransactionDetailsModel>(transaction);
+
+                    // I ask if its editable to show the field
+                    if ((bool)transaction.Category.Editable) { tdm.Editable = true; }
+                    else{ tdm.Editable = false; }
+
                     tdm.TransactionLog = _mapper.Map<List<TransactionLogModel>>(await _unitOfWork.TransactionLog.GetByTransactionId(transaction.Id));
                     return tdm;
                 }
                 else { throw new CustomException(400, "No se encontró la transacción"); }
-
             }
             else { throw new CustomException(404, "No se encontró alguna de las cuentas del usuario"); }
         }

@@ -16,7 +16,7 @@ namespace Wallet.Data.Repositories
 
         public Task<List<TransactionLog>> GetByTransactionId(int transaction_id)
         {
-            var list = _context.TransactionLog.Where(e => e.TransactionId == transaction_id).ToListAsync();
+            var list = _context.TransactionLog.Where(e => e.TransactionId == transaction_id).OrderByDescending(e=>e.ModificationDate).ToListAsync();
             return list;
         }
     }
