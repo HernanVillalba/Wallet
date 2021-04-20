@@ -20,6 +20,11 @@ namespace Wallet.API.Controllers
         {
             _refundsBusiness = refundsBusiness;
         }
+
+        /// <summary>
+        /// Mostrar todos los pedidos de reembolso vinculados a este usuario
+        /// </summary>
+        /// <returns></returns>
         [HttpGet]
         public IActionResult GetAll()
         {
@@ -31,6 +36,11 @@ namespace Wallet.API.Controllers
             catch { throw; }
         }
 
+        /// <summary>
+        /// Mostrar los detalles de un pedido de reembolso específico
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
         [HttpGet("{id}")]
         public IActionResult Details(int id)
         {
@@ -44,6 +54,11 @@ namespace Wallet.API.Controllers
             }
         }
 
+        /// <summary>
+        /// Crear un pedido de reembolso
+        /// </summary>
+        /// <param name="refund"></param>
+        /// <returns></returns>
         [HttpPost]
         public async Task<IActionResult> Create([FromBody] RefundRequestCreateModel refund)
         {
@@ -56,6 +71,12 @@ namespace Wallet.API.Controllers
             catch { throw; }
         }
 
+        /// <summary>
+        /// Modificar el estado de un pedido de reembolso
+        /// </summary>
+        /// <param name="id">Id del pedido de reembolso</param>
+        /// <param name="action">Acción a tomar: accept/cancel/reject</param>
+        /// <returns></returns>
         [HttpPatch("{id}")]
         public async Task<IActionResult> UpdateStatus(int id, [FromBody]RefundRequestActionModel action)
         {
