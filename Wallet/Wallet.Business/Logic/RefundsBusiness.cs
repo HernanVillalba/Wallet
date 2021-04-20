@@ -34,9 +34,9 @@ namespace Wallet.Business.Logic
 
             if (ori_transaction != null)
             {
-                if (_unitOfWork.RefundRequest.NotRefundable(ori_transaction.Id)) 
-                { 
-                    throw new CustomException(400, "No se puede crear la solicitud"); 
+                if (_unitOfWork.RefundRequest.NotRefundable(ori_transaction.Id))
+                {
+                    throw new CustomException(400, "No se puede crear la solicitud");
                 }
 
                 var transfer = _unitOfWork.Transfers.GetTransfer(ori_transaction.Id);
@@ -62,11 +62,11 @@ namespace Wallet.Business.Logic
 
                             //send email
                             int? des_user_id = _unitOfWork.Accounts.GetById(transfer.DestinationTransaction.AccountId).UserId;
-                            if(des_user_id != null && des_user_id > 0)
+                            if (des_user_id != null && des_user_id > 0)
                             {
                                 var origin_user = _unitOfWork.Users.GetById((int)user_id);
                                 string email = _unitOfWork.Users.GetById((int)des_user_id).Email;
-                                string origin_names = origin_user.FirstName + " " + origin_user.LastName; 
+                                string origin_names = origin_user.FirstName + " " + origin_user.LastName;
                                 EmailTemplates emailTemplate = _unitOfWork.EmailTemplates.GetById((int)EmailTemplatesEnum.RefundRequestCreated);
 
                                 if (emailTemplate != null)
@@ -74,18 +74,15 @@ namespace Wallet.Business.Logic
                                     string title = emailTemplate.Title;
                                     string body = string.Format(emailTemplate.Body, (int)user_id, origin_names, des_transaction.Amount, transfer.DestinationTransactionId);
                                     await _emailSender.SendEmailAsync(email, title, body);
+                                    return;
                                 }
                                 return;
                             }
-                            else
-                            {
-                                throw new CustomException(404, "No se pudo enviar el email de solicitud de reembolso");
-                            }
+                            else { throw new CustomException(404, "Solicitud de reembolso creada, pero no se pudo enviar el email de solicitud de reembolso."); }
                         }
                         else { throw new CustomException(400, "Reembolso no válido"); }
                     }
                     else { throw new CustomException(400, "No se puede pedir reembolso de la transacción"); }
-
                 }
                 else { throw new CustomException(404, "El id de alguna de las transacciones no es válido"); }
             }
@@ -199,11 +196,11 @@ namespace Wallet.Business.Logic
 
             EmailTemplates emailTemplate =
                 _unitOfWork.EmailTemplates.GetById((int)EmailTemplatesEnum.RefundRequestCanceled);
-            
+
             // Formatting email with current data
             string title = emailTemplate.Title;
             string body = string.Format(emailTemplate.Body, refundRequestId, sourceUserName, refundRequest.TransactionId);
-            
+
             // Send email
             await _emailSender.SendEmailAsync(email, title, body);
         }

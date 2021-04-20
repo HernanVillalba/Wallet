@@ -95,6 +95,16 @@ namespace Wallet.Test
             },
             new Transactions
             {
+                Id = 2,
+                Amount = 155,
+                Concept = "Recarga por defecto 2",
+                Type = "Topup",
+                AccountId = 4,
+                Date = DateTime.Now,
+                CategoryId = 1
+            },
+            new Transactions
+            {
                 Id = 10,
                 Amount = 100,
                 Concept = "Transferencia a la cuenta 3",
