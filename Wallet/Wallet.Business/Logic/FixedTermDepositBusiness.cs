@@ -148,12 +148,15 @@ namespace Wallet.Business.Logic
 
             EmailTemplates emailTemplate = 
                 _unitOfWork.EmailTemplates.GetById((int)EmailTemplatesEnum.FixedTermDepositClosed);
-            string title = emailTemplate.Title;
-            string body = String.Format(emailTemplate.Body, fixedTermDepositId,
-                Math.Round(interestsCalculation.montoInicial, 2),
-                Math.Round(interestsCalculation.montoFinal, 2),
-                Math.Round(interestsCalculation.montoFinal - interestsCalculation.montoInicial, 2));
-            await _emailSender.SendEmailAsync(email, title, body);
+            if (emailTemplate != null)
+            {
+                string title = emailTemplate.Title;
+                string body = String.Format(emailTemplate.Body, fixedTermDepositId,
+                    Math.Round(interestsCalculation.montoInicial, 2),
+                    Math.Round(interestsCalculation.montoFinal, 2),
+                    Math.Round(interestsCalculation.montoFinal - interestsCalculation.montoInicial, 2));
+                await _emailSender.SendEmailAsync(email, title, body);
+            }
         }
 
         public InterestsCalculationModel calculateProfit(string currency, double amount, DateTime from, DateTime to)
