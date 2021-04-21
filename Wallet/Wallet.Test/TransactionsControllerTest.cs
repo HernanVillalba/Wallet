@@ -304,5 +304,60 @@ namespace Wallet.Test
             context.Transactions.Remove(t);
             context.SaveChanges();
         }
+
+        [Fact]
+        public async void Buy_Dollars_Ok()
+        {
+            // Assert
+            TransactionBuyCurrency petition = new TransactionBuyCurrency
+            {
+                Amount = 0.5,
+                Type = "Compra"
+            };
+
+            // Act
+            var result = await _controller.BuyCurrencyAsync(petition);
+
+            // Assert
+            Assert.IsType<StatusCodeResult>(result);
+            Assert.Equal(201, ((StatusCodeResult)result).StatusCode);
+            var transaction_1 = _unitOfWork.Transactions.GetById(2);
+            var transaction_2 = _unitOfWork.Transactions.GetById(3);
+            Assert.NotNull(transaction_1);
+            Assert.NotNull(transaction_2);
+        }
+
+        [Fact]
+        public async void Sell_Dollars_Ok()
+        {
+            // Assert
+            Transactions topup = new Transactions
+            {
+                Type = "Topup",
+                AccountId = 1,
+                Amount = 1,
+                Concept = "carga dolares",
+                CategoryId = 4,
+                Date = DateTime.Now
+            };
+            context.Transactions.Add(topup);
+            context.SaveChanges();
+            TransactionBuyCurrency petition = new TransactionBuyCurrency
+            {
+                Amount = 1,
+                Type = "Venta"
+            };
+
+            // Act
+            var result = await _controller.BuyCurrencyAsync(petition);
+
+            // Assert
+            Assert.IsType<StatusCodeResult>(result);
+            Assert.Equal(201, ((StatusCodeResult)result).StatusCode);
+            var transaction_1 = _unitOfWork.Transactions.GetById(3);
+            var transaction_2 = _unitOfWork.Transactions.GetById(4);
+            Assert.NotNull(transaction_1);
+            Assert.NotNull(transaction_2);
+        }
     }
 }
