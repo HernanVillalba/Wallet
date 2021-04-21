@@ -40,7 +40,7 @@ namespace Wallet.Test
         {
             var result = (OkObjectResult)accountsController.ListAccounts();
             var accounts = (List<AccountModel>)result.Value;
-            Assert.Equal(0, accounts[0].Balance);   //Usd account
+            Assert.Equal(100, accounts[0].Balance);   //Usd account
             Assert.Equal(100, accounts[1].Balance); //Ars account (initialized with a topup transaction)
         }
 
@@ -59,7 +59,7 @@ namespace Wallet.Test
         {
             var result = (OkObjectResult)accountsController.ListBalance();
             var balances = (BalanceModel)result.Value;
-            Assert.Equal(0, balances.UsdBalance);
+            Assert.Equal(100, balances.UsdBalance);
             Assert.Equal(100, balances.ArgBalance);
         }
     }
