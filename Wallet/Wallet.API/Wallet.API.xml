@@ -43,8 +43,36 @@
         </member>
         <member name="M:Wallet.API.Controllers.RatesController.GetLatest">
             <summary>
-            Get the latest 10 rates stored in the database
+            Mostrar los últimos 10 valores del dolar guardados
             </summary>
+        </member>
+        <member name="M:Wallet.API.Controllers.RefundRequestsController.GetAll">
+            <summary>
+            Mostrar todos los pedidos de reembolso vinculados a este usuario
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Wallet.API.Controllers.RefundRequestsController.Details(System.Int32)">
+            <summary>
+            Mostrar los detalles de un pedido de reembolso específico
+            </summary>
+            <param name="id"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Wallet.API.Controllers.RefundRequestsController.Create(Wallet.Entities.RefundRequestCreateModel)">
+            <summary>
+            Crear un pedido de reembolso
+            </summary>
+            <param name="refund"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Wallet.API.Controllers.RefundRequestsController.UpdateStatus(System.Int32,Wallet.Entities.RefundRequestActionModel)">
+            <summary>
+            Modificar el estado de un pedido de reembolso
+            </summary>
+            <param name="id">Id del pedido de reembolso</param>
+            <param name="action">Acción a tomar: accept/cancel/reject</param>
+            <returns></returns>
         </member>
         <member name="M:Wallet.API.Controllers.SessionController.Login(Wallet.Entities.LoginModel)">
             <summary>
@@ -104,10 +132,10 @@
         </member>
         <member name="M:Wallet.API.Controllers.UsersController.GetUsersByPage(System.Int32,Wallet.Entities.UserFilterModel)">
             <summary>
-            Mostrar lista paginada de usuarios ordenada por apellido ascendente
+            Mostrar lista paginada de usuarios ordenada por apellido con filtros opcionales
             </summary>
             <param name="page">Página a mostrar</param>
-            <param name="user">Filtros</param>
+            <param name="user"></param>
         </member>
     </members>
 </doc>

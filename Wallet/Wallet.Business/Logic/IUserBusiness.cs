@@ -12,6 +12,5 @@ namespace Wallet.Business.Logic
         Task RegisterNewUser(RegisterModel newUser);
         IEnumerable<UserContact> PagedUsers(int page, UserFilterModel user);
         UserContact GetUserDetails(int userId);
-        List<UserFilterModel> Filter(UserFilterModel user);
     }
 }

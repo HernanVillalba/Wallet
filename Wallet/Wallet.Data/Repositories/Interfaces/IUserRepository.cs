@@ -11,6 +11,5 @@ namespace Wallet.Data.Repositories.Interfaces
         Task<Users> FindUser(string email);
         Task AddAccounts(Users user);
         IEnumerable<UserContact> GetByPage(int page, UserFilterModel user);
-        List<Users> Filter(UserFilterModel user);
     }
 }
