@@ -54,10 +54,10 @@ namespace Wallet.API.Controllers
         }
 
         /// <summary>
-        /// Mostrar lista paginada de usuarios ordenada por apellido ascendente
+        /// Mostrar lista paginada de usuarios ordenada por apellido con filtros opcionales
         /// </summary>
         /// <param name="page">Página a mostrar</param>
-        /// <param name="user">Filtros</param>
+        /// <param name="user"></param>
         [Authorize]
         [HttpGet]
         public IActionResult GetUsersByPage([FromQuery]int page, [FromQuery]UserFilterModel user)
@@ -69,20 +69,7 @@ namespace Wallet.API.Controllers
             catch 
             {
                 throw;
-            }
-        }
-
-        [Authorize]
-        [HttpPost("Filter")]
-        public IActionResult Filter([FromBody] UserFilterModel user)
-        {
-            try
-            {
-                var list = _userBusiness.Filter(user);
-                if(list.Count() > 0) { return Ok(list); }
-                else { return BadRequest("No se encontraron usuarios"); }
-            }
-            catch (Exception ex){ return BadRequest(ex.Message); }
+            }        
         }
     }
 }

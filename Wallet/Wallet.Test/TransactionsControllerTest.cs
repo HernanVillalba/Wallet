@@ -17,7 +17,6 @@ namespace Wallet.Test
     {
         //data definition
         static TransactionsController _controller;
-        static readonly TransactionFilterModel filterModel = new();
         static TransactionCreateModel createModel = new()
         {
             Amount = 100,
@@ -48,8 +47,8 @@ namespace Wallet.Test
         }
 
         [Fact]
-        [Trait("Created", "Not balance")]
-        public async void Created_Error_NoBalance()
+        [Trait("Created", "Error")] // not balance
+        public async void Create_Error()
         {
             // Values
             createModel.Concept = "Pago prueba not balance";
@@ -65,11 +64,23 @@ namespace Wallet.Test
             Assert.Equal("No hay saldo suficiente para realizar la transacción", ex.Error);
         }
 
-        [Fact]
+        [Theory]
+        [InlineData(1, "", "", 0)] // get all without filter
+        [InlineData(1, "", "", 2)] // filter by accound id
+        [InlineData(1, "", "Topup", 0)] // filter by type
         [Trait("Get All", "Ok")]
-        public async void Get_All_Ok()
+
+        public async void Get_All_Ok(int page, string concept, string type, int? accoundId)
         {
-            var result = await _controller.GetAll(1, filterModel);
+            TransactionFilterModel model = new()
+            {
+                Concept = concept,
+                Type = type,
+                AccountId = accoundId
+            };
+
+            // Act
+            var result = await _controller.GetAll(page, model);
 
             // Check object (list returned by controller)
             Assert.IsType<ObjectResult>(result);
@@ -83,47 +94,6 @@ namespace Wallet.Test
             Assert.True(list.Any());
         }
 
-        [Fact]
-        [Trait("Filter", "Ok")]
-        public async void Get_Filter_ByAccountId_Ok()
-        {
-            // Declare values
-            filterModel.AccountId = 2;
-
-            // Act
-            var result = await _controller.GetAll(1, filterModel);
-
-            //
-            Assert.IsType<ObjectResult>(result);
-            var objectResult = (ObjectResult)result;
-
-            // Check status code is OK
-            Assert.Equal(200, objectResult.StatusCode);
-
-            var list = (IEnumerable<TransactionModel>)objectResult.Value;
-            Assert.NotEmpty(list);
-        }
-        [Fact]
-        [Trait("Filter", "Ok")]
-        public async void Get_Filter_ByType_Ok()
-        {
-            // Declare values
-            filterModel.Type = "Topup";
-
-            // Act
-            var result = await _controller.GetAll(1, filterModel);
-
-            // Check type
-            Assert.IsType<ObjectResult>(result);
-            var objResult = (ObjectResult)result;
-
-            // Check status code OK
-            Assert.Equal(200, objResult.StatusCode);
-
-            // Check if list have some transaction
-            var list = (IEnumerable<TransactionModel>)objResult.Value;
-            Assert.True(list.Any());
-        }
         [Fact]
         [Trait("Details", "Ok")]
         public async void Details_Ok()
@@ -143,55 +113,55 @@ namespace Wallet.Test
             Assert.NotNull(transaction);
         }
 
-        [Fact]
-        [Trait("Details", "Not found")]
-        public async void Details_Error_NotFound()
+        [Theory]
+        [InlineData(100, 150, "Recarga de prueba, no le pertenece", "Topup", 4)] // Don't belong to you 
+        [InlineData(-1, 0, "", "", 4)] // Id not valid
+        [Trait("Details", "Error")]
+        public async void Details_Error(int id, double amount, string concept, string type, int accountId)
         { // Transaction does not belong to you
             var t = new Transactions
             {
-                Id = 100,
-                Amount = 150,
-                Concept = "Recarga por defecto sin usuario",
-                Type = "Topup",
-                AccountId = 4,
+                Id = id,
+                Amount = amount,
+                Concept = concept,
+                Type = type,
+                AccountId = accountId,
                 Date = DateTime.Now
             };
-            context.Transactions.Add(t);
-            context.SaveChanges();
+            if (t.Id > 0) // dont belong
+            {
+                context.Transactions.Add(t);
+                context.SaveChanges();
 
-            var algo = context.Transactions.ToList();
-            // Act
-            async Task result() => await  _controller.Details(t.Id);
+                var algo = context.Transactions.ToList();
+                // Act
+                async Task result() => await _controller.Details(t.Id);
 
-            // Catch exception
-            var ex = await Assert.ThrowsAsync<CustomException>(result);
+                // Catch exception
+                var ex = await Assert.ThrowsAsync<CustomException>(result);
 
-            //status code client error (bad request)
-            Assert.Equal(400, ex.StatusCode);
+                //status code client error (bad request)
+                Assert.Equal(400, ex.StatusCode);
 
-            // Check message exception
-            Assert.Equal("No se encontró la transacción", ex.Error);
+                // Check message exception
+                Assert.Equal("No se encontró la transacción", ex.Error);
 
-            // delete the record
-            context.Transactions.Remove(t);
-            context.SaveChanges();
-        }
+                // delete the record
+                context.Transactions.Remove(t);
+                context.SaveChanges();
+            }
+            else // id invalid
+            {
+                async Task result() => await _controller.Details(t.Id);
 
-        [Fact]
-        [Trait("Details", "Id not valid")]
-        public async void Details_Error_IdNotValid()
-        {
-            // Act
-            int id = 0;
-            async Task result() => await _controller.Details(id);
+                // Check status code not found
+                var ex = await Assert.ThrowsAsync<CustomException>(result);
+                Assert.Equal(400, ex.StatusCode);
 
-            // Check status code not found
-            var ex = await Assert.ThrowsAsync<CustomException>(result);
-            Assert.Equal(400, ex.StatusCode);
+                // Check custom exception
+                Assert.Equal("Id de la transacción no válido", ex.Error);
 
-            // Check custom exception
-            Assert.Equal("Id de la transacción no válido", ex.Error);
-
+            }
         }
 
         [Fact]
@@ -210,7 +180,7 @@ namespace Wallet.Test
             var statusCodeResult = (StatusCodeResult)resultEdit;
             Assert.Equal(200, statusCodeResult.StatusCode);
 
-                    // Check values change //
+            // Check values change //
             // Act 
             var resultDetails = await _controller.Details(1);
 
@@ -229,13 +199,15 @@ namespace Wallet.Test
             Assert.Equal("Nuevo concepto", t.Concept);
         }
 
-        [Fact]
-        [Trait("Edit","Error")]
-        public async void Edit_NotFound()
+        [Theory]
+        [InlineData(2, "No se encontró la transaccion")]
+        [InlineData(-2, "Id no valido")]
+        [InlineData(10, "Compra de divisas - no editable")]
+        [Trait("Edit", "Error")]
+        public async void Edit_Error(int id, string concept)
         {
             // Declare values
-            int id = 2;
-            TransactionEditModel model = new() { Concept = "Nuevo concepto 2" };
+            TransactionEditModel model = new() { Concept = concept };
 
             // Act
             async Task result() => await _controller.Edit(id, model);
@@ -246,63 +218,19 @@ namespace Wallet.Test
             // Check status code not found
             Assert.Equal(400, ex.StatusCode);
 
-            // Check message
-            Assert.Equal("No se encontró la transacción", ex.Error);
-        }
-
-        [Fact]
-        [Trait("Edit", "Error")]
-        public async void Edit_IdNotValid()
-        {
-            // DEclare values
-            int id = -2; // or zero
-            TransactionEditModel model = new() { Concept = "Nuevo concepto 3" };
-
-            // Act
-            async Task result() => await _controller.Edit(id, model);
-
-            // Catch exception
-            var ex = await Assert.ThrowsAsync<CustomException>(result);
-
-            // Check status code bad request
-            Assert.Equal(400, ex.StatusCode);
-
-            // Check message
-            Assert.Equal("Id no válido", ex.Error);
-        }
-
-        [Fact]
-        [Trait("Edit", "Error")]
-        public async void Edit_NotEditable()
-        {
-            // Declare values
-            Transactions t = new()
+            // check message error
+            switch (id)
             {
-                Id = 10,
-                Concept = "Compra de divisas",
-                AccountId = 1,
-                Category = new Categories() { Id = 2, Editable = false }
-            };
-            context.Transactions.Add(t);
-            context.SaveChanges();
-            TransactionEditModel model = new() { Concept = "Compra de divisas - Nuevo concepto" };
-
-            // Act
-            async Task result() => await _controller.Edit(t.Id, model);
-
-            // Catch exception
-            var ex = await Assert.ThrowsAsync<CustomException>(result);
-
-            // Check status code
-            Assert.Equal(400, ex.StatusCode);
-
-            // Check exception message
-            Assert.Equal("La transacción no es editable", ex.Error);
-
-
-            // Remove values of DB
-            context.Transactions.Remove(t);
-            context.SaveChanges();
+                case -2:
+                    Assert.Equal("Id no válido", ex.Error);
+                    break;
+                case 2:
+                    Assert.Equal("No se encontró la transacción", ex.Error);
+                    break;
+                case 10:
+                    Assert.Equal("La transacción no es editable", ex.Error);
+                    break;
+            }
         }
 
         [Fact]
