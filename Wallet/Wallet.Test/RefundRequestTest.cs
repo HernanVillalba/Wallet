@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Wallet.API.Controllers;
@@ -89,5 +90,40 @@ namespace Wallet.Test
             context.RemoveRange(transfer,request);
             await _unitOfWork.Complete();
         }
+
+        [Theory]
+        [MemberData(nameof(Data_Get_All))]
+        public void Get_All_Ok(List<RefundRequest> newRefunds, int expectedRefunds)
+        {
+            // Arrange
+            context.RefundRequest.AddRange(newRefunds);
+            context.SaveChanges();
+
+            // Act
+            var result = controller.GetAll();
+
+            // Assert
+            Assert.IsType<OkObjectResult>(result);
+            var resultCast = (OkObjectResult)result;
+            var refundList = (IEnumerable<RefundRequestModel>)resultCast.Value;
+            Assert.Equal(expectedRefunds, refundList.Count());
+        }
+        public static IEnumerable<object[]> Data_Get_All =>
+        new List<object[]>
+        {
+            new object[] { new List<RefundRequest>(), 0 },
+            new object[] { new List<RefundRequest> {
+                               new RefundRequest { TransactionId = 1, Status = "Pending", SourceAccountId = 1, TargetAccountId = 3 }
+                           }, 1},
+            new object[] { new List<RefundRequest> {
+                               new RefundRequest { TransactionId = 1, Status = "Pending", SourceAccountId = 1, TargetAccountId = 3 },
+                               new RefundRequest { TransactionId = 1, Status = "Pending", SourceAccountId = 1, TargetAccountId = 3 }
+                           }, 2},
+            new object[] { new List<RefundRequest> {
+                               new RefundRequest { TransactionId = 1, Status = "Pending", SourceAccountId = 1, TargetAccountId = 3 },
+                               new RefundRequest { TransactionId = 1, Status = "Pending", SourceAccountId = 1, TargetAccountId = 3 },
+                               new RefundRequest { TransactionId = 1, Status = "Pending", SourceAccountId = 1, TargetAccountId = 3 }
+                           }, 3},
+        };
     }
 }
