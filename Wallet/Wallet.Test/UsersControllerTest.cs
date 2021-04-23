@@ -11,7 +11,7 @@ using Xunit;
 
 namespace Wallet.Test
 {
-    public class UserControllerTest : TestBase
+    public class UsersControllerTest : TestBase
     {
         private readonly UsersController usersController;
         //Arrange for register
@@ -23,19 +23,20 @@ namespace Wallet.Test
             Password = "Pass1234!"
         };
         //List of 9 users to test paging (11 in total considering the one in DataInitializer)
-        private readonly List<Users> usersList = new List<Users>
+        private readonly List<Users> usersList = new()
         {
-            new Users  { FirstName = "A", LastName = "AA", Email = "A@mail.com", Password = "1234" },
-            new Users  { FirstName = "A", LastName = "AA", Email = "A2@mail.com", Password = "1234" },
-            new Users  { FirstName = "AA", LastName = "AA", Email = "A3@mail.com", Password = "1234" },
-            new Users  { FirstName = "AA", LastName = "AA", Email = "A4@mail.com", Password = "1234" },
-            new Users  { FirstName = "AA", LastName = "AA", Email = "A5@mail.com", Password = "1234" },
-            new Users  { FirstName = "B", LastName = "BB", Email = "B@mail.com", Password = "1234" },
-            new Users  { FirstName = "C", LastName = "CC", Email = "C@mail.com", Password = "1234" },
-            new Users  { FirstName = "D", LastName = "DD", Email = "D@mail.com", Password = "1234" },
-            new Users  { FirstName = "E", LastName = "EE", Email = "E@mail.com", Password = "1234" },           
+            new Users { FirstName = "A", LastName = "AA", Email = "A@mail.com", Password = "1234" },
+            new Users { FirstName = "B", LastName = "BB", Email = "B@mail.com", Password = "1234" },
+            new Users { FirstName = "C", LastName = "CC", Email = "C@mail.com", Password = "1234" },
+            new Users { FirstName = "D", LastName = "DD", Email = "D@mail.com", Password = "1234" },
+            new Users { FirstName = "E", LastName = "EE", Email = "E@mail.com", Password = "1234" },
+            new Users { FirstName = "F", LastName = "FF", Email = "F@mail.com", Password = "1234" },
+            new Users { FirstName = "G", LastName = "GG", Email = "G@mail.com", Password = "1234" },
+            new Users { FirstName = "H", LastName = "HH", Email = "H@mail.com", Password = "1234" },
+            new Users { FirstName = "I", LastName = "II", Email = "I@mail.com", Password = "1234" },
+
         };
-        public UserControllerTest()
+        public UsersControllerTest()
         {
             var userBusiness = new UserBusiness(_unitOfWork, _mapper);
             context.ChangeTracker.Clear();
@@ -108,7 +109,7 @@ namespace Wallet.Test
         [Theory]
         [InlineData(100)]
         [InlineData(Int32.MaxValue)]
-        public void GetById_nonexistentUser_Error(int id)
+        public void GetById_NonexistentUser_Error(int id)
         {
             //Act
             IActionResult result() => usersController.GetUserById(id);
@@ -118,23 +119,15 @@ namespace Wallet.Test
             Assert.Equal("Usuario no encontrado", exception.Error);
         }
 
-        //[Theory]
-        //[InlineData(0,10)] //page zero or less should return the first page
-        //[InlineData(Int32.MinValue,10)]
-        //[InlineData(1,10)] 
-        //[InlineData(2,1)] 
         [Theory]
-        [MemberData(nameof(Data_Paging))]
-        public void GetByPage_PageExists_Ok(UserFilterModel filter, int page, int count)
+        [InlineData(0)] //page zero should return the first page
+        [InlineData(1)]
+        [InlineData(2)]
+        public void GetByPage_PageExists_Ok(int page)
         {
             //Arrange
             //Empty filter to test only paging
-            //UserFilterModel filter = new()
-            //{
-            //    FirstName = "",
-            //    LastName = "",
-            //    Email = ""
-            //};
+            UserFilterModel filter = new();
             //Add users
             context.Users.AddRange(usersList);
             context.SaveChanges();
@@ -147,62 +140,26 @@ namespace Wallet.Test
             Assert.Equal(200, resultContent.StatusCode);
             //Test return type
             Assert.IsAssignableFrom<IEnumerable<UserContact>>(resultContent.Value);
-            var resultList = (List<UserContact>)resultContent.Value;
-            //Test return count
-            Assert.Equal(count, resultList.Count);
+        } 
+        
+        [Theory]
+        [InlineData(3)] //Non existent page
+        [InlineData(-1)]//Negative value
+        [InlineData(Int32.MinValue)] //Max value
+        [InlineData(Int32.MaxValue)] //Min value
+        public void GetByPage_PageNotFound_Error(int page)
+        {
+            //Arrange
+            UserFilterModel filter = new();
+            context.Users.AddRange(usersList);
+            context.SaveChanges();
+            //Act
+            IActionResult result()=> usersController.GetUsersByPage(page, filter);
+            //Assert
+            var exception = Assert.Throws<CustomException>(result);
+            Assert.Equal(404, exception.StatusCode);
+            Assert.Equal("Página no encontrada", exception.Error);            
         }
-        public static IEnumerable<object[]> Data_Paging =>
-            new List<object[]>
-            {
-                    //page 0 should return first page (10 first users)
-                    new object[]
-                    {
-                        new UserFilterModel(), 0, 10
-                    },
-                    //negative numbre page should return first page (10 first users)
-                    new object[]
-                    {
-                        new UserFilterModel(), Int32.MinValue, 10
-                    },
-                    //first page should return first ten users
-                    new object[]
-                    {
-                        new UserFilterModel(), 1, 10
-                    },
-                    //second page should return only one user
-                    new object[]
-                    {
-                        new UserFilterModel(), 2, 1
-                    },
-                    //first page filter by first name "A" should return two users
-                    new object[] {
-                        new UserFilterModel
-                        {
-                            FirstName = "A",
-                            LastName = "",
-                            Email = ""
-                        }, 1, 2
-                    },
-                    //first page filter by first name "AA" and last name "AA" should return three users
-                    new object[]
-                    {
-                        new UserFilterModel
-                        {
-                            FirstName = "AA",
-                            LastName = "AA",
-                            Email = ""
-                        }, 1, 3
-                    },
-                    new object[]
-                    {
-                        new UserFilterModel
-                        {
-                            FirstName = "",
-                            LastName = "",
-                            Email = "B@mail.com"
-                        }, 1, 1
-                    }
-            };
     }
 }
 

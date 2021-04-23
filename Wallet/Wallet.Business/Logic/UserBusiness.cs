@@ -56,7 +56,7 @@ namespace Wallet.Business.Logic
 
         public IEnumerable<UserContact> PagedUsers(int page, UserFilterModel user)
         {
-            if (page <= 0)
+            if (page == 0)
             {
                 page = 1;
             }
