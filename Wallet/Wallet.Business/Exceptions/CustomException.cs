@@ -6,7 +6,7 @@ namespace Wallet.Business
 {
     public class CustomException : Exception
     {
-        public CustomException() 
+        public CustomException()
         {
             Error = Message;
         }
