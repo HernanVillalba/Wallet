@@ -49,6 +49,7 @@ namespace Wallet.Data.Repositories
                             (string.IsNullOrEmpty(user.Email) || e.Email.ToLower() == user.Email.ToLower()))
                 .Skip((page - 1) * pageSize)
                 .Take(pageSize)
+                .OrderBy(u => u.LastName)
                 .Select(p => new UserContact
                 {
                        Id = p.Id,
@@ -57,30 +58,6 @@ namespace Wallet.Data.Repositories
                        Email = p.Email
                 }
                 ).ToList();
-        }
-
-        public List<Users> Filter(UserFilterModel user)
-        {
-            List<Users> list = new List<Users>();
-            if (user.FirstName != "" && user.LastName != "" && user.Email != "") //cuando busca por nombre, apellido y email paramentros
-            {
-                list = _context.Users.Where(e => e.FirstName.ToLower() == user.FirstName.ToLower() && e.LastName.ToLower() == user.LastName.ToLower() && e.Email.ToLower() == user.Email.ToLower())
-                    .ToList();
-            }
-            else if (user.FirstName != "" && user.LastName != "") //cuando busca por nombre y apellido
-            {
-
-                list = _context.Users.Where(e => e.FirstName.ToLower() == user.FirstName.ToLower() && e.LastName.ToLower() == user.LastName.ToLower())
-                    .ToList();
-            }
-            else //cuando busca por cualquier parametro
-            {
-                list = _context.Users.Where(e => e.FirstName.ToLower() == user.FirstName.ToLower() || 
-                                            e.LastName.ToLower() == user.LastName.ToLower() || 
-                                            e.Email.ToLower() == user.Email.ToLower())
-                    .ToList();
-            }
-            return list;
         }
     }
 }

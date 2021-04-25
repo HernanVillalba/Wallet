@@ -203,6 +203,7 @@ namespace Wallet.Test
                 Type = "Topup"
             };
             context.Transactions.Add(firstTransaction);
+            context.SaveChanges();
             // It should be a better way to arrange the data
             FixedTermDepositCreateModel fixedTermDeposit = new FixedTermDepositCreateModel
             {
@@ -231,6 +232,106 @@ namespace Wallet.Test
 
             // Act
             Func<Task> result = () => _controller.CreateFixedTermDeposit(fixedTermDeposit);
+
+            // Assert
+            var exception = await Assert.ThrowsAsync<CustomException>(result);
+            Assert.Equal(400, exception.StatusCode);
+            // TODO: Assert for equality of message error
+        }
+
+        [Fact]
+        public async void Close_Ok()
+        {
+            // Arrange
+            FixedTermDeposits fixedTermDeposit = new FixedTermDeposits
+            {
+                AccountId = 2,
+                Amount = 10,
+                CreationDate = DateTime.Now.AddDays(-1),
+            };
+            context.FixedTermDeposits.Add(fixedTermDeposit);
+            context.SaveChanges();
+
+            // Act
+            var result = await _controller.CloseFixedTermDeposit(fixedTermDeposit.Id);
+
+            // Assert
+            Assert.IsType<OkResult>(result);
+            Assert.NotNull(fixedTermDeposit.ClosingDate);
+        }
+
+        [Fact]
+        public async void Close_Fail_Doesnt_Exist()
+        {
+            // Arrange
+
+            // Act
+            Func<Task> result = () => _controller.CloseFixedTermDeposit(int.MaxValue);
+
+            // Assert
+            var exception = await Assert.ThrowsAsync<CustomException>(result);
+            Assert.Equal(404, exception.StatusCode);
+            // TODO: Assert for equality of message error
+        }
+
+        [Fact]
+        public async void Close_Fail_Not_Self_Account()
+        {
+            // Arrange
+            // Create new user manually
+            Users newUser = new Users()
+            {
+                Email = "asd@asd.com",
+                FirstName = "pepe",
+                LastName = "pompin",
+                Password = "123"
+            };
+            context.Users.Add(newUser);
+            await _unitOfWork.Users.AddAccounts(newUser);
+            // Create transactions
+            Transactions firstTransaction = new Transactions
+            {
+                AccountId = 3,
+                Amount = 100,
+                CategoryId = 4,
+                Type = "Topup"
+            };
+            context.Transactions.Add(firstTransaction);
+            // It should be a better way to arrange the data
+            FixedTermDeposits fixedTermDeposit = new FixedTermDeposits
+            {
+                AccountId = 3,
+                Amount = 10,
+                CreationDate = DateTime.Now.AddDays(-1),
+            };
+            context.FixedTermDeposits.Add(fixedTermDeposit);
+            context.SaveChanges();
+
+            // Act
+            Func<Task> result = () => _controller.CloseFixedTermDeposit(fixedTermDeposit.Id);
+
+            // Assert
+            var exception = await Assert.ThrowsAsync<CustomException>(result);
+            Assert.Equal(403, exception.StatusCode);
+            // TODO: Assert for equality of message error
+        }
+
+        [Fact]
+        public async void Close_Fail_Already_Closed()
+        {
+            // Arrange
+            FixedTermDeposits fixedTermDeposit = new FixedTermDeposits
+            {
+                AccountId = 2,
+                Amount = 10,
+                CreationDate = DateTime.Now.AddDays(-1),
+                ClosingDate = DateTime.Now
+            };
+            context.FixedTermDeposits.Add(fixedTermDeposit);
+            context.SaveChanges();
+
+            // Act
+            Func<Task> result = () => _controller.CloseFixedTermDeposit(fixedTermDeposit.Id);
 
             // Assert
             var exception = await Assert.ThrowsAsync<CustomException>(result);

@@ -230,5 +230,98 @@ namespace Wallet.Test
             //        break;
             //}
         }
+
+        [Fact]
+        public async void Buy_Dollars_Ok()
+        {
+            // Assert
+            TransactionBuyCurrency transaction = new TransactionBuyCurrency
+            {
+                Amount = 0.5,
+                Type = "Compra"
+            };
+
+            // Act
+            var result = await _controller.BuyCurrencyAsync(transaction);
+
+            // Assert
+            Assert.IsType<StatusCodeResult>(result);
+            Assert.Equal(201, ((StatusCodeResult)result).StatusCode);
+            var transaction_1 = _unitOfWork.Transactions.GetById(12);
+            var transaction_2 = _unitOfWork.Transactions.GetById(13);
+            Assert.NotNull(transaction_1);
+            Assert.NotNull(transaction_2);
+        }
+
+        [Fact]
+        public async void Buy_Pesos_Ok()
+        {
+            // Assert
+            Transactions topup = new Transactions
+            {
+                Type = "Topup",
+                AccountId = 1,
+                Amount = 1,
+                Concept = "carga dolares",
+                CategoryId = 4,
+                Date = DateTime.Now
+            };
+            context.Transactions.Add(topup);
+            context.SaveChanges();
+            TransactionBuyCurrency transaction = new TransactionBuyCurrency
+            {
+                Amount = 1,
+                Type = "Venta"
+            };
+
+            // Act
+            var result = await _controller.BuyCurrencyAsync(transaction);
+
+            // Assert
+            Assert.IsType<StatusCodeResult>(result);
+            Assert.Equal(201, ((StatusCodeResult)result).StatusCode);
+            var transaction_1 = _unitOfWork.Transactions.GetById(13);
+            var transaction_2 = _unitOfWork.Transactions.GetById(14);
+            Assert.NotNull(transaction_1);
+            Assert.NotNull(transaction_2);
+        }
+
+        [Fact]
+        public async void Buy_Dollars_Fail_Not_Money()
+        {
+            // Assert
+            TransactionBuyCurrency transaction = new TransactionBuyCurrency
+            {
+                Amount = 10000,
+                Type = "Compra"
+            };
+
+            // Act
+            async Task result() => await _controller.BuyCurrencyAsync(transaction);
+
+            // Assert
+            var ex = await Assert.ThrowsAsync<CustomException>(result);
+            Assert.Equal(400, ex.StatusCode);
+            Assert.Equal("Saldo insuficiente", ex.Error);
+        }
+
+        [Fact]
+        public async void Buy_Pesos_Fail_Not_Money()
+        {
+            // Assert
+            TransactionBuyCurrency transaction = new TransactionBuyCurrency
+            {
+                Amount = 10000,
+                Type = "Venta"
+            };
+
+            // Act
+            async Task result() => await _controller.BuyCurrencyAsync(transaction);
+
+            // Assert
+            var ex = await Assert.ThrowsAsync<CustomException>(result);
+            Assert.Equal(400, ex.StatusCode);
+            Assert.Equal("Saldo insuficiente", ex.Error);
+        }
     }
 }

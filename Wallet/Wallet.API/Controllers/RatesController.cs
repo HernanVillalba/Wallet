@@ -14,7 +14,7 @@ namespace Wallet.API.Controllers
         }
 
         /// <summary>
-        /// Get the latest 10 rates stored in the database
+        /// Mostrar los últimos 10 valores del dolar guardados
         /// </summary>
         [HttpGet]
         public IActionResult GetLatest()
