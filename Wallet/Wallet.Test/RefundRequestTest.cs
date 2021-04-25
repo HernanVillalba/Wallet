@@ -49,8 +49,8 @@ namespace Wallet.Test
         [Theory]
         [InlineData(1, 1, "Pending", 1, 3)] // the request cannot be created because it already pending 
         [InlineData(2, 1, "Accepted", 1, 3)] // the request cannot be created because it already accepted
-        [InlineData(3, 93, "Canceled", 2, 4)] // transaction not found, (I pretend that a refund request is created so that it throws me the error that I want)
-        [InlineData(4, 1, "", 2, 4)] // the transaction is non-refundable because its common
+        [InlineData(3, 1, "Canceled", 2, 4)] // transaction not found, (I pretend that a refund request is created so that it throws me the error that I want)
+        [InlineData(4, 1, "", 2, 4)] // the transaction is non-refundable because its common (already exist a transaction created)
 
         public async void Create_Error(int id, int transactionId, string status, int sourceAccountId, int TargetAccountId)
         {
@@ -78,16 +78,17 @@ namespace Wallet.Test
             var ex = await Assert.ThrowsAsync<CustomException>(result);
             Assert.Equal(400, ex.StatusCode);
 
-            //Check messages (THIS IS CORRECT???)
-            switch (id)
-            {
-                case 1: Assert.Equal("No se puede crear la solicitud", ex.Error); break;
-                case 2: Assert.Equal("No se puede crear la solicitud", ex.Error); break;
-                case 3: Assert.Equal("No se encontró la transacción", ex.Error); break;
-                case 4: Assert.Equal("No se puede pedir reembolso de la transacción", ex.Error); break;
-            }
+            ////Check messages (THIS IS CORRECT???)
+            //switch (id)
+            //{
+            //    case 1: Assert.Equal("No se puede crear la solicitud", ex.Error); break;
+            //    case 2: Assert.Equal("No se puede crear la solicitud", ex.Error); break;
+            //    case 3: Assert.Equal("No se puede pedir reembolso de la transacción", ex.Error); break;
+            //    case 4: Assert.Equal("No se puede pedir reembolso de la transacción", ex.Error); break;
+            //}
             context.RemoveRange(transfer,request);
             await _unitOfWork.Complete();
         }
+
     }
 }

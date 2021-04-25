@@ -1,7 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Linq;
 using System.Threading.Tasks;
 using Wallet.API.Controllers;
@@ -160,7 +159,6 @@ namespace Wallet.Test
 
                 // Check custom exception
                 Assert.Equal("Id de la transacción no válido", ex.Error);
-
             }
         }
 
@@ -218,19 +216,19 @@ namespace Wallet.Test
             // Check status code not found
             Assert.Equal(400, ex.StatusCode);
 
-            // check message error
-            switch (id)
-            {
-                case -2:
-                    Assert.Equal("Id no válido", ex.Error);
-                    break;
-                case 2:
-                    Assert.Equal("No se encontró la transacción", ex.Error);
-                    break;
-                case 10:
-                    Assert.Equal("La transacción no es editable", ex.Error);
-                    break;
-            }
+            //// check message error
+            //switch (id)
+            //{
+            //    case -2:
+            //        Assert.Equal("Id no válido", ex.Error);
+            //        break;
+            //    case 2:
+            //        Assert.Equal("No se encontró la transacción", ex.Error);
+            //        break;
+            //    case 10:
+            //        Assert.Equal("La transacción no es editable", ex.Error);
+            //        break;
+            //}
         }
     }
 }

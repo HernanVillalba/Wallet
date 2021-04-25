@@ -45,12 +45,6 @@ namespace Wallet.Data.Repositories
                 .FirstOrDefault(e => e.Id == id_transaction && (e.AccountId == ARS_account_id || e.AccountId == USD_account_id));
             return tra;
         }
-
-
-        public IEnumerable<Transactions> SP_GetTransactionsUser(string stored_procedure, int user_id)
-        {
-            return _context.Transactions.FromSqlRaw("EXEC " + stored_procedure, user_id);
-        }
         public async Task<IEnumerable<Transactions>> GetTransactionsUser(int ARS_id, int USD_id)
         {
             //los id recibidos son de la account del user

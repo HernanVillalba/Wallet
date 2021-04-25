@@ -64,8 +64,8 @@ namespace Wallet.Business.Logic
             //Map json response to database model
             Rates rate = new Rates
             {
-                BuyingPrice = Convert.ToDouble(dollarValues.First().Casa.Compra),
-                SellingPrice = Convert.ToDouble(dollarValues.First().Casa.Venta)
+                BuyingPrice = Convert.ToDouble(dollarValues.First().Casa.Venta),
+                SellingPrice = Convert.ToDouble(dollarValues.First().Casa.Compra)
             };
             //try inserting into database
             _unitOfWork.Rates.Insert(rate);
