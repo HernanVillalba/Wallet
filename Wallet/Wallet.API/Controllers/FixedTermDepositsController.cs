@@ -80,8 +80,8 @@ namespace Wallet.API.Controllers
         [HttpPost]
         public async Task<IActionResult> CreateFixedTermDeposit([FromBody] FixedTermDepositCreateModel fixedTermDeposit)
         {
-            try
-            {
+            //try
+            //{
                 // Get the current user's id logged to the API
                 var userId = int.Parse(User.Claims.First(i => i.Type == "UserId").Value);
 
@@ -89,11 +89,11 @@ namespace Wallet.API.Controllers
                 await _fixedTermDepositBusiness.CreateFixedTermDeposit(fixedTermDeposit, userId);
 
                 return Ok();
-            }
+            /*}
             catch
             {
                 throw;
-            }
+            }*/
         }
 
         /// <summary>

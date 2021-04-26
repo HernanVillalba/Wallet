@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Wallet.Business.EmailSender;
 using Wallet.Business.EmailSender.Interface;
+using Wallet.Business.Exceptions;
 using Wallet.Data.Models;
 using Wallet.Data.Repositories.Interfaces;
 using Wallet.Entities;
@@ -65,7 +66,8 @@ namespace Wallet.Business.Logic
             if (balance - fixedTermDeposit.Amount < 0)
             {
                 // If there isn't enough balance in the account, we cannot continue
-                throw new CustomException(400, "No hay suficiente dinero para realizar la operación.");
+                //throw new CustomException(400, "No hay suficiente dinero para realizar la operación.");
+                throw new BusinessException(ErrorMessages.Not_Enough_Balance);
             }
 
             // We have enough balance. Lets create the fixed term deposit
