@@ -325,5 +325,117 @@ namespace Wallet.Test
             Assert.Equal(400, ex.StatusCode);
             Assert.Equal("Saldo insuficiente", ex.Error);
         }
+
+        [Theory]
+        [InlineData(0)]
+        [InlineData(1)]
+        [InlineData(10)]
+        [InlineData(100)]
+        public async void Transfer_AccountsExist_Ok(int amount)
+        {
+            //Arrange
+            //Users, accounts and topup transaction already craeted in DataInitializer
+            TransferModel transferData = new()
+            {
+                AccountId = 2,
+                Amount = amount,
+                RecipientAccountId = 4
+            };
+            //Act
+            var result = await _controller.TransferAsync(transferData);
+            //Assert
+            Assert.IsType<StatusCodeResult>(result);
+            var resultContent = (StatusCodeResult)result;
+            Assert.Equal(201, resultContent.StatusCode);
+        }
+
+        [Theory]
+        [InlineData(0,0)] // Both accounts don't exist
+        [InlineData(Int32.MaxValue,Int32.MinValue)] //extreme values accounts don't exist
+        [InlineData(1,5)] //first account exists, second account doesn't
+        [InlineData(6,4)] //first account doesn't exists, second account exists
+        [InlineData(-1,-1)] //negative value accounts don't exist
+        public async void Transfer_AccountsNonexistent_Error(int senderId,int recipientId)
+        {
+            //Arrange
+            TransferModel transferData = new()
+            {
+                AccountId = senderId,
+                Amount = 10,
+                RecipientAccountId = recipientId
+            };
+            //Act
+            Func<Task> result = () => _controller.TransferAsync(transferData);
+            //Assert
+            var exception = await Assert.ThrowsAsync<CustomException>(result);
+            Assert.Equal(404, exception.StatusCode);
+            Assert.Equal("Alguna de las cuentas ingresadas no existe", exception.Error);
+        }
+
+        [Theory]
+        [InlineData(1,1)] //Same account
+        [InlineData(2,3)] //Pesos to dollars
+        [InlineData(1,4)] //Dollar to Pesos
+        [InlineData(3,4)] //Account not owned by logged-in user
+        public async void Transfer_IncorrectData_Error(int senderId,int recipientId)
+        {
+            //Arrange
+            TransferModel transferData = new()
+            {
+                AccountId = senderId,
+                Amount = 10,
+                RecipientAccountId = recipientId
+            };
+            //Act
+            Func<Task> result = () => _controller.TransferAsync(transferData);
+            //Assert
+            var exception = await Assert.ThrowsAsync<CustomException>(result);
+            Assert.Equal(400, exception.StatusCode);
+            Assert.Equal("Alguno de los datos ingresados es incorrecto", exception.Error);
+        }
+
+        [Theory]
+        [InlineData(1, double.Epsilon, 3)]//Dollar account, smallest value above the total balance
+        [InlineData(2, double.Epsilon, 4)] //Pesos account, smallest value above the total balance
+        [InlineData(1, Int32.MaxValue, 3)]    //Largest value
+        [InlineData(2, 10, 4)]   //Normal value above the total balance
+        public async void Transfer_InsufficientBalance_Error(int senderId, double amount, int recipientId)
+        {
+            //Arrange
+            //Empty accounts to test extreme values
+            Transactions transactionUSD = new()
+            {
+                Amount = 100,
+                Concept = "Recarga por defecto",
+                Type = "Payment",
+                AccountId = 1
+            };
+            Transactions transactionARS = new()
+            {
+                Amount = 100,
+                Concept = "Recarga por defecto",
+                Type = "Payment",
+                AccountId = 2
+            };
+            context.Transactions.Add(transactionUSD);
+            context.Transactions.Add(transactionARS);
+            context.SaveChanges();
+            TransferModel transferData = new()
+            {
+                AccountId = senderId,
+                Amount = amount,
+                RecipientAccountId = recipientId
+            };
+            //Act
+            Func<Task> result = () => _controller.TransferAsync(transferData);
+            //Assert
+            var exception = await Assert.ThrowsAsync<CustomException>(result);
+            Assert.Equal(400, exception.StatusCode);
+            Assert.Equal("Saldo insuficiente", exception.Error);
+        }
+
     }
 }
+
+
+
