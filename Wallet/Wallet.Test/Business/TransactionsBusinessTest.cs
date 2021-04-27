@@ -12,38 +12,27 @@ using Xunit;
 
 namespace Wallet.Test
 {
-    public class TransactionsControllerTest : TestBase
+    public class TransactionsBusinessTest : TestBase
     {
         //data definition
         static TransactionsController _controller;
+        static TransactionBusiness _business;
         static TransactionCreateModel createModel = new()
         {
             Amount = 100,
             Concept = "Recarga",
         };
         //constructor
-        public TransactionsControllerTest() : base()
+        public TransactionsBusinessTest() : base()
         {
-            var transactionsBusiness = new TransactionBusiness(_unitOfWork, _mapper, _ratesBusiness, _accountBusiness);
+            _business = new TransactionBusiness(_unitOfWork, _mapper, _ratesBusiness, _accountBusiness);
             context.ChangeTracker.Clear();
-            _controller = new TransactionsController(transactionsBusiness)
+            _controller = new TransactionsController(_business)
             {
                 ControllerContext = _controllerContext
             };
         }
 
-        [Fact]
-        [Trait("CreateAsync", "Ok")]
-        public async void Create_New_Ok()
-        {
-            createModel.Type = "Topup";
-            var result = await _controller.CreateAsync(createModel);
-
-            Assert.IsType<StatusCodeResult>(result);
-            var statusCodeResult = (StatusCodeResult)result;
-
-            Assert.Equal(201, statusCodeResult.StatusCode);
-        }
 
         [Fact]
         [Trait("Created", "Error")] // not balance
