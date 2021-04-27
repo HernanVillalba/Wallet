@@ -33,11 +33,11 @@ namespace Wallet.Test
         }
 
         [Fact]
-        [Trait("Create", "Ok")]
+        [Trait("CreateAsync", "Ok")]
         public async void Create_New_Ok()
         {
             createModel.Type = "Topup";
-            var result = await _controller.Create(createModel);
+            var result = await _controller.CreateAsync(createModel);
 
             Assert.IsType<StatusCodeResult>(result);
             var statusCodeResult = (StatusCodeResult)result;
@@ -55,7 +55,7 @@ namespace Wallet.Test
             createModel.Amount = 10005;
 
             // Act
-            static Task result() => _controller.Create(createModel);
+            static Task result() => _controller.CreateAsync(createModel);
 
             // Check if exception was thrown
             var ex = await Assert.ThrowsAsync<CustomException>(result);
@@ -79,7 +79,7 @@ namespace Wallet.Test
             };
 
             // Act
-            var result = await _controller.GetAll(page, model);
+            var result = await _controller.GetAllAsync(page, model);
 
             // Check object (list returned by controller)
             Assert.IsType<ObjectResult>(result);
@@ -94,12 +94,12 @@ namespace Wallet.Test
         }
 
         [Fact]
-        [Trait("Details", "Ok")]
+        [Trait("DetailsAsync", "Ok")]
         public async void Details_Ok()
         {
             int id = 1;
             // Act
-            var result = await _controller.Details(id);
+            var result = await _controller.DetailsAsync(id);
 
             // Check status code ok
             Assert.IsType<ObjectResult>(result);
@@ -115,7 +115,7 @@ namespace Wallet.Test
         [Theory]
         [InlineData(100, 150, "Recarga de prueba, no le pertenece", "Topup", 4)] // Don't belong to you 
         [InlineData(-1, 0, "", "", 4)] // Id not valid
-        [Trait("Details", "Error")]
+        [Trait("DetailsAsync", "Error")]
         public async void Details_Error(int id, double amount, string concept, string type, int accountId)
         { // Transaction does not belong to you
             var t = new Transactions
@@ -134,7 +134,7 @@ namespace Wallet.Test
 
                 var algo = context.Transactions.ToList();
                 // Act
-                async Task result() => await _controller.Details(t.Id);
+                async Task result() => await _controller.DetailsAsync(t.Id);
 
                 // Catch exception
                 var ex = await Assert.ThrowsAsync<CustomException>(result);
@@ -151,7 +151,7 @@ namespace Wallet.Test
             }
             else // id invalid
             {
-                async Task result() => await _controller.Details(t.Id);
+                async Task result() => await _controller.DetailsAsync(t.Id);
 
                 // Check status code not found
                 var ex = await Assert.ThrowsAsync<CustomException>(result);
@@ -180,7 +180,7 @@ namespace Wallet.Test
 
             // Check values change //
             // Act 
-            var resultDetails = await _controller.Details(1);
+            var resultDetails = await _controller.DetailsAsync(1);
 
             // Check if result details is type object result 
             Assert.IsType<ObjectResult>(resultDetails);

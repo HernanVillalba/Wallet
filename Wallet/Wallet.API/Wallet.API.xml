@@ -79,20 +79,20 @@
             Ingresar con email y contraseña para obtener token y poder utilizar la API
             </summary>
         </member>
-        <member name="M:Wallet.API.Controllers.TransactionsController.GetAll(System.Int32,Wallet.Entities.TransactionFilterModel)">
+        <member name="M:Wallet.API.Controllers.TransactionsController.GetAllAsync(System.Int32,Wallet.Entities.TransactionFilterModel)">
             <summary>
             Listar todas las transacciones ordenadas por fecha descendente y paginadas de a 10
             </summary>
             <param name="page">Página</param>
             <param name="transactionFilterModel">Transacción</param>
         </member>
-        <member name="M:Wallet.API.Controllers.TransactionsController.Details(System.Nullable{System.Int32})">
+        <member name="M:Wallet.API.Controllers.TransactionsController.DetailsAsync(System.Nullable{System.Int32})">
             <summary>
             Mostrar los detalles de una transacción en específico por Id
             </summary>
             <param name="id">Id de la transacción</param>
         </member>
-        <member name="M:Wallet.API.Controllers.TransactionsController.Create(Wallet.Entities.TransactionCreateModel)">
+        <member name="M:Wallet.API.Controllers.TransactionsController.CreateAsync(Wallet.Entities.TransactionCreateModel)">
             <summary>
             Crear una transacción en pesos
             </summary>

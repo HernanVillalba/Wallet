@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Wallet.Business.Exceptions;
 using Wallet.Data.Models;
 using Wallet.Data.Repositories.Interfaces;
 using Wallet.Entities;
@@ -25,7 +26,7 @@ namespace Wallet.Business.Logic
 
         public async Task<IEnumerable<TransactionModel>> GetAll(TransactionFilterModel tfm, int user_id, int page)
         {
-            if (user_id <= 0) { throw new CustomException(400, "Id de usuario no válido"); }
+            if (user_id <= 0) { throw new BusinessException(ErrorMessages.User_Date_Not_Found); }
             IEnumerable<Transactions> listDB;
 
             //si busca con algún filtro
@@ -39,11 +40,15 @@ namespace Wallet.Business.Logic
             else
             {
                 AccountsUserModel a = _unitOfWork.Accounts.GetAccountsUsers(user_id);
-                if (_unitOfWork.Accounts.ValidateAccounts(a))
+
+                if (_unitOfWork.Accounts.InvalidAccounts(a))
+                {
+                    throw new BusinessException(ErrorMessages.User_Date_Not_Found);
+                }
+                else
                 {
                     listDB = await _unitOfWork.Transactions.GetTransactionsUser((int)a.IdARS, (int)a.IdUSD);
                 }
-                else { throw new CustomException(404, "No se encontró algunas de las cuentas del usuario"); }
             }
 
             IEnumerable<TransactionModel> list = _mapper.Map<IEnumerable<TransactionModel>>(listDB);
@@ -64,7 +69,7 @@ namespace Wallet.Business.Logic
                 IdUSD = _unitOfWork.Accounts.GetAccountId(user_id, "USD")
             };
 
-            if (!_unitOfWork.Accounts.ValidateAccounts(acc)) { throw new CustomException(404, "No se encontró algunas de las cuentas del usuario"); }
+            if (_unitOfWork.Accounts.InvalidAccounts(acc)) { throw new BusinessException(ErrorMessages.User_Date_Not_Found); }
 
             //si el id de account es null o menor a 0 se asume que busca en pesos
             if (transaction.AccountId == null || transaction.AccountId <= 0)
@@ -90,14 +95,14 @@ namespace Wallet.Business.Logic
 
             if (acc.IdARS == null || acc.IdARS <= 0 || user_id <= 0)
             {
-                throw new CustomException(404, "No se pudo obtener alguno de los datos del usuario");
+                throw new BusinessException(ErrorMessages.User_Date_Not_Found);
             }
 
             var saldo = _accountBusiness.GetAccountBalance(user_id, "ARS");
 
             if ((newT.Type.ToLower() == "payment") && (saldo - newT.Amount < 0))
             {
-                throw new CustomException(400, "No hay saldo suficiente para realizar la transacción");
+                throw new InvalidException(ErrorMessages.Not_Enough_Balance);
             }
 
             Transactions transaction = _mapper.Map<Transactions>(newT);
@@ -109,15 +114,20 @@ namespace Wallet.Business.Logic
 
         public async Task Edit(int? id, TransactionEditModel NewTransaction, int user_id)
         {
+            if (id == null || id <= 0)
+            {
+                throw new BusinessException(ErrorMessages.User_Date_Not_Found);
+            }
+
             AccountsUserModel acc = new AccountsUserModel
             {
                 IdARS = _unitOfWork.Accounts.GetAccountId(user_id, "ARS"),
                 IdUSD = _unitOfWork.Accounts.GetAccountId(user_id, "USD")
             };
 
-            if (acc.IdUSD == null || acc.IdUSD <= 0 || acc.IdARS == null || acc.IdARS <= 0)
+            if (_unitOfWork.Accounts.InvalidAccounts(acc))
             {
-                throw new CustomException(404, "No se encontró alguna de las cuentas del usuario");
+                throw new BusinessException(ErrorMessages.User_Date_Not_Found);
             }
 
             var transaction_buscada = _unitOfWork.Transactions.FindTransaction((int)id, (int)acc.IdUSD, (int)acc.IdARS);
@@ -137,38 +147,43 @@ namespace Wallet.Business.Logic
                     await _unitOfWork.Complete();
                     return;
                 }
-                else { throw new CustomException(400, "La transacción no es editable"); }
+                else { throw new InvalidException(ErrorMessages.Operation_Cannot_Be_Performed); }
             }
-            else { throw new CustomException(400, "No se encontró la transacción"); }
+            else { throw new InvalidException(ErrorMessages.Resource_Not_Found); }
         }
 
-        public async Task<TransactionDetailsModel> Details(int? id, int user_id)
+        public async Task<TransactionDetailsModel> Details(int? t_id, int user_id)
         {
-            if (user_id <= 0) { throw new CustomException(404, "Id de usario no válido"); }
+            if (t_id == null || t_id <= 0) { throw new InvalidException(ErrorMessages.Incorrect_Data); }
+            if (user_id <= 0) { throw new BusinessException(ErrorMessages.User_Date_Not_Found); }
             AccountsUserModel acc = new AccountsUserModel
             {
                 IdARS = _unitOfWork.Accounts.GetAccountId(user_id, "ARS"),
                 IdUSD = _unitOfWork.Accounts.GetAccountId(user_id, "USD")
             };
 
-            if (acc.IdARS != null && acc.IdUSD != null)
+            if (_unitOfWork.Accounts.InvalidAccounts(acc))
             {
-                var transaction = _unitOfWork.Transactions.FindTransaction((int)id, (int)acc.IdUSD, (int)acc.IdARS);
-
-                if (transaction != null)
-                {
-                    TransactionDetailsModel tdm = _mapper.Map<TransactionDetailsModel>(transaction);
-
-                    // I ask if its editable to show the field
-                    if ((bool)transaction.Category.Editable) { tdm.Editable = true; }
-                    else { tdm.Editable = false; }
-
-                    tdm.TransactionLog = _mapper.Map<List<TransactionLogModel>>(await _unitOfWork.TransactionLog.GetByTransactionId(transaction.Id));
-                    return tdm;
-                }
-                else { throw new CustomException(400, "No se encontró la transacción"); }
+                throw new BusinessException(ErrorMessages.User_Date_Not_Found);
             }
-            else { throw new CustomException(404, "No se encontró alguna de las cuentas del usuario"); }
+
+            var transaction = _unitOfWork.Transactions.FindTransaction((int)t_id, (int)acc.IdUSD, (int)acc.IdARS);
+
+            if (transaction != null)
+            {
+                TransactionDetailsModel tdm = _mapper.Map<TransactionDetailsModel>(transaction);
+
+                // I ask if its editable to show the field
+                if ((bool)transaction.Category.Editable) { tdm.Editable = true; }
+                else { tdm.Editable = false; }
+
+                tdm.TransactionLog = _mapper.Map<List<TransactionLogModel>>(await _unitOfWork.TransactionLog.GetByTransactionId(transaction.Id));
+                return tdm;
+            }
+            else
+            {
+                throw new InvalidException(ErrorMessages.Resource_Not_Found);
+            }
         }
 
         public async Task Transfer(TransferModel newTransfer, int id)
@@ -176,10 +191,12 @@ namespace Wallet.Business.Logic
             //get accounts to compare
             var senderAccount = _unitOfWork.Accounts.GetAccountById(newTransfer.AccountId);
             var recipientAccount = _unitOfWork.Accounts.GetAccountById(newTransfer.RecipientAccountId);
+
             if (senderAccount == null || recipientAccount == null)
             {
-                throw new CustomException(404, "Alguna de las cuentas ingresadas no existe");
+                throw new BusinessException(ErrorMessages.User_Date_Not_Found);
             }
+
             //set conditions to validate the transfer
             bool isSameAccount = newTransfer.AccountId == newTransfer.RecipientAccountId;
             bool isSameCurrency = senderAccount.Currency == recipientAccount.Currency;
@@ -187,13 +204,13 @@ namespace Wallet.Business.Logic
             //validate the transfer
             if (isSameAccount || !isSameCurrency || !isAccountOwner)
             {
-                throw new CustomException(400, "Alguno de los datos ingresados es incorrecto");
+                throw new InvalidException(ErrorMessages.Incorrect_Data);
             }
             //get balance and validate
             var balance = _accountBusiness.GetAccountBalance(senderAccount.UserId, senderAccount.Currency);
             if (newTransfer.Amount > balance)
             {
-                throw new CustomException(400, "Saldo insuficiente");
+                throw new InvalidException(ErrorMessages.Not_Enough_Balance);
             }
             //after validation create transactions on both accounts
             Transactions transferTopup = new Transactions
@@ -226,7 +243,7 @@ namespace Wallet.Business.Logic
                 _unitOfWork.Transfers.Insert(transfer);
                 await _unitOfWork.Complete();
             }
-            else { throw new CustomException(404, "No se creó la transferencia"); }
+            else { throw new BusinessException(ErrorMessages.Operation_Cannot_Be_Performed); }
         }
 
         public async Task BuyCurrency(TransactionBuyCurrency tbc, int user_id)
@@ -264,7 +281,7 @@ namespace Wallet.Business.Logic
                         CategoryId = 2
                     };
                 }
-                else { throw new CustomException(400, "Saldo insuficiente"); }
+                else { throw new InvalidException(ErrorMessages.Not_Enough_Balance); }
             }
             else
             {
@@ -291,7 +308,7 @@ namespace Wallet.Business.Logic
                     };
 
                 }
-                else { throw new CustomException(400, "Saldo insuficiente"); }
+                else { throw new InvalidException(ErrorMessages.Not_Enough_Balance); }
             }
             _unitOfWork.Transactions.Insert(transactionOrigin);
             _unitOfWork.Transactions.Insert(transactionDestiny);

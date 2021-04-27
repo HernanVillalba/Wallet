@@ -40,11 +40,11 @@ namespace Wallet.Data.Repositories
             return accounts;
         }
 
-        public bool ValidateAccounts(AccountsUserModel accounts)
+        public bool InvalidAccounts(AccountsUserModel accounts)
         {
-            //return false if any of the data is wrong
-            if(accounts.IdUSD > 0 && accounts.IdUSD != null && accounts.IdARS > 0 && accounts.IdARS != null) { return true; }
-            else { return false; }
+            //return true if any of the data is wrong
+            if(accounts.IdUSD > 0 && accounts.IdUSD != null && accounts.IdARS > 0 && accounts.IdARS != null) { return false; }
+            else { return true; }
         }
     }
 }

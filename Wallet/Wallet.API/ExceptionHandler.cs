@@ -40,7 +40,7 @@ namespace Wallet.Business
             }
             catch (BusinessException ex)
             {
-                await HandleExceptionAsync(httpContext, (int)HttpStatusCode.BadRequest, ex.Message);
+                await HandleExceptionAsync(httpContext, (int)HttpStatusCode.InternalServerError, ex.Message);
             }
             catch (Exception)
             {

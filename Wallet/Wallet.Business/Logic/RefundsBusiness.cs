@@ -28,7 +28,7 @@ namespace Wallet.Business.Logic
 
             //ceuntas del usuario que pide el reembolso
             AccountsUserModel acc_ori = _unitOfWork.Accounts.GetAccountsUsers((int)user_id);
-            if (!_unitOfWork.Accounts.ValidateAccounts(acc_ori)) { throw new CustomException(404, "No se encontró alguna de las cuentas del usuario"); }
+            if (!_unitOfWork.Accounts.InvalidAccounts(acc_ori)) { throw new CustomException(404, "No se encontró alguna de las cuentas del usuario"); }
 
             var ori_transaction = _unitOfWork.Transactions.FindTransaction(refund.TransactionId, (int)acc_ori.IdUSD, (int)acc_ori.IdARS);
 
