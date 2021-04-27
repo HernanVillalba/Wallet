@@ -63,8 +63,8 @@ namespace Wallet.Business.Logic
                 IdARS = _unitOfWork.Accounts.GetAccountId(user_id, "ARS"),
                 IdUSD = _unitOfWork.Accounts.GetAccountId(user_id, "USD")
             };
-            
-            if (!_unitOfWork.Accounts.ValidateAccounts(acc) ) { throw new CustomException(404, "No se encontró algunas de las cuentas del usuario"); }
+
+            if (!_unitOfWork.Accounts.ValidateAccounts(acc)) { throw new CustomException(404, "No se encontró algunas de las cuentas del usuario"); }
 
             //si el id de account es null o menor a 0 se asume que busca en pesos
             if (transaction.AccountId == null || transaction.AccountId <= 0)
@@ -92,7 +92,9 @@ namespace Wallet.Business.Logic
             {
                 throw new CustomException(404, "No se pudo obtener alguno de los datos del usuario");
             }
+
             var saldo = _accountBusiness.GetAccountBalance(user_id, "ARS");
+
             if ((newT.Type.ToLower() == "payment") && (saldo - newT.Amount < 0))
             {
                 throw new CustomException(400, "No hay saldo suficiente para realizar la transacción");
@@ -100,6 +102,7 @@ namespace Wallet.Business.Logic
 
             Transactions transaction = _mapper.Map<Transactions>(newT);
             transaction.AccountId = (int)acc.IdARS;
+
             _unitOfWork.Transactions.Insert(transaction);
             await _unitOfWork.Complete();
         }
@@ -158,7 +161,7 @@ namespace Wallet.Business.Logic
 
                     // I ask if its editable to show the field
                     if ((bool)transaction.Category.Editable) { tdm.Editable = true; }
-                    else{ tdm.Editable = false; }
+                    else { tdm.Editable = false; }
 
                     tdm.TransactionLog = _mapper.Map<List<TransactionLogModel>>(await _unitOfWork.TransactionLog.GetByTransactionId(transaction.Id));
                     return tdm;
