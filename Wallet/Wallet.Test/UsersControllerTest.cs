@@ -1,15 +1,17 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Wallet.API.Controllers;
 using Wallet.Business;
 using Wallet.Business.Logic;
+using Wallet.Data.Models;
 using Wallet.Entities;
 using Xunit;
 
 namespace Wallet.Test
 {
-    public class UserControllerTest : TestBase
+    public class UsersControllerTest : TestBase
     {
         private readonly UsersController usersController;
         //Arrange for register
@@ -20,7 +22,21 @@ namespace Wallet.Test
             Email = "alice@mail.com",
             Password = "Pass1234!"
         };
-        public UserControllerTest()
+        //List of 9 users to test paging (11 in total considering the one in DataInitializer)
+        private readonly List<Users> usersList = new()
+        {
+            new Users { FirstName = "A", LastName = "AA", Email = "A@mail.com", Password = "1234" },
+            new Users { FirstName = "B", LastName = "BB", Email = "B@mail.com", Password = "1234" },
+            new Users { FirstName = "C", LastName = "CC", Email = "C@mail.com", Password = "1234" },
+            new Users { FirstName = "D", LastName = "DD", Email = "D@mail.com", Password = "1234" },
+            new Users { FirstName = "E", LastName = "EE", Email = "E@mail.com", Password = "1234" },
+            new Users { FirstName = "F", LastName = "FF", Email = "F@mail.com", Password = "1234" },
+            new Users { FirstName = "G", LastName = "GG", Email = "G@mail.com", Password = "1234" },
+            new Users { FirstName = "H", LastName = "HH", Email = "H@mail.com", Password = "1234" },
+            new Users { FirstName = "I", LastName = "II", Email = "I@mail.com", Password = "1234" },
+
+        };
+        public UsersControllerTest()
         {
             var userBusiness = new UserBusiness(_unitOfWork, _mapper);
             context.ChangeTracker.Clear();
@@ -42,11 +58,10 @@ namespace Wallet.Test
             // Test correct status code
             Assert.Equal(201, statusCodeResult.StatusCode);
             // Test user creation
-            Assert.NotNull(_unitOfWork.Users.GetById(2));
+            Assert.NotNull(_unitOfWork.Users.GetById(3));
             // Test accounts creation
-            Assert.NotNull(_unitOfWork.Accounts.GetById(3));
-            Assert.NotNull(_unitOfWork.Accounts.GetById(4));
-
+            Assert.NotNull(_unitOfWork.Accounts.GetById(5));
+            Assert.NotNull(_unitOfWork.Accounts.GetById(6));
         }
 
         [Fact]
@@ -94,7 +109,7 @@ namespace Wallet.Test
         [Theory]
         [InlineData(100)]
         [InlineData(Int32.MaxValue)]
-        public void GetById_nonexistentUser_Error(int id)
+        public void GetById_NonexistentUser_Error(int id)
         {
             //Act
             IActionResult result() => usersController.GetUserById(id);
@@ -102,6 +117,48 @@ namespace Wallet.Test
             var exception = Assert.Throws<CustomException>(result);
             Assert.Equal(404, exception.StatusCode);
             Assert.Equal("Usuario no encontrado", exception.Error);
+        }
+
+        [Theory]
+        [InlineData(0)] //page zero should return the first page
+        [InlineData(1)]
+        [InlineData(2)]
+        public void GetByPage_PageExists_Ok(int page)
+        {
+            //Arrange
+            //Empty filter to test only paging
+            UserFilterModel filter = new();
+            //Add users
+            context.Users.AddRange(usersList);
+            context.SaveChanges();
+            //Act
+            var result = usersController.GetUsersByPage(page, filter);
+            //Assert
+            Assert.IsType<OkObjectResult>(result);
+            var resultContent = (OkObjectResult)result;
+            //Test correct status code
+            Assert.Equal(200, resultContent.StatusCode);
+            //Test return type
+            Assert.IsAssignableFrom<IEnumerable<UserContact>>(resultContent.Value);
+        } 
+        
+        [Theory]
+        [InlineData(3)] //Non existent page
+        [InlineData(-1)]//Negative value
+        [InlineData(Int32.MinValue)] //Max value
+        [InlineData(Int32.MaxValue)] //Min value
+        public void GetByPage_PageNotFound_Error(int page)
+        {
+            //Arrange
+            UserFilterModel filter = new();
+            context.Users.AddRange(usersList);
+            context.SaveChanges();
+            //Act
+            IActionResult result()=> usersController.GetUsersByPage(page, filter);
+            //Assert
+            var exception = Assert.Throws<CustomException>(result);
+            Assert.Equal(404, exception.StatusCode);
+            Assert.Equal("Página no encontrada", exception.Error);            
         }
     }
 }

@@ -48,7 +48,7 @@ namespace Wallet.Test
                 new Claim("UserId", userId.ToString()),
             });
             // Set Database in memory
-            context = new WALLETContext(GetDbOptionsBuilder().Options);
+            context = new WALLETContext(GetDbOptionsBuilder().Options);            
             DataInitializer.Initialize(context);
 
              // Set Unit of Work

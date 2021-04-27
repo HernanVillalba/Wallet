@@ -168,19 +168,19 @@ namespace Wallet.API
         {
             if (env.IsDevelopment())
             {
-                app.UseDeveloperExceptionPage();
+                app.UseDeveloperExceptionPage(); // search info to determine if we can delete this line since we have our own exception handler
                 app.UseSwagger();
                 app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "Wallet.API v1"));
             }
 
-            app.UseStatusCodePages(); // To handle responses without body
+            app.UseMiddleware<ExceptionHandler>(); // To handle the exceptions
 
             app.UseHttpsRedirection();
 
             app.UseRouting();
 
             app.UseAuthentication();
-            app.UseMiddleware<ExceptionHandler>(); // To handle the exceptions
+            
             app.UseAuthorization();
 
             app.UseEndpoints(endpoints =>

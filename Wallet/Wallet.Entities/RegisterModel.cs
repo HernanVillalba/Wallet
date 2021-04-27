@@ -18,6 +18,6 @@ namespace Wallet.Entities
         public string Email { get; set; }
 
         [Required(ErrorMessage = "El campo {0} es obligatorio")]
-        public string Password { get; set; }
+        public string Password { get; set; }        
     }
 }

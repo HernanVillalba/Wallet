@@ -43,11 +43,18 @@ namespace Wallet.Data.Repositories
         public IEnumerable<UserContact> GetByPage(int page, UserFilterModel user)
         {
             int pageSize = 10;
+            int skipSize = (page - 1) * pageSize;
+            //empty list, negative skip size should not return any page
+            if(skipSize < 0)
+            {
+                return new List<UserContact>();
+            }
+            //returns page or empty list if not found
             return _context.Users                
                 .Where(e => (string.IsNullOrEmpty(user.FirstName) || e.FirstName.ToLower() == user.FirstName.ToLower()) &&
                             (string.IsNullOrEmpty(user.LastName) || e.LastName.ToLower() == user.LastName.ToLower()) &&
                             (string.IsNullOrEmpty(user.Email) || e.Email.ToLower() == user.Email.ToLower()))
-                .Skip((page - 1) * pageSize)
+                .Skip(skipSize)
                 .Take(pageSize)
                 .OrderBy(u => u.LastName)
                 .Select(p => new UserContact
