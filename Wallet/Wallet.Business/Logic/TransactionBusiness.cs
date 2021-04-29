@@ -26,7 +26,7 @@ namespace Wallet.Business.Logic
 
         public async Task<IEnumerable<TransactionModel>> GetAll(TransactionFilterModel tfm, int user_id, int page)
         {
-            if (user_id <= 0) { throw new BusinessException(ErrorMessages.User_Date_Not_Found); }
+            if (user_id <= 0) { throw new BusinessException(ErrorMessages.User_Data_Not_Found); }
             IEnumerable<Transactions> listDB;
 
             //si busca con algún filtro
@@ -43,7 +43,7 @@ namespace Wallet.Business.Logic
 
                 if (_unitOfWork.Accounts.InvalidAccounts(a))
                 {
-                    throw new BusinessException(ErrorMessages.User_Date_Not_Found);
+                    throw new BusinessException(ErrorMessages.User_Data_Not_Found);
                 }
                 else
                 {
@@ -69,7 +69,7 @@ namespace Wallet.Business.Logic
                 IdUSD = _unitOfWork.Accounts.GetAccountId(user_id, "USD")
             };
 
-            if (_unitOfWork.Accounts.InvalidAccounts(acc)) { throw new BusinessException(ErrorMessages.User_Date_Not_Found); }
+            if (_unitOfWork.Accounts.InvalidAccounts(acc)) { throw new BusinessException(ErrorMessages.User_Data_Not_Found); }
 
             //si el id de account es null o menor a 0 se asume que busca en pesos
             if (transaction.AccountId == null || transaction.AccountId <= 0)
@@ -95,7 +95,7 @@ namespace Wallet.Business.Logic
 
             if (acc.IdARS == null || acc.IdARS <= 0 || user_id <= 0)
             {
-                throw new BusinessException(ErrorMessages.User_Date_Not_Found);
+                throw new BusinessException(ErrorMessages.User_Data_Not_Found);
             }
 
             var saldo = _accountBusiness.GetAccountBalance(user_id, "ARS");
@@ -116,7 +116,7 @@ namespace Wallet.Business.Logic
         {
             if (id == null || id <= 0)
             {
-                throw new BusinessException(ErrorMessages.User_Date_Not_Found);
+                throw new BusinessException(ErrorMessages.User_Data_Not_Found);
             }
 
             AccountsUserModel acc = new AccountsUserModel
@@ -127,7 +127,7 @@ namespace Wallet.Business.Logic
 
             if (_unitOfWork.Accounts.InvalidAccounts(acc))
             {
-                throw new BusinessException(ErrorMessages.User_Date_Not_Found);
+                throw new BusinessException(ErrorMessages.User_Data_Not_Found);
             }
 
             var transaction_buscada = _unitOfWork.Transactions.FindTransaction((int)id, (int)acc.IdUSD, (int)acc.IdARS);
@@ -155,7 +155,7 @@ namespace Wallet.Business.Logic
         public async Task<TransactionDetailsModel> Details(int? t_id, int user_id)
         {
             if (t_id == null || t_id <= 0) { throw new InvalidException(ErrorMessages.Incorrect_Data); }
-            if (user_id <= 0) { throw new BusinessException(ErrorMessages.User_Date_Not_Found); }
+            if (user_id <= 0) { throw new BusinessException(ErrorMessages.User_Data_Not_Found); }
             AccountsUserModel acc = new AccountsUserModel
             {
                 IdARS = _unitOfWork.Accounts.GetAccountId(user_id, "ARS"),
@@ -164,7 +164,7 @@ namespace Wallet.Business.Logic
 
             if (_unitOfWork.Accounts.InvalidAccounts(acc))
             {
-                throw new BusinessException(ErrorMessages.User_Date_Not_Found);
+                throw new BusinessException(ErrorMessages.User_Data_Not_Found);
             }
 
             var transaction = _unitOfWork.Transactions.FindTransaction((int)t_id, (int)acc.IdUSD, (int)acc.IdARS);
@@ -194,7 +194,7 @@ namespace Wallet.Business.Logic
 
             if (senderAccount == null || recipientAccount == null)
             {
-                throw new BusinessException(ErrorMessages.User_Date_Not_Found);
+                throw new BusinessException(ErrorMessages.User_Data_Not_Found);
             }
 
             //set conditions to validate the transfer
